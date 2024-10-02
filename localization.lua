@@ -22,7 +22,7 @@ return {
 		['21'] = '21',
 		Question = '???',
 		
-		Half = '0.5',
+		Half = 'Half',
 		['1'] = '1',
 		Euler = "e",
 		Pi = "Pi",
@@ -38,7 +38,7 @@ return {
             ['text'] = {
                 [1] = 'This Joker gains {C:chips}Chips{} equals to total rank',
 				[2] = 'of the played hand if it is under {C:attention}#1#{}.',
-				[3] = 'Doubled the total amount of chips if the total rank is exactly {C:attention}#1#{}.',
+				[3] = 'Doubled the amount of gained chips if the total rank is exactly {C:attention}#1#{}.',
 				[4] = 'Resets if the total rank is more than {C:attention}#1#{}.',
 				[5] = '{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)'
             }

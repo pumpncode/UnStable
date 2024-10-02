@@ -419,8 +419,7 @@ create_joker({
 					card = card
 				}
 			elseif totalRank == card.ability.extra.maxRank then
-				card.ability.extra.chips = card.ability.extra.chips + totalRank
-				card.ability.extra.chips = card.ability.extra.chips * 2
+				card.ability.extra.chips = card.ability.extra.chips + totalRank * 2
 				
 				local popup_msg = 'Black Jack!'
 				if card.ability.extra.maxRank ~= 21 then
