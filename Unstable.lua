@@ -242,6 +242,29 @@ SMODS.Rank {
 	hc_atlas = 'rank_ex_hc',
     lc_atlas = 'rank_ex',
 	
+	loc_txt = loc.ranks['0'],
+	hidden = true,
+
+    key = '0',
+    card_key = '0',
+    pos = { x = 6 },
+    nominal = 0,
+    next = { 'unstb_1' },
+    shorthand = '0',
+	
+	straight_edge = true,
+	
+	in_pool = function(self, args)
+        if args and args.initial_deck then
+            return false
+        end
+    end
+}
+
+SMODS.Rank {
+	hc_atlas = 'rank_ex_hc',
+    lc_atlas = 'rank_ex',
+	
 	loc_txt = loc.ranks['1'],
 	hidden = true,
 
@@ -346,6 +369,143 @@ SMODS.Rank {
         end
     end
 }
+
+--Change straight edge off from Ace, so it start to look at rank 0 instead
+SMODS.Rank:take_ownership('Ace', {
+	straight_edge = false
+}, true)
+
+-- Poker Hand Rewrite to support new ranks probably?
+
+local function get_keys(t)
+  local keys={}
+  for key,_ in pairs(t) do
+    table.insert(keys, key)
+  end
+  return keys
+end
+
+local isAllowDecimal = true
+
+local decimalHands = {['unstb_0.5'] = {0, 1}, ['unstb_e'] = {2, 3}, ['unstb_Pi'] = {3, 4}}
+
+function ustb_get_straight(hand)
+
+	local ret = {}
+	if #hand < (5 - (four_fingers and 1 or 0)) then return ret end
+	
+	local hasDecimal = false
+	for i = 1, #hand do
+		if decimalHands[hand[i].base.value] then
+			hasDecimal = true
+			break
+		end
+	end
+	
+	if hasDecimal then
+		--print('Has decimal')
+		return ustb_straight_decimal(hand) 
+	else
+		--print('do not has decimal')
+		return get_straight(hand) 
+	end
+end
+
+function ustb_straight_decimal(hand) 
+
+	--TODO: Figure this out what to do later
+
+	--Basically SMOD's implementation of straight, but w/ extra implementations to support decimal ranks
+
+	local ret = {}
+	local four_fingers = next(SMODS.find_card('j_four_fingers'))
+	local can_skip = next(SMODS.find_card('j_shortcut'))
+	
+	if #hand < (5 - (four_fingers and 1 or 0)) then return ret end
+	
+	local t = {}
+	local RANKS = {}
+	for i = 1, #hand do
+		if hand[i]:get_id() > 0 then
+			local rank = hand[i].base.value	
+			RANKS[rank] = RANKS[rank] or {}
+			RANKS[rank][#RANKS[rank] + 1] = hand[i]
+		end
+	end
+	
+	local straight_length = 0
+	local straight = false
+	local skipped_rank = false
+	local vals = {}
+	for k, v in pairs(SMODS.Ranks) do
+		if v.straight_edge then
+			table.insert(vals, k)
+		end
+	end
+	
+	local init_vals = {}
+	for _, v in ipairs(vals) do
+		init_vals[v] = true
+	end
+	if not next(vals) then table.insert(vals, 'Ace') end
+	
+	local initial = true
+	local br = false
+	local end_iter = false
+	local i = 0
+	
+	while 1 do
+		end_iter = false
+		if straight_length >= (5 - (four_fingers and 1 or 0)) then
+			straight = true
+		end
+		i = i + 1
+		if br or (i > #SMODS.Rank.obj_buffer + 1) then break end
+		if not next(vals) then break end
+		for _, val in ipairs(vals) do
+			if init_vals[val] and not initial then br = true end
+			if RANKS[val] then
+				straight_length = straight_length + 1
+				skipped_rank = false
+				for _, vv in ipairs(RANKS[val]) do
+					t[#t + 1] = vv
+				end
+				
+				vals = SMODS.Ranks[val].next
+				
+				initial = false
+				end_iter = true
+				break
+			end
+		end
+		if not end_iter then
+			local new_vals = {}
+			for _, val in ipairs(vals) do
+				for _, r in ipairs(SMODS.Ranks[val].next) do
+					table.insert(new_vals, r)
+				end
+			end
+			vals = new_vals
+			if can_skip and not skipped_rank then
+				skipped_rank = true
+			else
+				straight_length = 0
+				skipped_rank = false
+				if not straight then t = {} end
+				if straight then break end
+			end
+		end
+	end
+	if not straight then return ret end
+	table.insert(ret, t)
+	
+	return ret
+end
+
+SMODS.PokerHandPart:take_ownership('_straight', {
+	func = function(hand) return ustb_get_straight(hand) end
+})
+
 
 --BlackJack + Question Mark Line Jokers
 
@@ -513,6 +673,97 @@ create_joker({
 	end
 })
 
+--Binary-line Jokers
+
+create_joker({
+    name = 'Social Experiment', id = 0,
+    rarity = 'Rare', cost = 4,
+	
+	vars = {{odds_en = 4}, {odds_ed = 8}, {odds_s = 12}},
+	
+    custom_vars = function(self, info_queue, card)
+        local vars
+        if G.GAME and G.GAME.probabilities.normal then
+            vars = {G.GAME.probabilities.normal, card.ability.extra.odds_en, card.ability.extra.odds_ed, card.ability.extra.odds_s}
+        else
+            vars = {1, card.ability.extra.odds_en, card.ability.extra.odds_ed, card.ability.extra.odds_s}
+        end
+        return {vars = vars}
+    end,
+	
+    blueprint = false, eternal = true,
+	
+    calculate = function(self, card, context)
+		
+		if context.before and context.scoring_hand and #context.scoring_hand > 1 and not context.blueprint then
+			local sourceCard = {}
+		
+			for i = 1, #context.scoring_hand do
+				if context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
+					if sourceCard[context.scoring_hand[i].base.value..context.scoring_hand[i].base.suit] then --targetCard exists
+						
+						local currentCard = context.scoring_hand[i]
+						local targetCard = sourceCard[context.scoring_hand[i].base.value..context.scoring_hand[i].base.suit]
+						
+						
+						local isCopyEnhancement = true; --pseudorandom('prop_enh'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_en
+						local isCopyEdition = true; --pseudorandom('prop_ed'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_ed
+						local isCopySeal = true; -- pseudorandom('prop_s'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_s
+						
+						--Extra check, if the current card and target card have the same status, don't play animation
+						
+						if currentCard.config.center == targetCard.config.center then
+							isCopyEnhancement = false
+							
+						end
+						if (currentCard.edition or {}).key == (targetCard.edition or {}).key then
+							isCopyEdition = false
+							
+						end
+						if currentCard.seal == targetCard.seal then
+							isCopySeal = false
+						end
+						
+						local isPlayingAnimation = isCopyEnhancement or isCopyEdition or isCopySeal
+						
+						if isPlayingAnimation then
+							--Flipping Animation
+							event({trigger = 'after', delay = 0.1, func = function() currentCard:flip(); play_sound('card1', 1); currentCard:juice_up(0.3, 0.3); return true end })
+							
+							--Changing Card Property
+							event({trigger = 'after', delay = 0.05,  func = function()
+							
+							--Copy enhancement
+							if isCopyEnhancement then
+								currentCard:set_ability(targetCard.config.center)
+							end
+							
+							--Copy edition
+							if isCopyEdition then
+								currentCard:set_edition(targetCard.edition, true, true)
+							end
+							
+							--Copy seal
+							if isCopySeal then
+								currentCard:set_seal(targetCard.seal, true, true)
+							end
+							
+							return true end })
+							
+							--Unflipping Animation
+							event({trigger = 'after', delay = 0.1, func = function() currentCard:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); currentCard:juice_up(0.3, 0.3); return true end })
+							forced_message("Copied!", currentCard, G.C.RED, true)
+						end
+					else --set the target card to the following
+						sourceCard[context.scoring_hand[i].base.value..context.scoring_hand[i].base.suit] = context.scoring_hand[i]
+					end	
+				end
+			end
+		
+		end
+		
+    end
+})
 
 --Enhancement-line Jokers
 

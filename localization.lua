@@ -22,6 +22,7 @@ return {
 		['21'] = '21',
 		Question = '???',
 		
+		['0'] = '0',
 		Half = 'Half',
 		['1'] = '1',
 		Euler = "e",
@@ -61,6 +62,15 @@ return {
             ['name'] = 'Floating-Point Error',
             ['text'] = {
                 [1] = 'Bleh',
+            }
+        }
+    },
+	
+	social_experiment = {
+        ['en-us'] = {
+            ['name'] = 'Social Experiment',
+            ['text'] = {
+                [1] = 'Double it and give it to the next card',
             }
         }
     },
