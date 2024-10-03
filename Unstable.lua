@@ -695,68 +695,68 @@ create_joker({
 	
     calculate = function(self, card, context)
 		
-		if context.before and context.scoring_hand and #context.scoring_hand > 1 and not context.blueprint then
-			local sourceCard = {}
+		if context.after and context.scoring_hand and #context.scoring_hand > 1 and not context.blueprint then
+			local totalChipCount = 0
 		
 			for i = 1, #context.scoring_hand do
-				if context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
-					if sourceCard[context.scoring_hand[i].base.value..context.scoring_hand[i].base.suit] then --targetCard exists
+				if i<#context.scoring_hand and not (context.scoring_hand[i]:is_face() and context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone) then --context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
+					local currentCard = context.scoring_hand[i]
+					
+					local bonusChip = currentCard.ability.perma_bonus or 0
+					
+					
+					local baseChip = SMODS.Ranks[currentCard.base.value].nominal
+					
+					if currentCard.config.center == G.P_CENTERS.m_stone then
+						baseChip = 0
+						bonusChip = bonusChip + 50
+					end
+					
+					if bonusChip + baseChip > 0 then
+					
+						context.scoring_hand[i+1].ability.perma_bonus = (context.scoring_hand[i+1].ability.perma_bonus or 0) + (bonusChip + baseChip)*2
 						
-						local currentCard = context.scoring_hand[i]
-						local targetCard = sourceCard[context.scoring_hand[i].base.value..context.scoring_hand[i].base.suit]
+						totalChipCount = totalChipCount + bonusChip + baseChip
 						
+						currentCard.ability.perma_bonus = 0
 						
-						local isCopyEnhancement = true; --pseudorandom('prop_enh'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_en
-						local isCopyEdition = true; --pseudorandom('prop_ed'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_ed
-						local isCopySeal = true; -- pseudorandom('prop_s'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_s
+						--Flipping Animation
+						event({trigger = 'after', delay = 0.1, func = function() currentCard:flip(); play_sound('card1', 1); currentCard:juice_up(0.3, 0.3); return true end })
 						
-						--Extra check, if the current card and target card have the same status, don't play animation
+						--Changing Card Property
 						
-						if currentCard.config.center == targetCard.config.center then
-							isCopyEnhancement = false
+						event({trigger = 'after', delay = 0.05,  func = function()
+						
+							local suit_data = SMODS.Suits[currentCard.base.suit]
+							local suit_prefix = suit_data.card_key
 							
-						end
-						if (currentCard.edition or {}).key == (targetCard.edition or {}).key then
-							isCopyEdition = false
+							currentCard:set_base(G.P_CARDS[suit_prefix .. '_unstb_0' ])
 							
-						end
-						if currentCard.seal == targetCard.seal then
-							isCopySeal = false
-						end
-						
-						local isPlayingAnimation = isCopyEnhancement or isCopyEdition or isCopySeal
-						
-						if isPlayingAnimation then
-							--Flipping Animation
-							event({trigger = 'after', delay = 0.1, func = function() currentCard:flip(); play_sound('card1', 1); currentCard:juice_up(0.3, 0.3); return true end })
-							
-							--Changing Card Property
-							event({trigger = 'after', delay = 0.05,  func = function()
-							
-							--Copy enhancement
-							if isCopyEnhancement then
-								currentCard:set_ability(targetCard.config.center)
-							end
-							
-							--Copy edition
-							if isCopyEdition then
-								currentCard:set_edition(targetCard.edition, true, true)
-							end
-							
-							--Copy seal
-							if isCopySeal then
-								currentCard:set_seal(targetCard.seal, true, true)
+							--Un-stoned the stone card
+							if currentCard.config.center == G.P_CENTERS.m_stone then
+								currentCard:set_ability(G.P_CENTERS.c_base)
 							end
 							
 							return true end })
-							
-							--Unflipping Animation
-							event({trigger = 'after', delay = 0.1, func = function() currentCard:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); currentCard:juice_up(0.3, 0.3); return true end })
-							forced_message("Copied!", currentCard, G.C.RED, true)
-						end
-					else --set the target card to the following
-						sourceCard[context.scoring_hand[i].base.value..context.scoring_hand[i].base.suit] = context.scoring_hand[i]
-					end	
+						
+						--Unflipping Animation
+						event({trigger = 'after', delay = 0.1, func = function() currentCard:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); currentCard:juice_up(0.3, 0.3); return true end })
+						forced_message("Double It!", currentCard, G.C.CHIPS, true)
+					end
+					
+				else
+					if totalChipCount > 0 then
+						local currentCard = context.scoring_hand[i]
+						
+						event({ trigger = 'after', delay = 0.2, func = function()
+						big_juice(currentCard)
+						play_sound('multhit1')
+						return true end })
+						
+						forced_message("Take!", currentCard, G.C.CHIPS, true)
+						
+						totalChipCount = 0
+					end
 				end
 			end
 		
