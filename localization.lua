@@ -16,6 +16,22 @@ return {
         },
     },
 	
+	-- Enhancement
+	
+	enh_radioactive = {
+		['en-us'] = {
+            ['name'] = 'Radioactive Card',
+            ['text'] = {
+                [1] = '{C:chips}+#1#{} Chips, no rank or suit',
+				[2] = 'When played, {C:green}#2# in #3#{} chance to',
+				[3] = 'convert other played cards to {C:attention}Radioactive Card{}',
+				[4] = '',
+				[5] = 'When held in hand, {C:green}#2# in #4#{} chance to give',
+				[6] = '{X:mult,C:white}X#5#{} Mult, otherwise give {X:mult,C:white}X#6#{} Mult',
+            }
+        }
+	},
+	
 	-- Ranks
 
     ranks = {

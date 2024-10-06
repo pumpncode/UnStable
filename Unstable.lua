@@ -239,7 +239,7 @@ SMODS.Enhancement {
     no_rank = true,
     always_scores = true,
 	
-	config = {extra = { chips = 13, odds_conv = 5, odds_mult = 5, mult_good = 2.5, mult_bad = 0.5 }},
+	config = {extra = { chips = 13, odds_conv = 2, odds_mult = 3, mult_good = 2.5, mult_bad = 0.5 }, h_x_mult = 0.5},
 	--TODO: Export this to localization file
 	loc_vars = function(self)
         return {
@@ -247,40 +247,50 @@ SMODS.Enhancement {
         }
     end,
 	
-	loc_txt = {
-        name = 'Radioactive Card',
-        text = {
-            "{C:chips}+#1#{} Chips",
-            "no rank or suit",
-			"when played, {C:green,E:1,S:1.1}#2# in #3#{} chance to",
-			"convert other played cards to Radioactive Card",
-			
-			"When held in hand, {C:green,E:1,S:1.1}#2# in #4#{} chance to give",
-			"{C:red}X#5#{} Mult, otherwise give {C:red}X#6#{} Mult"
-        }
-    },
+	loc_txt = loc["enh_radioactive"],
     
 	
 	calculate = function(self, card, context)
         if context.cardarea == G.play and not context.repetition then
             SMODS.eval_this(card, {chip_mod = card.ability.extra.chips, message = localize{type='variable',key='a_chips',vars={card.ability.extra.chips}}} )
-        end
-		
-		print(context)
-		
-		if context.after and context.scoring_hand then
-			print("This can trigger")
+			
 			if #context.scoring_hand > 1 then
-				for i = 1, #context.scoring_hand do
-					local target = math.random(#scoring_hand)
+				local target = context.scoring_hand[math.random(#context.scoring_hand)]
+				
+				
+				if target.config.center ~= G.P_CENTERS.m_unstb_radioactive and pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_conv then
+					--Flipping Animation
+					event({trigger = 'after', delay = 0.1, func = function() target:flip(); play_sound('card1', 1); target:juice_up(0.3, 0.3); return true end })
 					
-					print(context.scoring_hand[target].config.center.key);
+					--Changing Card Property
 					
-					--if context.scoring_hand[target].config.center ~= G.P_CENTERS.m_stone
+					event({trigger = 'after', delay = 0.05,  func = function()
+					
+						target:set_ability(G.P_CENTERS.m_unstb_radioactive)
+						
+						return true end })
+					
+					--Unflipping Animation
+					event({trigger = 'after', delay = 0.1, func = function() target:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); target:juice_up(0.3, 0.3); return true end })
+
+					forced_message("Decayed!", target, G.C.RED, true)
+				else
+					forced_message("Safe!", card, G.C.GREEN, true)
 				end
+				
 			end
 			
-			--Add conversion function here
+			
+        end
+		
+		if context.cardarea == G.hand and not context.repetition then
+			--Xmult handling ability is built-in, so this one just checks for odds and alter it respectively.
+			if pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_mult then
+				card.ability.h_x_mult = 2.5
+			else
+				card.ability.h_x_mult = 0.5
+			end
+			
 		end
     end
  }
