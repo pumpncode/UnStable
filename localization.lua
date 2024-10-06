@@ -32,6 +32,15 @@ return {
         }
 	},
 	
+	enh_resource = {
+		['en-us'] = {
+            ['name'] = 'Resource Card',
+            ['text'] = {
+                [1] = 'snip #1#, #2#',
+            }
+        }
+	},
+	
 	-- Ranks
 
     ranks = {

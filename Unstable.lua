@@ -240,7 +240,7 @@ SMODS.Enhancement {
     always_scores = true,
 	
 	config = {extra = { chips = 13, odds_conv = 2, odds_mult = 3, mult_good = 2.5, mult_bad = 0.5 }, h_x_mult = 0.5},
-	--TODO: Export this to localization file
+	
 	loc_vars = function(self)
         return {
             vars = { self.config.extra.chips, (G.GAME and G.GAME.probabilities.normal or 1), self.config.extra.odds_conv, self.config.extra.odds_mult, self.config.extra.mult_good, self.config.extra.mult_bad }
@@ -294,6 +294,164 @@ SMODS.Enhancement {
 		end
     end
  }
+ 
+ SMODS.Enhancement {
+	key = "resource",
+	atlas = "unstb_back",
+	pos = {x=0, y = 1},
+	
+    replace_base_card = true,
+    --no_suit = false,
+    no_rank = true,
+    always_scores = true,
+	
+	config = {extra = { xmult = 5, suit = "undefined"} },
+	
+	loc_vars = function(self, info_queue, card)
+        return {
+            vars = { (card.ability and card.ability.extra.xmult) or 5, (card.ability and card.ability.extra.suit) or "undefined"}
+        }
+    end,
+	
+	suit_map = {
+		Hearts = 0,
+        Clubs = 1,
+        Diamonds = 2,
+        Spades = 3,
+	},
+	
+	loc_txt = loc["enh_resource"],
+	
+	set_sprites = function(self, card, initial, delay_sprites)
+		
+		local isCollection = (card.area and card.area.config.collection) or false
+		
+		if not isCollection and card.ability and card.ability.extra then
+			local suit = (card.base and card.base.suit) or 'Spades'
+			
+			card.ability.extra.suit = suit
+				
+			local pos  = {x = self.suit_map[suit] or 4, y = 0}
+				
+			card.children.center:set_sprite_pos(pos)
+		end
+		
+    end,
+	
+	update = function(self, card)
+		if (card.VT.w <= 0 or card.ability.extra.suit == 'undefined') then
+			local isCollection = (card.area and card.area.config.collection) or false
+		
+			if not isCollection then
+				card.ability.extra.suit = card.base.suit
+				card.children.center:set_sprite_pos({x = self.suit_map[card.base.suit] or 4, y = 0})
+			else 
+				card.ability.extra.suit = "(Corresponding Suit)"
+			end
+		end
+    end,
+	
+	calculate = function(self, card, context)
+
+        if context.cardarea == G.play and not context.repetition then
+		
+			
+		
+			local has_suit = false
+			
+			if context.scoring_hand then
+				for i = 1, #context.scoring_hand do
+					local currentCard = context.scoring_hand[i]
+					if currentCard ~= card and currentCard.config.center ~= G.P_CENTERS.m_unstb_resource and currentCard.base.suit == card.ability.extra.suit then				
+						has_suit = true
+						break
+					end
+				end
+			end
+			
+			if has_suit then
+				--[[event({trigger = 'after',  func = function()
+				play_sound('multhit1')
+				return true end })]]
+				
+				SMODS.eval_this(card, {Xmult_mod = card.ability.extra.xmult, message = localize{type='variable',key='a_xmult',vars={card.ability.extra.xmult}}} )
+				
+				card.ability.extra.to_destroy = true
+			else
+				event({trigger = 'after', delay = 0.05,  func = function()
+				play_sound('tarot2', 1, 0.4);
+				return true end })
+
+				forced_message("Invalid", card, G.C.GRAY, true)
+			end
+			
+			return {
+			  repetitions = -1,
+			  card = context.other_card
+			}
+        end
+    end,
+	
+	--Injected the trigger using lovely, can be used for any post-play enchantment stuff
+	after_play = function(self, card, context) 
+		if card.ability.extra.to_destroy then
+			forced_message("Redeemed!", card, G.C.RED, true)
+				
+			card.to_destroy = true
+		end
+	end
+ }
+ 
+ --[[SMODS.Enhancement {
+	key = "resource2",
+	atlas = "unstb_back",
+	pos = {x=2, y = 0},
+	
+    replace_base_card = true,
+    --no_suit = false,
+    no_rank = true,
+    --always_scores = true,
+	
+	config = {extra = { mult = 13} },
+	--TODO: Export this to localization file
+	loc_vars = function(self)
+        return {
+            vars = { self.config.extra.mult, "Hearts, Diamond"}
+        }
+    end,
+	
+	loc_txt = loc["enh_resource"],
+	
+	calculate = function(self, card, context)
+        if context.cardarea == G.play and not context.repetition then
+            card:change_suit(self.suit)
+        end
+		
+		if context.cardarea == G.hand and not context.repetition then
+			--Xmult handling ability is built-in, so this one just checks for odds and alter it respectively.
+
+		end
+    end
+ }
+ 
+ local changeSuitPointer = Card.change_suit
+ 
+ local ticketMap = {
+	Hearts = G.P_CENTERS.m_unstb_resource2,
+	Diamond = G.P_CENTERS.m_unstb_resource2,
+	Spades = G.P_CENTERS.m_unstb_resource,
+	Clubs = G.P_CENTERS.m_unstb_resource
+ }
+ 
+ function Card:change_suit(new_suit)
+ 
+	if self.config.center == G.P_CENTERS.m_unstb_resource or self.config.center == G.P_CENTERS.m_unstb_resource2 then
+		self:set_ability(ticketMap[new_suit])
+	end
+	
+	print(new_suit)
+	changeSuitPointer(self,new_suit)
+ end]]
 
 --New Ranks
 --TODO: Figure out how to hide these rank from the deck preview until it start crops up

@@ -1,0 +1,17 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+#Adds triggers for destroyable enhancement after-play
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''if destroyed then'''
+position = 'before'
+match_indent = true
+payload = '''
+if scoring_hand[i].config.center.after_play and not scoring_hand[i].debuff then
+    scoring_hand[i].config.center:after_play(scoring_hand[i], {scoring_hand = scoring_hand})
+	destroyed = scoring_hand[i].to_destroy
+end'''
