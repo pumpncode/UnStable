@@ -31,12 +31,25 @@ local function get_coordinates(position, width)
     return {x = (position) % width, y = math.floor((position) / width)}
 end
 
---Creates an atlas for cards to use
+--Creates an atlas for Jokers to use
 SMODS.Atlas {
   -- Key for code to find it with
   key = "unstb_jokers",
   -- The name of the file, for the code to pull the atlas from
   path = "unstb_jokers.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
+--Atlas for new enhancements
+
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "unstb_back",
+  -- The name of the file, for the code to pull the atlas from
+  path = "unstb_back.png",
   -- Width of each sprite in 1x size
   px = 71,
   -- Height of each sprite in 1x size
@@ -212,6 +225,65 @@ local function create_joker(joker)
         effect = joker.effect
         }
 end
+
+--New Enhancements
+SMODS.Enhancement {
+	key = "radioactive",
+	atlas = "unstb_back",
+	pos = {x=0, y = 0},
+	
+	
+	
+    replace_base_card = true,
+    no_suit = true,
+    no_rank = true,
+    always_scores = true,
+	
+	config = {extra = { chips = 13, odds_conv = 5, odds_mult = 5, mult_good = 2.5, mult_bad = 0.5 }},
+	--TODO: Export this to localization file
+	loc_vars = function(self)
+        return {
+            vars = { self.config.extra.chips, (G.GAME and G.GAME.probabilities.normal or 1), self.config.extra.odds_conv, self.config.extra.odds_mult, self.config.extra.mult_good, self.config.extra.mult_bad }
+        }
+    end,
+	
+	loc_txt = {
+        name = 'Radioactive Card',
+        text = {
+            "{C:chips}+#1#{} Chips",
+            "no rank or suit",
+			"when played, {C:green,E:1,S:1.1}#2# in #3#{} chance to",
+			"convert other played cards to Radioactive Card",
+			
+			"When held in hand, {C:green,E:1,S:1.1}#2# in #4#{} chance to give",
+			"{C:red}X#5#{} Mult, otherwise give {C:red}X#6#{} Mult"
+        }
+    },
+    
+	
+	calculate = function(self, card, context)
+        if context.cardarea == G.play and not context.repetition then
+            SMODS.eval_this(card, {chip_mod = card.ability.extra.chips, message = localize{type='variable',key='a_chips',vars={card.ability.extra.chips}}} )
+        end
+		
+		print(context)
+		
+		if context.after and context.scoring_hand then
+			print("This can trigger")
+			if #context.scoring_hand > 1 then
+				for i = 1, #context.scoring_hand do
+					local target = math.random(#scoring_hand)
+					
+					print(context.scoring_hand[target].config.center.key);
+					
+					--if context.scoring_hand[target].config.center ~= G.P_CENTERS.m_stone
+				end
+			end
+			
+			--Add conversion function here
+		end
+    end
+ }
 
 --New Ranks
 --TODO: Figure out how to hide these rank from the deck preview until it start crops up
