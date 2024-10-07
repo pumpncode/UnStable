@@ -32,11 +32,37 @@ return {
         }
 	},
 	
+	enh_acorn = {
+		['en-us'] = {
+            ['name'] = 'Acorn Mark Card',
+            ['text'] = {
+                [1] = 'Give {C:chips}+#1#{} chips when in hand',
+				[2] = 'Does not give any chips when scored',
+            }
+        }
+	},
+	
+	enh_vintage = {
+		['en-us'] = {
+            ['name'] = 'Vintage Card',
+            ['text'] = {
+                [1] = 'Gains {C:chips}+#1#{} extra chips when scored',
+				[2] = '{C:green}#2# in #3#{} chance to destroy itself',
+				[3] = '{C:inactive}Chance increases by +#4# when scored{}',
+            }
+        }
+	},
+	
 	enh_resource = {
 		['en-us'] = {
             ['name'] = 'Resource Card',
             ['text'] = {
-                [1] = 'snip #1#, #2#',
+                [1] = 'Has no rank, always scored.',
+				[2] = 'Give {X:mult,C:white}X#1#{} Mult',
+				[3] = 'if the played hand has at least',
+				[4] = 'one card with {V:1}#2#{} suit',
+				[5] = '{C:red}Destroy itself after scored{}',
+				[6] = '{C:inactive}(Does not count another Resource Card){}',
             }
         }
 	},

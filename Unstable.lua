@@ -49,7 +49,18 @@ SMODS.Atlas {
   -- Key for code to find it with
   key = "unstb_back",
   -- The name of the file, for the code to pull the atlas from
-  path = "unstb_back.png",
+  path = "back.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "enh_resource",
+  -- The name of the file, for the code to pull the atlas from
+  path = "enh_res.png",
   -- Width of each sprite in 1x size
   px = 71,
   -- Height of each sprite in 1x size
@@ -227,6 +238,8 @@ local function create_joker(joker)
 end
 
 --New Enhancements
+
+--Radioactive
 SMODS.Enhancement {
 	key = "radioactive",
 	atlas = "unstb_back",
@@ -295,10 +308,100 @@ SMODS.Enhancement {
     end
  }
  
+ --Patch get_chip_bonus to allow total chip override
+local cardGetChipBonusPointer = Card.get_chip_bonus
+ 
+function Card:get_chip_bonus()
+ 
+	if self.config.center.override_chip then
+		return self.config.center.override_chip
+	end
+	
+	return cardGetChipBonusPointer(self)
+end
+ 
+ --Acorn
+SMODS.Enhancement {
+	key = "acorn",
+	atlas = "unstb_back",
+	pos = {x=1, y = 0},
+	
+    replace_base_card = false,
+    no_suit = false,
+    no_rank = false,
+    always_scores = false,
+	override_chip = 0,
+	
+	
+	config = {extra = { totalchips = 0, originalchips = 0}},
+	
+	loc_vars = function(self, info_queue, card)
+        return {
+            vars = { card.base.nominal*2 }
+        }
+    end,
+	
+	loc_txt = loc["enh_acorn"],
+	
+	--Override genere_ui so it does not display any chips
+	generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
+            SMODS.Enhancement.super.generate_ui(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
+    end,
+
+	
+	calculate = function(self, card, context, ret)
+        if context.cardarea == G.play and not context.repetition then
+            --SMODS.eval_this(card, {chip_mod = card.ability.extra.chips, message = localize{type='variable',key='a_chips',vars={card.ability.extra.chips}}} )	
+			
+			event({trigger = 'after', delay = 0.05,  func = function()
+				play_sound('tarot2', 1, 0.4);
+				return true end })
+			
+			forced_message("Not Allowed!", card, G.C.RED, true)				
+        end
+		
+		if context.cardarea == G.hand and not context.repetition then
+			card.ability.extra.totalchips = card.base.nominal * 2
+			
+			ret.h_chips = card.ability.extra.totalchips
+			
+		end
+    end
+ }
+ 
+  --Acorn
+SMODS.Enhancement {
+	key = "vintage",
+	atlas = "unstb_back",
+	pos = {x=2, y = 0},
+	
+	
+	config = {extra = { bonus_chip = 0, chip_gain_rate = 3, current_odd = 1, odd_destroy = 25, destroy_rate = 1}},
+	
+	loc_vars = function(self, info_queue, card)
+        return {
+            vars = {  }
+        }
+    end,
+	
+	loc_txt = loc["enh_vintage"],
+
+	
+	calculate = function(self, card, context, ret)
+        if context.cardarea == G.play and not context.repetition then
+	
+        end
+		
+		if context.cardarea == G.hand and not context.repetition then
+			
+		end
+    end
+ }
+ 
  SMODS.Enhancement {
 	key = "resource",
-	atlas = "unstb_back",
-	pos = {x=0, y = 1},
+	atlas = "enh_resource",
+	pos = {x=0, y = 0},
 	
     replace_base_card = true,
     --no_suit = false,
@@ -308,8 +411,24 @@ SMODS.Enhancement {
 	config = {extra = { xmult = 5, suit = "undefined"} },
 	
 	loc_vars = function(self, info_queue, card)
+	
+		local suit_text = 'undefined'
+		local suit_text_color = {}
+		
+		if card.ability then
+			suit_text = card.ability.extra.suit;
+			
+			if suit_text ~= '(Corresponding Suit)' then
+				suit_text = localize(card.ability.extra.suit, 'suits_singular');
+				suit_text_color = G.C.SUITS[card.ability.extra.suit]
+			else
+				suit_text_color = G.C.ORANGE
+			end
+		end
+	
         return {
-            vars = { (card.ability and card.ability.extra.xmult) or 5, (card.ability and card.ability.extra.suit) or "undefined"}
+            vars = { (card.ability and card.ability.extra.xmult) or 5, suit_text,
+			colours = {suit_text_color} }
         }
     end,
 	
@@ -331,7 +450,7 @@ SMODS.Enhancement {
 			
 			card.ability.extra.suit = suit
 				
-			local pos  = {x = self.suit_map[suit] or 4, y = 0}
+			local pos  = {x = self.suit_map[suit]+2 or 1, y = 0}
 				
 			card.children.center:set_sprite_pos(pos)
 		end
@@ -344,7 +463,7 @@ SMODS.Enhancement {
 		
 			if not isCollection then
 				card.ability.extra.suit = card.base.suit
-				card.children.center:set_sprite_pos({x = self.suit_map[card.base.suit] or 4, y = 0})
+				card.children.center:set_sprite_pos({x = self.suit_map[card.base.suit]+2 or 1, y = 0})
 			else 
 				card.ability.extra.suit = "(Corresponding Suit)"
 			end
@@ -402,57 +521,6 @@ SMODS.Enhancement {
 	end
  }
  
- --[[SMODS.Enhancement {
-	key = "resource2",
-	atlas = "unstb_back",
-	pos = {x=2, y = 0},
-	
-    replace_base_card = true,
-    --no_suit = false,
-    no_rank = true,
-    --always_scores = true,
-	
-	config = {extra = { mult = 13} },
-	--TODO: Export this to localization file
-	loc_vars = function(self)
-        return {
-            vars = { self.config.extra.mult, "Hearts, Diamond"}
-        }
-    end,
-	
-	loc_txt = loc["enh_resource"],
-	
-	calculate = function(self, card, context)
-        if context.cardarea == G.play and not context.repetition then
-            card:change_suit(self.suit)
-        end
-		
-		if context.cardarea == G.hand and not context.repetition then
-			--Xmult handling ability is built-in, so this one just checks for odds and alter it respectively.
-
-		end
-    end
- }
- 
- local changeSuitPointer = Card.change_suit
- 
- local ticketMap = {
-	Hearts = G.P_CENTERS.m_unstb_resource2,
-	Diamond = G.P_CENTERS.m_unstb_resource2,
-	Spades = G.P_CENTERS.m_unstb_resource,
-	Clubs = G.P_CENTERS.m_unstb_resource
- }
- 
- function Card:change_suit(new_suit)
- 
-	if self.config.center == G.P_CENTERS.m_unstb_resource or self.config.center == G.P_CENTERS.m_unstb_resource2 then
-		self:set_ability(ticketMap[new_suit])
-	end
-	
-	print(new_suit)
-	changeSuitPointer(self,new_suit)
- end]]
-
 --New Ranks
 --TODO: Figure out how to hide these rank from the deck preview until it start crops up
 SMODS.Rank {

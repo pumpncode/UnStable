@@ -3,7 +3,7 @@ version = "1.0.0"
 dump_lua = true
 priority = 0
 
-#Adds triggers for destroyable enhancement after-play
+# Adds triggers for destroyable enhancement after-play
 [[patches]]
 [patches.pattern]
 target = 'functions/state_events.lua'
@@ -15,3 +15,19 @@ if scoring_hand[i].config.center.after_play and not scoring_hand[i].debuff then
     scoring_hand[i].config.center:after_play(scoring_hand[i], {scoring_hand = scoring_hand})
 	destroyed = scoring_hand[i].to_destroy
 end'''
+
+# h_chips implementation, originally from TWEWJ
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''if effects[ii].h_mult then'''
+position = "before"
+match_indent = false
+payload = '''
+if effects[ii].h_chips then
+	mod_percent = true
+	hand_chips = mod_chips(hand_chips + effects[ii].h_chips)
+	update_hand_text({delay = 0}, {chips = hand_chips})
+	card_eval_status_text(G.hand.cards[i], 'chips', effects[ii].h_chips, percent)
+end
+'''
