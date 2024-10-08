@@ -260,82 +260,8 @@ local function create_joker(joker)
 end
 
 --New Enhancements
-
---Radioactive
-SMODS.Enhancement {
-	key = "radioactive",
-	atlas = "unstb_back",
-	pos = {x=0, y = 0},
-	
-	
-	
-    replace_base_card = true,
-    no_suit = true,
-    no_rank = true,
-    always_scores = true,
-	
-	config = {extra = { chips = 13, odds_conv = 2, odds_mult = 3, mult_good = 2.5, mult_bad = 0.5 }, h_x_mult = 0.5},
-	
-	loc_vars = function(self)
-        return {
-            vars = { self.config.extra.chips, (G.GAME and G.GAME.probabilities.normal or 1), self.config.extra.odds_conv, self.config.extra.odds_mult, self.config.extra.mult_good, self.config.extra.mult_bad }
-        }
-    end,
-	
-	loc_txt = loc["enh_radioactive"],
-    
-	
-	calculate = function(self, card, context)
-        if context.cardarea == G.play and not context.repetition then
-            SMODS.eval_this(card, {chip_mod = card.ability.extra.chips, message = localize{type='variable',key='a_chips',vars={card.ability.extra.chips}}} )
-			
-			if #context.scoring_hand > 1 then
-				local target = context.scoring_hand[math.random(#context.scoring_hand)]
-				
-				
-				if target.config.center ~= G.P_CENTERS.m_unstb_radioactive and pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_conv then
-					--Flipping Animation
-					event({trigger = 'after', delay = 0.1, func = function() target:flip(); play_sound('card1', 1); target:juice_up(0.3, 0.3); return true end })
-					
-					--Changing Card Property
-					
-					event({trigger = 'after', delay = 0.05,  func = function()
-					
-						target:set_ability(G.P_CENTERS.m_unstb_radioactive)
-						
-						return true end })
-					
-					--Unflipping Animation
-					event({trigger = 'after', delay = 0.1, func = function() target:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); target:juice_up(0.3, 0.3); return true end })
-
-					forced_message("Decayed!", target, G.C.RED, true)
-				else
-					forced_message("Safe!", card, G.C.GREEN, true)
-				end
-				
-			end
-			
-			
-        end
-		
-		if context.cardarea == G.hand and not context.repetition then
-			--Xmult handling ability is built-in, so this one just checks for odds and alter it respectively.
-			if pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_mult then
-				card.ability.h_x_mult = 2.5
-			else
-				card.ability.h_x_mult = 0.5
-			end
-			
-		end
-    end,
-	
-	--This cannot spawn naturally at all
-	in_pool = function(self, args)
-        return false
-    end
- }
  
- --Patch get_chip_bonus to allow total chip override
+--Patch get_chip_bonus to allow total chip override
 local cardGetChipBonusPointer = Card.get_chip_bonus
  
 function Card:get_chip_bonus()
@@ -347,7 +273,7 @@ function Card:get_chip_bonus()
 	return cardGetChipBonusPointer(self)
 end
  
- --Acorn
+--Acorn
 SMODS.Enhancement {
 	key = "acorn",
 	atlas = "unstb_back",
@@ -408,8 +334,17 @@ SMODS.Enhancement {
 	config = {extra = { bonus_chip = 0, chip_gain_rate = 3, current_odd = 1, odd_destroy = 25, destroy_rate = 1}},
 	
 	loc_vars = function(self, info_queue, card)
+		
+		local odds_current = card.ability.extra.current_odd or 1
+		local destroy_rate = card.ability.extra.destroy_rate
+		
+		if G.GAME and G.GAME.probabilities.normal then
+			odds_current = odds_current * G.GAME.probabilities.normal
+			destroy_rate = destroy_rate * G.GAME.probabilities.normal
+		end
+	
         return {
-            vars = {  }
+            vars = { card.ability.extra.chip_gain_rate, odds_current, card.ability.extra.odd_destroy, destroy_rate}
         }
     end,
 	
@@ -418,13 +353,69 @@ SMODS.Enhancement {
 	
 	calculate = function(self, card, context, ret)
         if context.cardarea == G.play and not context.repetition then
-	
+			card.ability.perma_bonus = (card.ability.perma_bonus or 0) + card.ability.extra.chip_gain_rate
+			forced_message("Upgrade!", card, G.C.CHIPS, true)
         end
+    end,
+	
+	after_play = function(self, card, context) 
+		local isDestroy = pseudorandom('vintage'..G.SEED) < card.ability.extra.current_odd * G.GAME.probabilities.normal / card.ability.extra.odd_destroy
 		
-		if context.cardarea == G.hand and not context.repetition then
-			
+		if isDestroy then
+			event({trigger = 'after', delay = 0.05,  func = function()
+				play_sound('tarot2', 1, 0.4);
+				return true end })
+		
+			forced_message("Torn...", card, G.C.BLACK, true)
+			card.to_destroy = true
+		else
+			card.ability.extra.current_odd = (card.ability.extra.current_odd or 0) + card.ability.extra.destroy_rate
 		end
-    end
+	end,
+ }
+ 
+ --Promo
+SMODS.Enhancement {
+	key = "promo",
+	atlas = "unstb_back",
+	pos = {x=3, y = 0},
+	
+    replace_base_card = false,
+    no_suit = false,
+    no_rank = false,
+    always_scores = false,
+	
+	config = {extra = { gold = 0, gold_rate = 2, odds_destroy = 8}},
+	
+	loc_vars = function(self, info_queue, card)
+        return {
+            vars = { card.ability.extra.gold, card.ability.extra.gold_rate, (G.GAME and G.GAME.probabilities.normal or 1), card.ability.extra.odds_destroy }
+        }
+    end,
+	
+	loc_txt = loc["enh_promo"],
+	
+	calculate = function(self, card, context, ret)
+        if context.cardarea == G.play and not context.repetition then
+           card.ability.extra.gold = (card.ability.extra.gold or 0) + card.ability.extra.gold_rate
+		   card.ability.h_dollars = card.ability.extra.gold
+		   
+		   forced_message("Upgrade!", card, G.C.GOLD, true)	 
+        end
+    end,
+	
+	after_play = function(self, card, context) 
+		local isDestroy = pseudorandom('promo'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_destroy
+		
+		if isDestroy then
+			event({trigger = 'after', delay = 0.05,  func = function()
+				play_sound('tarot2', 1, 0.4);
+				return true end })
+		
+			forced_message("Sold", card, G.C.ORANGE, true)
+			card.to_destroy = true
+		end
+	end,
  }
  
  --Slop
@@ -684,6 +675,82 @@ SMODS.Enhancement {
 			card.to_destroy = true
 		end
 	end,
+	
+	--This cannot spawn naturally at all
+	in_pool = function(self, args)
+        return false
+    end
+ }
+ 
+--"Negative" Enhancements
+
+--Radioactive
+SMODS.Enhancement {
+	key = "radioactive",
+	atlas = "unstb_back",
+	pos = {x=0, y = 0},
+	
+	
+	
+    replace_base_card = true,
+    no_suit = true,
+    no_rank = true,
+    always_scores = true,
+	
+	config = {extra = { chips = 13, odds_conv = 2, odds_mult = 3, mult_good = 2.5, mult_bad = 0.5 }, h_x_mult = 0.5},
+	
+	loc_vars = function(self)
+        return {
+            vars = { self.config.extra.chips, (G.GAME and G.GAME.probabilities.normal or 1), self.config.extra.odds_conv, self.config.extra.odds_mult, self.config.extra.mult_good, self.config.extra.mult_bad }
+        }
+    end,
+	
+	loc_txt = loc["enh_radioactive"],
+    
+	
+	calculate = function(self, card, context)
+        if context.cardarea == G.play and not context.repetition then
+            SMODS.eval_this(card, {chip_mod = card.ability.extra.chips, message = localize{type='variable',key='a_chips',vars={card.ability.extra.chips}}} )
+			
+			if #context.scoring_hand > 1 then
+				local target = context.scoring_hand[math.random(#context.scoring_hand)]
+				
+				
+				if target.config.center ~= G.P_CENTERS.m_unstb_radioactive and pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_conv then
+					--Flipping Animation
+					event({trigger = 'after', delay = 0.1, func = function() target:flip(); play_sound('card1', 1); target:juice_up(0.3, 0.3); return true end })
+					
+					--Changing Card Property
+					
+					event({trigger = 'after', delay = 0.05,  func = function()
+					
+						target:set_ability(G.P_CENTERS.m_unstb_radioactive)
+						
+						return true end })
+					
+					--Unflipping Animation
+					event({trigger = 'after', delay = 0.1, func = function() target:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); target:juice_up(0.3, 0.3); return true end })
+
+					forced_message("Decayed!", target, G.C.RED, true)
+				else
+					forced_message("Safe!", card, G.C.GREEN, true)
+				end
+				
+			end
+			
+			
+        end
+		
+		if context.cardarea == G.hand and not context.repetition then
+			--Xmult handling ability is built-in, so this one just checks for odds and alter it respectively.
+			if pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_mult then
+				card.ability.h_x_mult = 2.5
+			else
+				card.ability.h_x_mult = 0.5
+			end
+			
+		end
+    end,
 	
 	--This cannot spawn naturally at all
 	in_pool = function(self, args)

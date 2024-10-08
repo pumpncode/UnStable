@@ -18,20 +18,6 @@ return {
 	
 	-- Enhancement
 	
-	enh_radioactive = {
-		['en-us'] = {
-            ['name'] = 'Radioactive Card',
-            ['text'] = {
-                [1] = '{C:chips}+#1#{} Chips, no rank or suit',
-				[2] = 'When played, {C:green}#2# in #3#{} chance to',
-				[3] = 'convert other played cards to {C:attention}Radioactive Card{}',
-				[4] = '',
-				[5] = 'When held in hand, {C:green}#2# in #4#{} chance to give',
-				[6] = '{X:mult,C:white}X#5#{} Mult, otherwise give {X:mult,C:white}X#6#{} Mult',
-            }
-        }
-	},
-	
 	enh_acorn = {
 		['en-us'] = {
             ['name'] = 'Acorn Mark Card',
@@ -48,7 +34,18 @@ return {
             ['text'] = {
                 [1] = 'Gains {C:chips}+#1#{} extra chips when scored',
 				[2] = '{C:green}#2# in #3#{} chance to destroy itself',
-				[3] = '{C:inactive}Chance increases by +#4# when scored{}',
+				[3] = '{C:inactive}Chance increases by {C:green}+#4#{C:inactive} when scored{}',
+            }
+        }
+	},
+	
+	enh_promo = {
+		['en-us'] = {
+            ['name'] = 'Promo Card',
+            ['text'] = {
+                [1] = 'Gives {C:gold}$#1#{} when in hand at the end of round',
+				[2] = 'Gains {C:gold}+$#2#{} when scored',
+				[3] = '{C:green}#3# in #4#{} chance to destroy when scored',
             }
         }
 	},
@@ -75,6 +72,21 @@ return {
 				[4] = 'one card with {V:1}#2#{} suit',
 				[5] = '{C:red}Destroy itself after scored{}',
 				[6] = '{C:inactive}(Does not count another Resource Card){}',
+            }
+        }
+	},
+	
+	--"Cursed" Enhancements
+	enh_radioactive = {
+		['en-us'] = {
+            ['name'] = 'Radioactive Card',
+            ['text'] = {
+                [1] = '{C:chips}+#1#{} Chips, no rank or suit',
+				[2] = 'When played, {C:green}#2# in #3#{} chance to',
+				[3] = 'convert other played cards to {C:attention}Radioactive Card{}',
+				[4] = '',
+				[5] = 'When held in hand, {C:green}#2# in #4#{} chance to give',
+				[6] = '{X:mult,C:white}X#5#{} Mult, otherwise give {X:mult,C:white}X#6#{} Mult',
             }
         }
 	},
