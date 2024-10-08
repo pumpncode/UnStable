@@ -53,6 +53,18 @@ return {
         }
 	},
 	
+	enh_slop = {
+		['en-us'] = {
+            ['name'] = 'Slop Card',
+            ['text'] = {
+                [1] = '{C:chips}+#1#{} chips',
+				[2] = 'Always scored',
+				[3] = 'Random suit and rank after scored',
+				[4] = 'Current: {C:attention}#3#{} of {V:1}#2#{}',
+            }
+        }
+	},
+	
 	enh_resource = {
 		['en-us'] = {
             ['name'] = 'Resource Card',

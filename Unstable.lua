@@ -58,6 +58,28 @@ SMODS.Atlas {
 
 SMODS.Atlas {
   -- Key for code to find it with
+  key = "enh_slop",
+  -- The name of the file, for the code to pull the atlas from
+  path = "enh_slop.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "enh_slop_hc",
+  -- The name of the file, for the code to pull the atlas from
+  path = "enh_slop_hc.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
+SMODS.Atlas {
+  -- Key for code to find it with
   key = "enh_resource",
   -- The name of the file, for the code to pull the atlas from
   path = "enh_res.png",
@@ -305,6 +327,11 @@ SMODS.Enhancement {
 			end
 			
 		end
+    end,
+	
+	--This cannot spawn naturally at all
+	in_pool = function(self, args)
+        return false
     end
  }
  
@@ -363,13 +390,15 @@ SMODS.Enhancement {
 		if context.cardarea == G.hand and not context.repetition then
 			card.ability.extra.totalchips = card.base.nominal * 2
 			
-			ret.h_chips = card.ability.extra.totalchips
+			if not card.debuff then
+				ret.h_chips = card.ability.extra.totalchips
+			end
 			
 		end
     end
  }
  
-  --Acorn
+--Vintage
 SMODS.Enhancement {
 	key = "vintage",
 	atlas = "unstb_back",
@@ -398,6 +427,142 @@ SMODS.Enhancement {
     end
  }
  
+ --Slop
+SMODS.Enhancement {
+	key = "slop",
+	
+	lc_atlas = "enh_slop",
+	hc_atlas = "enh_slop_hc",
+	
+	atlas = "enh_slop",
+	is_hc = false,
+	
+	pos = {x=0, y = 0},
+	
+	replace_base_card = true,
+    no_suit = false,
+    no_rank = false,
+    always_scores = true,
+	
+	config = {extra = { suit = 'Spades', rank = '2', chips = 0}},
+	
+	loc_vars = function(self, info_queue, card)
+	
+		local suit_text = 'undefined'
+		local suit_text_color = {}
+		
+		if card.ability then
+			suit_text = localize(card.ability.extra.suit, 'suits_plural');
+			suit_text_color = G.C.SUITS[card.ability.extra.suit]
+		end
+	
+        return {
+            vars = { card.ability.extra.chips or 0, suit_text, card.ability.extra.rank or 0 ,
+			colours = {suit_text_color} }
+        }
+    end,
+	
+	loc_txt = loc["enh_slop"],
+	
+	suit_map = {
+		Hearts = 0,
+        Clubs = 1,
+        Diamonds = 2,
+        Spades = 3,
+	},
+	
+	set_sprites = function(self, card, initial, delay_sprites)
+		local isCollection = (card.area and card.area.config.collection) or false
+		
+		if not isCollection and card.ability and card.ability.extra then
+			local suit = (card.base and card.base.suit) or 'Spades'
+			
+			local pos  = {x = self.suit_map[suit]+1 or 0, y = 0}
+				
+			card.children.center:set_sprite_pos(pos)
+		end
+		
+    end,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+		if card.base then
+			card.ability.extra.suit = card.base.suit or 'Hearts'
+			card.ability.extra.rank = card.base.value or '2'
+			card.ability.extra.chips = SMODS.Ranks[card.ability.extra.rank].nominal
+		end
+    end,
+	
+	update = function(self, card) 
+	
+		--Jank, supporting for high contrast texture change settings
+		if G.SETTINGS.colourblind_option ~= card.atlasmode then
+		
+			if G.SETTINGS.colourblind_option then
+				self.atlas = self.hc_atlas			
+			else
+				self.atlas = self.lc_atlas
+			end
+			card.children.center.atlas = G.ASSET_ATLAS[self.atlas]
+			card.atlasmode = G.SETTINGS.colourblind_option
+			
+		end
+	
+		--Update the value for the 'wise' player who tries to change card value using tarots
+		if (card.VT.w <= 0) and card.base.suit and card.base.value then
+			local isCollection = (card.area and card.area.config.collection) or false
+		
+			if not isCollection then
+				card.ability.extra.suit = card.base.suit or 'Hearts'
+				card.ability.extra.rank = card.base.value or '2'
+				card.ability.extra.chips = SMODS.Ranks[card.ability.extra.rank].nominal
+				
+				local suit = (card.base and card.base.suit) or 'Spades'
+				local pos  = {x = self.suit_map[suit]+1 or 0, y = 0}	
+				card.children.center:set_sprite_pos(pos)
+			end
+		end
+    end,
+	
+	calculate = function(self, card, context, ret)
+        if context.cardarea == G.play and not context.repetition then
+			local scoredAmount = card.ability.extra.chips + card.ability.perma_bonus
+			SMODS.eval_this(card, {chip_mod = scoredAmount, message = localize{type='variable',key='a_chips',vars={scoredAmount}}} )
+        end
+    end,
+	
+	after_play = function(self, card, context) 
+		
+		forced_message("Randomize!", card, G.C.RED, true)
+		
+		event({trigger = 'after', delay = 0.05,  func = function()
+			card.ability.extra.suit = pseudorandom_element(SMODS.Suits, pseudoseed('slop_card')..G.SEED).key
+			card.ability.extra.rank = pseudorandom_element(SMODS.Ranks, pseudoseed('slop_card')..G.SEED).key
+			
+			card.ability.extra.chips = SMODS.Ranks[card.base.value].nominal
+			
+			local suit_data = SMODS.Suits[card.ability.extra.suit]
+			local suit_prefix = suit_data.card_key
+			
+			local targetCard = suit_prefix .. '_' ..SMODS.Ranks[card.ability.extra.rank].card_key
+			
+			--print(targetCard)
+			
+			card:set_base(G.P_CARDS[targetCard])
+			
+			local suit = (card.base and card.base.suit) or 'Spades'
+			local pos  = {x = self.suit_map[suit]+1 or 0, y = 0}	
+			card.children.center:set_sprite_pos(pos)
+			
+		return true end })
+	end,
+	
+	--This cannot spawn naturally at all
+	in_pool = function(self, args)
+        return false
+    end
+ }
+ 
+ --Resource
  SMODS.Enhancement {
 	key = "resource",
 	atlas = "enh_resource",
@@ -518,7 +683,12 @@ SMODS.Enhancement {
 				
 			card.to_destroy = true
 		end
-	end
+	end,
+	
+	--This cannot spawn naturally at all
+	in_pool = function(self, args)
+        return false
+    end
  }
  
 --New Ranks
