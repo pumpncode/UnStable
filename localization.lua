@@ -43,7 +43,7 @@ return {
 		['en-us'] = {
             ['name'] = 'Promo Card',
             ['text'] = {
-                [1] = 'Gives {C:gold}$#1#{} when in hand at the end of round',
+                [1] = 'Gives {C:gold}$#1#{} when in hand',
 				[2] = 'Gains {C:gold}+$#2#{} when scored',
 				[3] = '{C:green}#3# in #4#{} chance to destroy when scored',
             }

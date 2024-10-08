@@ -385,7 +385,7 @@ SMODS.Enhancement {
     no_rank = false,
     always_scores = false,
 	
-	config = {extra = { gold = 0, gold_rate = 2, odds_destroy = 8}},
+	config = {extra = { gold = 0, gold_rate = 1, odds_destroy = 8}},
 	
 	loc_vars = function(self, info_queue, card)
         return {
@@ -398,10 +398,16 @@ SMODS.Enhancement {
 	calculate = function(self, card, context, ret)
         if context.cardarea == G.play and not context.repetition then
            card.ability.extra.gold = (card.ability.extra.gold or 0) + card.ability.extra.gold_rate
-		   card.ability.h_dollars = card.ability.extra.gold
+		   --card.ability.h_dollars = card.ability.extra.gold
 		   
 		   forced_message("Upgrade!", card, G.C.GOLD, true)	 
         end
+		
+		if context.cardarea == G.hand and not context.repetition then
+			--Hacky way to make it grant money from hand
+			ret.dollars = card.ability.extra.gold
+		end
+		
     end,
 	
 	after_play = function(self, card, context) 
