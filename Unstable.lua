@@ -347,11 +347,11 @@ SMODS.Enhancement {
 	pos = {x=2, y = 0},
 	
 	
-	config = {extra = { bonus_chip = 0, chip_gain_rate = 3, current_odd = 1, odd_destroy = 25, destroy_rate = 1}},
+	config = {extra = { bonus_chip = 0, chip_gain_rate = 3, current_odd = 0, odd_destroy = 25, destroy_rate = 1}},
 	
 	loc_vars = function(self, info_queue, card)
 		
-		local odds_current = card.ability.extra.current_odd or 1
+		local odds_current = card.ability.extra.current_odd or 0
 		local destroy_rate = card.ability.extra.destroy_rate
 		
 		if G.GAME and G.GAME.probabilities.normal then
@@ -370,6 +370,8 @@ SMODS.Enhancement {
 	calculate = function(self, card, context, ret)
         if context.cardarea == G.play and not context.repetition then
 			card.ability.perma_bonus = (card.ability.perma_bonus or 0) + card.ability.extra.chip_gain_rate
+			card.ability.extra.current_odd = (card.ability.extra.current_odd or 0) + card.ability.extra.destroy_rate
+			
 			forced_message("Upgrade!", card, G.C.CHIPS, true)
         end
     end,
@@ -384,8 +386,6 @@ SMODS.Enhancement {
 		
 			forced_message("Torn...", card, G.C.BLACK, true)
 			card.to_destroy = true
-		else
-			card.ability.extra.current_odd = (card.ability.extra.current_odd or 0) + card.ability.extra.destroy_rate
 		end
 	end,
  }
@@ -737,8 +737,8 @@ SMODS.Enhancement {
 			if #context.scoring_hand > 1 then
 				local target = context.scoring_hand[math.random(#context.scoring_hand)]
 				
-				
-				if target.config.center ~= G.P_CENTERS.m_unstb_radioactive and pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_conv then
+				--Exclude slop card because it interacts horribly with this
+				if target.config.center ~= G.P_CENTERS.m_unstb_radioactive and target.config.center.key ~= 'm_unstb_slop' and pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_conv then
 					--Flipping Animation
 					event({trigger = 'after', delay = 0.1, func = function() target:flip(); play_sound('card1', 1); target:juice_up(0.3, 0.3); return true end })
 					
@@ -1077,7 +1077,7 @@ local function blackJack_evalrank(hand, bustAmount)
 	
 	for i = 1, #hand do
 		local currentCard = hand[i]
-		if currentCard.config.center ~= G.P_CENTERS.m_stone and not currentCard.debuff  then
+		if (currentCard.config.center ~= G.P_CENTERS.m_stone or currentCard.config.center.no_rank) and not currentCard.debuff  then
 			
 			if currentCard.base.value ~= 'Ace' then
 				rank = rank + (SMODS.Ranks[currentCard.base.value].nominal or 0) --Supports modded ranks as well, just in case
@@ -1233,6 +1233,13 @@ create_joker({
 
 --Binary-line Jokers
 
+local chipsAbilityMatch = {
+	m_stone = 50,
+	m_unstb_resource = 0,
+	m_unstb_radioactive = 13,
+	m_unstb_biohazard = 0
+}
+
 create_joker({
     name = 'Social Experiment', id = 1, no_art = true,
     rarity = 'Rare', cost = 4,
@@ -1262,7 +1269,7 @@ create_joker({
 			local totalChipCount = 0
 		
 			for i = 1, #context.scoring_hand do
-				if i<#context.scoring_hand and not (context.scoring_hand[i]:is_face() and context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone) then --context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
+				if i<#context.scoring_hand and not (context.scoring_hand[i]:is_face() and not (context.scoring_hand[i].config.center.key == 'm_unstb_slop' or context.scoring_hand[i].config.center.no_rank)) then --context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
 					local currentCard = context.scoring_hand[i]
 					
 					local bonusChip = currentCard.ability.perma_bonus or 0
@@ -1270,9 +1277,12 @@ create_joker({
 					
 					local baseChip = SMODS.Ranks[currentCard.base.value].nominal
 					
-					if currentCard.config.center == G.P_CENTERS.m_stone then
+					if currentCard.config.center.key == 'm_unstb_slop' then
 						baseChip = 0
-						bonusChip = bonusChip + 50
+						bonusChip = bonusChip + currentCard.ability.extra.chips				
+					elseif chipsAbilityMatch[currentCard.config.center.key] then
+						baseChip = 0
+						bonusChip = bonusChip + chipsAbilityMatch[currentCard.config.center.key]
 					end
 					
 					if bonusChip + baseChip > 0 then
@@ -1296,7 +1306,9 @@ create_joker({
 							currentCard:set_base(G.P_CARDS[suit_prefix .. '_unstb_0' ])
 							
 							--Un-stoned the stone card
-							if currentCard.config.center == G.P_CENTERS.m_stone then
+							print(currentCard.config.center.key)
+							print(chipsAbilityMatch[currentCard.config.center.key])
+							if currentCard.config.center.key == 'm_unstb_slop' or chipsAbilityMatch[currentCard.config.center.key] then
 								currentCard:set_ability(G.P_CENTERS.c_base)
 							end
 							
@@ -1497,7 +1509,11 @@ create_joker({
 			local sourceCard = {}
 		
 			for i = 1, #context.scoring_hand do
-				if context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
+				print(context.scoring_hand[i].config.center == G.P_CENTERS.m_stone)
+				print(context.scoring_hand[i].config.center.replace_base_card)
+				print(context.scoring_hand[i].config.center == G.P_CENTERS.m_stone or context.scoring_hand[i].config.center.replace_base_card)
+				print('---')
+				if not (context.scoring_hand[i].config.center == G.P_CENTERS.m_stone or context.scoring_hand[i].config.center.replace_base_card) then --Check if it is not a Stone card or have any weird enhancement
 					if sourceCard[context.scoring_hand[i].base.value..context.scoring_hand[i].base.suit] then --targetCard exists
 						
 						local currentCard = context.scoring_hand[i]
