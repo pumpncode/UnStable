@@ -765,7 +765,26 @@ SMODS.Enhancement {
  }
  
 --New Ranks
---TODO: Figure out how to hide these rank from the deck preview until it start crops up
+
+--Pool flag wrapper function to help assist managing ranks enable / disable
+function setPoolRankFlagEnable(rank, isEnable)
+	if not G.GAME then return end
+	
+	G.GAME.pool_flags[rank] = isEnable
+end
+
+function getPoolRankFlagEnable(rank)
+	return (G.GAME and G.GAME.pool_flags[rank] or false)
+end
+
+--Shared pool rank checking function
+local function unstb_rankCheck(self, args)
+	if args and args.initial_deck then
+        return false
+    end
+	return getPoolRankFlagEnable(self.key)
+end
+
 SMODS.Rank {
 	hc_atlas = 'rank_ex_hc',
     lc_atlas = 'rank_ex',
@@ -782,11 +801,7 @@ SMODS.Rank {
 	
 	is_decimal = true,
 	
-	in_pool = function(self, args)
-        if args and args.initial_deck then
-            return false
-        end
-    end
+	in_pool = unstb_rankCheck,
 }
 
 SMODS.Rank {
@@ -805,11 +820,7 @@ SMODS.Rank {
 	
 	straight_edge = true,
 	
-	in_pool = function(self, args)
-        if args and args.initial_deck then
-            return false
-        end
-    end
+	in_pool = unstb_rankCheck,
 }
 
 SMODS.Rank {
@@ -826,11 +837,7 @@ SMODS.Rank {
     next = { '2' },
     shorthand = '1',
 	
-	in_pool = function(self, args)
-        if args and args.initial_deck then
-            return false
-        end
-    end
+	in_pool = unstb_rankCheck,
 }
 
 SMODS.Rank {
@@ -849,11 +856,7 @@ SMODS.Rank {
 	
 	is_decimal = true,
 	
-	in_pool = function(self, args)
-        if args and args.initial_deck then
-            return false
-        end
-    end
+	in_pool = unstb_rankCheck,
 }
 
 SMODS.Rank {
@@ -872,11 +875,7 @@ SMODS.Rank {
 	
 	is_decimal = true,
 	
-	in_pool = function(self, args)
-        if args and args.initial_deck then
-            return false
-        end
-    end
+	in_pool = unstb_rankCheck,
 }
 
 SMODS.Rank {
@@ -893,11 +892,7 @@ SMODS.Rank {
     next = { 'unstb_???' },
     shorthand = '?',
 	
-	in_pool = function(self, args)
-        if args and args.initial_deck then
-            return false
-        end
-    end
+	in_pool = unstb_rankCheck,
 }
 
 SMODS.Rank {
@@ -914,11 +909,7 @@ SMODS.Rank {
     next = { 'unstb_???' }, -- the next rank directly above it, used for Strength Tarot
     shorthand = '21', -- used for deck preview (ex. 1 of Spades)
 	
-	in_pool = function(self, args)
-        if args and args.initial_deck then
-            return false
-        end
-    end
+	in_pool = unstb_rankCheck,
 }
 
 --Change straight edge off from Ace, so it start to look at rank 0 instead
@@ -1244,6 +1235,11 @@ create_joker({
 	
     blueprint = false, eternal = true,
 	
+	set_ability = function(self, card, initial, delay_sprites)
+		--Enable 0 rank card in pools
+		setPoolRankFlagEnable('unstb_0', true);
+    end,
+	
     calculate = function(self, card, context)
 		
 		if context.after and context.scoring_hand and #context.scoring_hand > 1 and not context.blueprint then
@@ -1550,5 +1546,11 @@ create_joker({
 		
     end
 })
+
+--Compatibility / Tweaks / Rework Stuff
+
+--Deck Preview UI supports for hiding modded ranks
+filesystem.load(unStb.path..'/override/ui.lua')()
+
 ----------------------------------------------
 ------------MOD CODE END----------------------
