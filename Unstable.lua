@@ -1241,25 +1241,85 @@ local chipsAbilityMatch = {
 }
 
 create_joker({
-    name = 'Social Experiment', id = 1, no_art = true,
-    rarity = 'Rare', cost = 4,
+    name = 'Dummy Data', id = 6,
+    rarity = 'Uncommon', cost = 4,
 	
-	vars = {{odds_en = 4}, {odds_ed = 8}, {odds_s = 12}},
+	vars = {{odds = 2}, {unscored_card = {}}},
 	
     custom_vars = function(self, info_queue, card)
-        local vars
-        if G.GAME and G.GAME.probabilities.normal then
-            vars = {G.GAME.probabilities.normal, card.ability.extra.odds_en, card.ability.extra.odds_ed, card.ability.extra.odds_s}
-        else
-            vars = {1, card.ability.extra.odds_en, card.ability.extra.odds_ed, card.ability.extra.odds_s}
-        end
-        return {vars = vars}
+		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
     end,
 	
     blueprint = false, eternal = true,
 	
 	set_ability = function(self, card, initial, delay_sprites)
-		--Enable 0 rank card in pools
+		--Enable rank 0 card in pools
+		setPoolRankFlagEnable('unstb_0', true);
+    end,
+	
+    calculate = function(self, card, context)
+		if context.before and context.scoring_hand and not context.blueprint then
+			card.ability.extra.unscored_card = {}
+			for k, v in pairs(context.full_hand) do
+				local unscoring = true
+				for _k,_v in pairs(context.scoring_hand) do
+					if v == _v then
+						unscoring = false
+						break
+					end
+				end
+				
+				if unscoring and not v.debuff then
+					card.ability.extra.unscored_card[#card.ability.extra.unscored_card+1] = v
+				end
+			end
+		end
+		
+		if context.after and not context.blueprint then
+			for i = 1, #card.ability.extra.unscored_card do
+			
+				local isTurning = pseudorandom('dummy'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds
+				if isTurning then
+					local currentCard = card.ability.extra.unscored_card[i]
+					
+					currentCard.ability.perma_bonus = (currentCard.ability.perma_bonus or 0) + SMODS.Ranks[currentCard.base.value].nominal
+					
+					--Flipping Animation
+					event({trigger = 'after', delay = 0.1, func = function() currentCard:flip(); play_sound('card1', 1); currentCard:juice_up(0.3, 0.3); return true end })
+					
+					--Changing Card Property
+					
+					event({trigger = 'after', delay = 0.05,  func = function()
+					
+						local suit_data = SMODS.Suits[currentCard.base.suit]
+						local suit_prefix = suit_data.card_key
+						
+						currentCard:set_base(G.P_CARDS[suit_prefix .. '_unstb_0' ])
+						
+						--Un-stoned the stone card
+						if currentCard.config.center.key == 'm_unstb_slop' or chipsAbilityMatch[currentCard.config.center.key] then
+							currentCard:set_ability(G.P_CENTERS.c_base)
+						end
+						
+						return true end })
+					
+					--Unflipping Animation
+					event({trigger = 'after', delay = 0.1, func = function() currentCard:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); currentCard:juice_up(0.3, 0.3); return true end })
+					forced_message("Zero!", currentCard, G.C.GRAY, true)
+				end
+			end
+		end
+	end
+})
+
+create_joker({
+    name = 'Social Experiment', id = 1, no_art = true,
+    rarity = 'Rare', cost = 4,
+	
+    blueprint = false, eternal = true,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+		--Enable rank 0 card in pools
 		setPoolRankFlagEnable('unstb_0', true);
     end,
 	

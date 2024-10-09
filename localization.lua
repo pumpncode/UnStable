@@ -142,13 +142,25 @@ return {
         }
     },
 	
+	dummy_data = {
+        ['en-us'] = {
+            ['name'] = 'Dummy Data',
+            ['text'] = {
+                [1] = 'For each {C:attention}unscored cards{}',
+				[2] = '{C:green}#1# in #2#{} chance to',
+				[3] = "Converts rank to {C:attention}0{}",
+				[4] = "(Retains amount of chips)",
+            }
+        }
+    },
+	
 	social_experiment = {
         ['en-us'] = {
             ['name'] = 'Social Experiment',
             ['text'] = {
                 [1] = 'For each {C:attention}Numbered Cards{},',
-				[2] = 'Double all chips and give it to the next card',
-				[3] = "Strips the card's rank to {C:attention}0{}",
+				[2] = 'Double all chips and give it to next card',
+				[3] = "Strips card's rank to {C:attention}0{}",
             }
         }
     },
