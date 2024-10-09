@@ -36,7 +36,18 @@ SMODS.Atlas {
   -- Key for code to find it with
   key = "unstb_jokers",
   -- The name of the file, for the code to pull the atlas from
-  path = "unstb_jokers.png",
+  path = "jokers.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "unstb_jokers_wip",
+  -- The name of the file, for the code to pull the atlas from
+  path = "jokers_wip.png",
   -- Width of each sprite in 1x size
   px = 71,
   -- Height of each sprite in 1x size
@@ -179,6 +190,11 @@ local function create_joker(joker)
     if joker.rarity == 'Legendary' then
         joker.atlas = 'unstb_jokers_legend'
     end
+	
+	--If the joker has no art, fallback to WIP sheet
+	if joker.no_art then
+		joker.atlas = 'unstb_jokers_wip'
+	end
 
     -- Key generation from name
 
@@ -1091,7 +1107,7 @@ end
 
 --Black Jack
 create_joker({
-    name = 'Black Jack', id = 0,
+    name = 'Black Jack', id = 1, no_art = true,
     rarity = 'Common', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -1160,7 +1176,7 @@ create_joker({
 
 --What
 create_joker({
-    name = 'What', id = 0,
+    name = 'What', id = 1, no_art = true,
     rarity = 'Rare', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -1186,7 +1202,7 @@ local function is_decimal(card)
 end
 
 create_joker({
-    name = 'Floating Point Error', id = 0,
+    name = 'Floating Point Error', id = 1, no_art = true,
     rarity = 'Uncommon', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -1218,7 +1234,7 @@ create_joker({
 --Binary-line Jokers
 
 create_joker({
-    name = 'Social Experiment', id = 0,
+    name = 'Social Experiment', id = 1, no_art = true,
     rarity = 'Rare', cost = 4,
 	
 	vars = {{odds_en = 4}, {odds_ed = 8}, {odds_s = 12}},
@@ -1316,7 +1332,7 @@ create_joker({
 
 --Quintuplets
 create_joker({
-    name = 'Quintuplets', id = 0,
+    name = 'Quintuplets', id = 2,
     rarity = 'Rare', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -1380,7 +1396,7 @@ end
 
 --Connoiseur
 create_joker({
-    name = 'Connoiseur', id = 0,
+    name = 'Connoiseur', id = 1, no_art = true,
     rarity = 'Rare', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -1456,9 +1472,9 @@ create_joker({
 
 --Miscellaneous
 
---Propagation
+--Inductor
 create_joker({
-    name = 'Propagation', id = 0,
+    name = 'Inductor', id = 1,
     rarity = 'Rare', cost = 4,
 	
 	vars = {{odds_en = 4}, {odds_ed = 8}, {odds_s = 12}},

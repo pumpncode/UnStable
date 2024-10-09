@@ -136,7 +136,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Floating-Point Error',
             ['text'] = {
-                [1] = 'Bleh',
+                [1] = 'Scored cards with {C:attention}Decimal Rank{}',
+				[2] = 'Gains {C:chips}extra chips{} equal to its own {C:attention}rank{}',
             }
         }
     },
@@ -145,7 +146,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Social Experiment',
             ['text'] = {
-                [1] = 'Double it and give it to the next card',
+                [1] = 'For each {C:attention}Numbered Cards{},',
+				[2] = 'Double all chips and give it to the next card',
+				[3] = "Strips the card's rank to {C:attention}0{}",
             }
         }
     },
@@ -185,9 +188,9 @@ return {
     },
 	
 	--Miscellaneous
-	propagation = {
+	inductor = {
         ['en-us'] = {
-            ['name'] = 'Propagation',
+            ['name'] = 'Inductor',
             ['text'] = {
                 [1] = 'For every played card with',
 				[2] = 'the same rank and suits',
