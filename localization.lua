@@ -154,6 +154,21 @@ return {
         }
     },
 	
+	micro_sd_card = {
+        ['en-us'] = {
+            ['name'] = 'Micro SD Card',
+            ['text'] = {
+				[1] = 'If this Joker is in the {C:attention}leftmost position{}',
+                [2] = 'take all {C:chips}chips{} from discarded base {C:attention}numbered cards{}',
+				[3] = "Strips card's rank to {C:attention}0{}",
+				[4] = "{C:green}#1# in #2#{} chance to destroy itself at the end of round",
+				[5] = "Chance increases by the amount of chip stored",
+				[6] = '{C:inactive}(Currently {C:chips}+#4#{C:inactive} Chips)',
+				[7] = '{C:inactive}Status: {V:1}#5#{}',
+            }
+        }
+    },
+	
 	social_experiment = {
         ['en-us'] = {
             ['name'] = 'Social Experiment',

@@ -268,7 +268,11 @@ local function create_joker(joker)
         update = joker.update,
         remove_from_deck = joker.remove,
         add_to_deck = joker.add,
+		
         set_ability = joker.set_ability,
+		set_sprites = joker.set_sprites,
+		load = joker.load,
+		
         in_pool = joker.custom_in_pool or pool,
 
         effect = joker.effect
@@ -484,7 +488,7 @@ SMODS.Enhancement {
         Spades = 3,
 	},
 	
-	set_sprites = function(self, card, initial, delay_sprites)
+	set_sprites = function(self, card, front)
 		local isCollection = (card.area and card.area.config.collection) or false
 		
 		if not isCollection and card.ability and card.ability.extra then
@@ -619,7 +623,7 @@ SMODS.Enhancement {
 	
 	loc_txt = loc["enh_resource"],
 	
-	set_sprites = function(self, card, initial, delay_sprites)
+	set_sprites = function(self, card, front)
 		
 		local isCollection = (card.area and card.area.config.collection) or false
 		
@@ -719,7 +723,7 @@ SMODS.Enhancement {
     no_rank = true,
     always_scores = true,
 	
-	config = {extra = { chips = 13, odds_conv = 2, odds_mult = 3, mult_good = 2.5, mult_bad = 0.5 }, h_x_mult = 0.5},
+	config = {extra = { chips = 13, odds_conv = 2, odds_mult = 3, mult_good = 2, mult_bad = 0.5 }, h_x_mult = 1},
 	
 	loc_vars = function(self)
         return {
@@ -729,6 +733,14 @@ SMODS.Enhancement {
 	
 	loc_txt = loc["enh_radioactive"],
     
+	set_ability = function(self, card, initial, delay_sprites)
+		--Set the hand multiplier the first time
+		if pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_mult then
+			card.ability.h_x_mult = card.ability.extra.mult_good
+		else
+			card.ability.h_x_mult = card.ability.extra.mult_bad
+		end
+    end,
 	
 	calculate = function(self, card, context)
         if context.cardarea == G.play and not context.repetition then
@@ -766,9 +778,9 @@ SMODS.Enhancement {
 		if context.cardarea == G.hand and not context.repetition then
 			--Xmult handling ability is built-in, so this one just checks for odds and alter it respectively.
 			if pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_mult then
-				card.ability.h_x_mult = 2.5
+				card.ability.h_x_mult = card.ability.extra.mult_good
 			else
-				card.ability.h_x_mult = 0.5
+				card.ability.h_x_mult = card.ability.extra.mult_bad
 			end
 			
 		end
@@ -1255,6 +1267,7 @@ create_joker({
 	set_ability = function(self, card, initial, delay_sprites)
 		--Enable rank 0 card in pools
 		setPoolRankFlagEnable('unstb_0', true);
+		setPoolRankFlagEnable('unstb_1', true);
     end,
 	
     calculate = function(self, card, context)
@@ -1313,6 +1326,131 @@ create_joker({
 })
 
 create_joker({
+    name = 'Micro SD Card', id = 4,
+    rarity = 'Uncommon', cost = 4,
+	
+	vars = {{odds_current = 0}, {odds_destroy = 512}, {stored_chips = 0}},
+	
+    custom_vars = function(self, info_queue, card)
+	
+		local activate_text = 'Inactive'
+		local activate_color = G.C.RED
+		if G.jokers and G.jokers.cards[1] == card then
+			activate_text = 'Active'
+			activate_color = G.C.GREEN
+		end
+	
+		return {vars = {G.GAME and G.GAME.probabilities.normal * card.ability.extra.odds_current or 0, card.ability.extra.odds_destroy, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.stored_chips, activate_text,
+				colours = {activate_color} }}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+	--Set sprites and hitbox
+	
+	set_sprites = function(self, card, front)
+        local w_scale, h_scale = 41/71, 59/95
+        card.children.center.scale.y = card.children.center.scale.y * h_scale
+        card.children.center.scale.x = card.children.center.scale.x * h_scale
+    end,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+        local w_scale, h_scale = 41/71, 59/95
+        card.T.h = card.T.h * h_scale
+        card.T.w = card.T.w * w_scale
+    end,
+	
+	load = function(self, card, initial, delay_sprites)
+        local w_scale, h_scale = 41/71, 59/95
+        card.T.h = card.T.h * h_scale
+        card.T.w = card.T.w * w_scale
+    end,
+	
+    calculate = function(self, card, context)
+		--This part handles the chip reward
+		if context.joker_main then
+		  return {
+			chip_mod = card.ability.extra.stored_chips,
+			message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.stored_chips } }
+		  }
+		end
+	
+		--The scaling part is not copyable by Blueprint
+		if context.discard and not context.blueprint then
+			
+			--Check if the joker is on the leftmost slot
+			if G.jokers.cards[1] == card then
+				local currentCard = context.other_card
+				
+				--Not debuffed, and isn't face card, and is base card
+				if not currentCard:is_face() and not currentCard.debuff and currentCard.config.center == G.P_CENTERS.c_base then
+					
+					local bonusChip = currentCard.ability.perma_bonus or 0
+					local baseChip = SMODS.Ranks[currentCard.base.value].nominal
+					
+					local totalChip = baseChip + bonusChip
+					
+					if totalChip>0 then
+						card.ability.extra.stored_chips = (card.ability.extra.stored_chips or 0) + totalChip
+						
+						card.ability.extra.odds_current = (card.ability.extra.odds_current or 0) + totalChip
+						
+						--Change card
+						event({trigger = 'after', delay = 0.02,  func = function()
+								
+							local suit_data = SMODS.Suits[currentCard.base.suit]
+							local suit_prefix = suit_data.card_key
+							
+							currentCard:juice_up(0.3, 0.3);
+							currentCard:set_base(G.P_CARDS[suit_prefix .. '_unstb_0' ])
+							
+							return true end })
+						
+						return {
+							message = localize { type = 'variable', key = 'a_chips', vars = { totalChip } },
+							colour = G.C.CHIPS,
+							card = card
+						}
+					end
+				end
+			end
+			
+		end
+		
+		--End of round check, make sure it's checked absolutely once per round
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			if pseudorandom('sdcard'..G.SEED) < G.GAME.probabilities.normal * card.ability.extra.odds_current / card.ability.extra.odds_destroy then
+				event({func = function()
+							
+						play_sound('tarot1')
+						card.T.r = -0.2
+						card:juice_up(0.3, 0.4)
+						card.states.drag.is = true
+						card.children.center.pinch.x = true
+						
+						--Destroy Card
+						event({trigger = 'after', delay = 0.3,  func = function()
+							
+							G.jokers:remove_card(card)
+							card:remove()
+							card = nil
+							return true end })
+						
+						return true end })
+				return {
+				  message = 'Corrupted...',
+				  colour = G.C.BLACK
+				}
+			else
+				return {
+				  message = 'Safe!'
+				}
+			end
+		end
+	end
+})
+
+create_joker({
     name = 'Social Experiment', id = 1, no_art = true,
     rarity = 'Rare', cost = 4,
 	
@@ -1321,6 +1459,7 @@ create_joker({
 	set_ability = function(self, card, initial, delay_sprites)
 		--Enable rank 0 card in pools
 		setPoolRankFlagEnable('unstb_0', true);
+		setPoolRankFlagEnable('unstb_1', true);
     end,
 	
     calculate = function(self, card, context)
@@ -1422,7 +1561,7 @@ create_joker({
 			card.ability.extra.scoring_hand = context.scoring_hand
 		end
 		
-		if context.end_of_round and card.ability.extra.scoring_name == 'Flush Five' then
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and card.ability.extra.scoring_name == 'Flush Five' then
 		
 			local isActivated = true
 			
@@ -1438,7 +1577,9 @@ create_joker({
 					card.ability.extra.scoring_name = ''
 				end
 				
-				event({	 trigger = 'after', delay = 0.3, func = function()
+				event({	 trigger = 'after', delay = 0.5, func = function()
+								card:juice_up(0.3, 0.3)
+				
 								add_tag(Tag('tag_negative'))
 								play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
 								play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
