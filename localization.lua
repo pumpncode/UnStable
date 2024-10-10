@@ -214,6 +214,22 @@ return {
         }
     },
 	
+	--New Enhancement Supports
+	
+	joker_island = {
+        ['en-us'] = {
+            ['name'] = 'Joker Island',
+            ['text'] = {
+                [1] = 'For every played card',
+				[2] = 'with rank {C:attention}#1#{}',
+				[3] = '{C:green}#2# in #3#{} chance to create',
+				[4] = 'a new {C:attention}Resource Card{} of the same scored suit',
+            }
+        }
+    },
+	
+	--New Anti-Enhancement Stuff
+	
 	--Miscellaneous
 	inductor = {
         ['en-us'] = {

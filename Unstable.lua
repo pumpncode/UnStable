@@ -702,9 +702,9 @@ SMODS.Enhancement {
 		end
 	end,
 	
-	--This cannot spawn naturally at all
+	--Can spawn when Catan mode enabled
 	in_pool = function(self, args)
-        return false
+        return G.GAME.pool_flags.catan_enabled
     end
  }
  
@@ -1358,6 +1358,10 @@ create_joker({
         local w_scale, h_scale = 41/71, 59/95
         card.T.h = card.T.h * h_scale
         card.T.w = card.T.w * w_scale
+		
+		--Enable rank 0 card in pools
+		setPoolRankFlagEnable('unstb_0', true);
+		setPoolRankFlagEnable('unstb_1', true);
     end,
 	
 	load = function(self, card, initial, delay_sprites)
@@ -1682,6 +1686,73 @@ create_joker({
 		
     end
 })
+
+--New Enhancements Support Stuff
+
+create_joker({
+    name = 'Joker Island', id = 0, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+	vars = {{target_rank = 2}, {odds_ticket = 6}},
+	
+    custom_vars = function(self, info_queue, card)
+        return {vars = {SMODS.Ranks[card.ability.extra.target_rank].key, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_ticket}}
+    end,
+	
+    blueprint = false, eternal = true,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+		--Random possible rank
+		local rank = '2'
+		if G.playing_cards then
+			rank = pseudorandom_element(G.playing_cards, pseudoseed('jokerisland')..G.SEED).base.value
+		end
+		
+		card.ability.extra.target_rank = rank
+    end,
+	
+    calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			local currentCard = context.other_card
+			if currentCard.base.value == card.ability.extra.target_rank then
+				
+				local isActivated = pseudorandom('jokerisland'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_ticket
+				
+				if isActivated then
+					event({func = function()
+									local rank = pseudorandom_element(SMODS.Ranks, pseudoseed('jokerisland')..G.SEED).card_key
+									local suit = SMODS.Suits[currentCard.base.suit].card_key
+									
+									local _card = Card(G.play.T.x + G.play.T.w/2, G.play.T.y, G.CARD_W, G.CARD_H, G.P_CARDS[suit..'_'..rank], G.P_CENTERS.m_unstb_resource, {playing_card = G.playing_card})
+									
+									_card:start_materialize({G.C.SECONDARY_SET.Enhanced})
+									G.play:emplace(_card)
+									table.insert(G.playing_cards, _card)
+									
+									return true end
+							})
+
+					event({func = function()
+						G.deck.config.card_limit = G.deck.config.card_limit + 1
+						draw_card(G.play,G.deck, 90,'up', nil)  
+						return true end
+						})
+						
+					playing_card_joker_effects({true})
+				end
+			end
+		end
+		
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			card.ability.extra.target_rank = pseudorandom_element(G.playing_cards, pseudoseed('jokerisland')..G.SEED).base.value --pseudorandom_element(SMODS.Ranks, pseudoseed('jokerisland')..G.SEED).key
+			return{
+				message = "Randomize"
+			}
+		end
+    end
+})
+
+--New Anti-Enhancement Stuff
 
 --Miscellaneous
 
