@@ -281,6 +281,27 @@ end
 
 --New Enhancements
  
+ function get_valid_card_from_deck(seed)
+    
+	local res_suit = 'Spades'
+	local res_rank = '2'
+	
+    local valid_cards = {}
+    for k, v in ipairs(G.playing_cards) do
+        if not v.config.center.replace_base_card  then --Excludes all cards with replace_base_card enhancements
+            valid_cards[#valid_cards+1] = v
+        end
+    end
+    if valid_cards[1] then 
+        local target_card = pseudorandom_element(valid_cards, pseudoseed(seed or 'validcard'..G.GAME.round_resets.ante))
+		
+        res_suit = target_card.base.suit
+		res_rank = target_card.base.value
+    end
+	
+	return {suit = res_suit, rank = res_rank}
+end
+ 
 --Patch get_chip_bonus to allow total chip override
 local cardGetChipBonusPointer = Card.get_chip_bonus
  
@@ -783,6 +804,67 @@ SMODS.Enhancement {
 				card.ability.h_x_mult = card.ability.extra.mult_bad
 			end
 			
+		end
+    end,
+	
+	--This cannot spawn naturally at all
+	in_pool = function(self, args)
+        return false
+    end
+ }
+ 
+ SMODS.Enhancement {
+	key = "biohazard",
+	atlas = "unstb_jokers",
+	pos = {x=0, y = 0},
+	
+    replace_base_card = true,
+    no_suit = true,
+    no_rank = true,
+    always_scores = true,
+	
+	config = {extra = { xmult = 0.9, h_money = 1}},
+	
+	loc_vars = function(self)
+        return {
+            vars = { self.config.extra.xmult, self.config.extra.h_money }
+        }
+    end,
+	
+	loc_txt = loc["enh_biohazard"],
+
+	
+	calculate = function(self, card, context, ret)
+
+		if context.cardarea == G.play and not context.repetition then
+			SMODS.eval_this(card, {Xmult_mod = card.ability.extra.xmult, message = localize{type='variable',key='a_xmult',vars={card.ability.extra.xmult}}} )
+		end
+
+		if context.discard then
+			--check hand card
+			local hand_card = {}
+			for i = 1, #G.hand.cards do
+				hand_card[G.hand.cards[i]] = true
+			end
+			
+			--populate valid cards
+			local valid_cards = {}
+			for k, v in ipairs(G.playing_cards) do
+				if v.config.center ~= G.P_CENTERS.m_unstb_biohazard and not hand_card[v] then --Excludes all cards with replace_base_card enhancements
+					valid_cards[#valid_cards+1] = v
+				end
+			end
+			
+			if valid_cards[1] then 
+				local target_card = pseudorandom_element(valid_cards, pseudoseed(seed or 'validcard'..G.GAME.round_resets.ante))
+				target_card:set_ability(G.P_CENTERS.m_unstb_biohazard , nil, true)
+			end
+			
+		end
+		
+		if context.cardarea == G.hand and not context.repetition then
+			--Hacky way to make it grant money from hand
+			ret.dollars = -card.ability.extra.h_money
 		end
     end,
 	
@@ -1717,7 +1799,7 @@ function get_valid_card_from_deck(seed)
 end
 
 create_joker({
-    name = 'Joker Island', id = 0, no_art = true,
+    name = 'Joker Island', id = 1, no_art = true,
     rarity = 'Uncommon', cost = 4,
 	
 	vars = {{target_rank = 2}, {odds_ticket = 6}},
@@ -1786,6 +1868,54 @@ create_joker({
 })
 
 --New Anti-Enhancement Stuff
+
+create_joker({
+    name = 'Kaiju', id = 0, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+	vars = {{add_slot = 3}},
+	
+    custom_vars = function(self, info_queue, card)
+	
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_radioactive']
+	
+        return {vars = {card.ability.extra.add_slot}}
+    end,
+	
+    blueprint = false, eternal = true,
+	
+	add_to_deck = function(self, card, from_debuff)
+		if not G.GAME.pool_flags.radioactive_enabled then
+			G.GAME.pool_flags.radioactive_enabled = true
+		end
+		
+		G.jokers.config.card_limit = G.jokers.config.card_limit + card.ability.extra.add_slot
+	end,
+	
+	remove_from_deck = function(self, card, from_debuff)
+		G.jokers.config.card_limit = G.jokers.config.card_limit - card.ability.extra.add_slot
+	end,
+	
+    calculate = function(self, card, context)
+		if context.first_hand_drawn then
+			event({delay = 0.4, trigger = 'after',
+						func = function()
+							local eligible_list={}
+							for i=1, #G.hand.cards do
+								if G.hand.cards[i].config.center ~= G.P_CENTERS.m_unstb_radioactive then table.insert(eligible_list,G.hand.cards[i]) end
+							end
+							if #eligible_list>0 then
+								local enhanced_card = pseudorandom_element(eligible_list, pseudoseed('kaiju'..G.SEED))
+								enhanced_card:set_ability(G.P_CENTERS.m_unstb_radioactive , nil, true)
+								play_sound('tarot1')
+								enhanced_card:juice_up()
+							end
+							
+						return true end}
+					)
+		end
+    end
+})
 
 --Miscellaneous
 

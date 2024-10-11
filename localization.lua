@@ -91,6 +91,18 @@ return {
         }
 	},
 	
+	enh_biohazard = {
+		['en-us'] = {
+            ['name'] = 'Biohazard Card',
+            ['text'] = {
+                [1] = '{X:mult,C:white}X#1#{} Mult, no rank or suit',
+				[2] = '{C:red}-$#2#{} on hand',
+				[3] = 'When discarded, turns one random',
+				[4] = 'card in the deck into {C:attention}Biohazard Card{}',
+            }
+        }
+	},
+	
 	-- Ranks
 
     ranks = {
@@ -229,6 +241,18 @@ return {
     },
 	
 	--New Anti-Enhancement Stuff
+	
+	kaiju = {
+        ['en-us'] = {
+            ['name'] = 'Kaiju',
+            ['text'] = {
+                [1] = '{C:dark_edition}+#1#{} Joker Slot',
+				[2] = 'Turns one random card',
+				[3] = 'into {C:attention}Radioactive Card{} when',
+				[4] = 'first hand is drawn',
+            }
+        }
+    },
 	
 	--Miscellaneous
 	inductor = {
