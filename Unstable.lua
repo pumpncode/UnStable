@@ -266,8 +266,8 @@ local function create_joker(joker)
 
         calculate = joker.calculate,
         update = joker.update,
-        remove_from_deck = joker.remove,
-        add_to_deck = joker.add,
+        remove_from_deck = joker.remove_from_deck,
+        add_to_deck = joker.add_to_deck,
 		
         set_ability = joker.set_ability,
 		set_sprites = joker.set_sprites,
@@ -1264,10 +1264,12 @@ create_joker({
 	
     blueprint = false, eternal = true,
 	
-	set_ability = function(self, card, initial, delay_sprites)
+	add_to_deck = function(self, card, from_debuff)
 		--Enable rank 0 card in pools
-		setPoolRankFlagEnable('unstb_0', true);
-		setPoolRankFlagEnable('unstb_1', true);
+		if not from_debuff then
+			setPoolRankFlagEnable('unstb_0', true);
+			setPoolRankFlagEnable('unstb_1', true);
+		end
     end,
 	
     calculate = function(self, card, context)
@@ -1358,10 +1360,6 @@ create_joker({
         local w_scale, h_scale = 41/71, 59/95
         card.T.h = card.T.h * h_scale
         card.T.w = card.T.w * w_scale
-		
-		--Enable rank 0 card in pools
-		setPoolRankFlagEnable('unstb_0', true);
-		setPoolRankFlagEnable('unstb_1', true);
     end,
 	
 	load = function(self, card, initial, delay_sprites)
@@ -1369,6 +1367,12 @@ create_joker({
         card.T.h = card.T.h * h_scale
         card.T.w = card.T.w * w_scale
     end,
+	
+	add_to_deck = function(self, card, from_debuff)
+		--Enable rank 0 card in pools
+		setPoolRankFlagEnable('unstb_0', true);
+		setPoolRankFlagEnable('unstb_1', true);
+	end,
 	
     calculate = function(self, card, context)
 		--This part handles the chip reward
@@ -1460,7 +1464,7 @@ create_joker({
 	
     blueprint = false, eternal = true,
 	
-	set_ability = function(self, card, initial, delay_sprites)
+	add_to_deck = function(self, card, from_debuff)
 		--Enable rank 0 card in pools
 		setPoolRankFlagEnable('unstb_0', true);
 		setPoolRankFlagEnable('unstb_1', true);
@@ -1689,6 +1693,29 @@ create_joker({
 
 --New Enhancements Support Stuff
 
+--New global function to get a random eligible suit and rank from the deck without rank-overrides enhancements getting in the way
+--Code based on Castle from base game
+function get_valid_card_from_deck(seed)
+    
+	local res_suit = 'Spades'
+	local res_rank = '2'
+	
+    local valid_cards = {}
+    for k, v in ipairs(G.playing_cards) do
+        if not v.config.center.replace_base_card  then --Excludes all cards with replace_base_card enhancements
+            valid_cards[#valid_cards+1] = v
+        end
+    end
+    if valid_cards[1] then 
+        local target_card = pseudorandom_element(valid_cards, pseudoseed(seed or 'validcard'..G.GAME.round_resets.ante))
+		
+        res_suit = target_card.base.suit
+		res_rank = target_card.base.value
+    end
+	
+	return {suit = res_suit, rank = res_rank}
+end
+
 create_joker({
     name = 'Joker Island', id = 0, no_art = true,
     rarity = 'Uncommon', cost = 4,
@@ -1705,11 +1732,17 @@ create_joker({
 		--Random possible rank
 		local rank = '2'
 		if G.playing_cards then
-			rank = pseudorandom_element(G.playing_cards, pseudoseed('jokerisland')..G.SEED).base.value
+			rank = get_valid_card_from_deck('jokerisland'..G.SEED).rank --pseudorandom_element(G.playing_cards, pseudoseed('jokerisland')..G.SEED).base.value
 		end
 		
 		card.ability.extra.target_rank = rank
     end,
+	
+	add_to_deck = function(self, card, from_debuff)
+		if not G.GAME.pool_flags.catan_enabled then
+			G.GAME.pool_flags.catan_enabled = true
+		end
+	end,
 	
     calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
@@ -1744,7 +1777,7 @@ create_joker({
 		end
 		
 		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
-			card.ability.extra.target_rank = pseudorandom_element(G.playing_cards, pseudoseed('jokerisland')..G.SEED).base.value --pseudorandom_element(SMODS.Ranks, pseudoseed('jokerisland')..G.SEED).key
+			card.ability.extra.target_rank = get_valid_card_from_deck('jokerisland'..G.SEED).rank --pseudorandom_element(G.playing_cards, pseudoseed('jokerisland')..G.SEED).base.value --pseudorandom_element(SMODS.Ranks, pseudoseed('jokerisland')..G.SEED).key
 			return{
 				message = "Randomize"
 			}
