@@ -31,3 +31,20 @@ if effects[ii].h_chips then
 	card_eval_status_text(G.hand.cards[i], 'chips', effects[ii].h_chips, percent)
 end
 '''
+
+# Enhancement Discard Overrides
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = "draw_card(G.hand, G.discard, i*100/highlighted_count, 'down', false, G.hand.highlighted[i])"
+position = 'at'
+match_indent = true
+payload = '''
+
+if G.hand.highlighted[i].config.center.discard_override and not G.hand.highlighted[i].debuff then
+	G.hand.highlighted[i].config.center:discard_override(G.hand.highlighted[i], {delay = i*100/highlighted_count})
+else
+    draw_card(G.hand, G.discard, i*100/highlighted_count, 'down', false, G.hand.highlighted[i])
+end
+
+'''

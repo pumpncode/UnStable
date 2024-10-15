@@ -318,7 +318,7 @@ end
 SMODS.Enhancement {
 	key = "acorn",
 	atlas = "unstb_back",
-	pos = {x=1, y = 0},
+	pos = {x=0, y = 0},
 	
     replace_base_card = false,
     no_suit = false,
@@ -369,7 +369,7 @@ SMODS.Enhancement {
 SMODS.Enhancement {
 	key = "vintage",
 	atlas = "unstb_back",
-	pos = {x=2, y = 0},
+	pos = {x=1, y = 0},
 	
 	
 	config = {extra = { bonus_chip = 0, chip_gain_rate = 3, current_odd = 0, odd_destroy = 25, destroy_rate = 1}},
@@ -419,7 +419,7 @@ SMODS.Enhancement {
 SMODS.Enhancement {
 	key = "promo",
 	atlas = "unstb_back",
-	pos = {x=3, y = 0},
+	pos = {x=2, y = 0},
 	
     replace_base_card = false,
     no_suit = false,
@@ -735,7 +735,7 @@ SMODS.Enhancement {
 SMODS.Enhancement {
 	key = "radioactive",
 	atlas = "unstb_back",
-	pos = {x=0, y = 0},
+	pos = {x=3, y = 0},
 	
 	
 	
@@ -813,10 +813,10 @@ SMODS.Enhancement {
     end
  }
  
- SMODS.Enhancement {
+SMODS.Enhancement {
 	key = "biohazard",
-	atlas = "unstb_jokers",
-	pos = {x=0, y = 0},
+	atlas = "unstb_back",
+	pos = {x=4, y = 0},
 	
     replace_base_card = true,
     no_suit = true,
@@ -867,6 +867,60 @@ SMODS.Enhancement {
 			ret.dollars = -card.ability.extra.h_money
 		end
     end,
+	
+	--This cannot spawn naturally at all
+	in_pool = function(self, args)
+        return false
+    end
+ }
+ 
+SMODS.Enhancement {
+	key = "poison",
+	atlas = "unstb_back",
+	pos = {x=5, y = 0},
+	
+    replace_base_card = false,
+    no_suit = false,
+    no_rank = false,
+    always_scores = true,
+	
+	override_chip = 0,
+	
+	config = {extra = { chip = 0.9, h_money = 1}},
+	
+	loc_vars = function(self, info_queue, card)
+	
+		local chip = 0
+		if card.base then
+			chip = card.base.nominal
+		end
+	
+        return {
+            vars = { chip , self.config.extra.h_money }
+        }
+    end,
+	
+	loc_txt = loc["enh_poison"],
+	
+	--Override genere_ui so it does not display any chips
+	generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
+            SMODS.Enhancement.super.generate_ui(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
+    end,
+
+	
+	calculate = function(self, card, context, ret)
+
+		if context.cardarea == G.play and not context.repetition then
+			local totalChip = card.base.nominal
+			SMODS.eval_this(card, {chip_mod = -totalChip})
+			forced_message('-'..totalChip, card, G.C.RED, true) --Tried to sent color, but it got override with chips color	fsr	
+		end
+    end,
+	
+	discard_override = function(self, card, args) --Discard overridden function, injected by Lovely
+		draw_card(G.hand, G.deck, args.delay, 'down', false, card)
+		G.deck:shuffle('poison'..G.GAME.round_resets.ante)
+	end,
 	
 	--This cannot spawn naturally at all
 	in_pool = function(self, args)

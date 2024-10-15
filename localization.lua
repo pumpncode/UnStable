@@ -96,9 +96,20 @@ return {
             ['name'] = 'Biohazard Card',
             ['text'] = {
                 [1] = '{X:mult,C:white}X#1#{} Mult, no rank or suit',
-				[2] = '{C:red}-$#2#{} on hand',
+				[2] = 'Lose {C:red}-$#2#{} on hand',
 				[3] = 'When discarded, turns one random',
 				[4] = 'card in the deck into {C:attention}Biohazard Card{}',
+            }
+        }
+	},
+	
+	enh_poison = {
+		['en-us'] = {
+            ['name'] = 'Poison Card',
+            ['text'] = {
+				[1] = '{C:red}-#1#{} chips',
+				[2] = 'Discarded {C:attention}Poison Cards{}',
+				[3] = 'goes back into the deck',
             }
         }
 	},
