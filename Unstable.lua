@@ -13,8 +13,12 @@ local unStb = SMODS.current_mod
 local filesystem = NFS or love.filesystem
 local path = unStb.path
 
+--Global Table
+unstb_global = {}
+
 --Localization Messages
 local loc = filesystem.load(unStb.path..'localization.lua')()
+unstb_global.loc = loc
 
 -- Debug message
 
@@ -495,7 +499,7 @@ SMODS.Enhancement {
 		end
 	
         return {
-            vars = { card.ability.extra.chips or 0, suit_text, card.ability.extra.rank or 0 ,
+            vars = { card.ability.extra.chips or 0, suit_text, localize(card.ability.extra.rank or '2', 'ranks')  ,
 			colours = {suit_text_color} }
         }
     end,
@@ -1649,8 +1653,8 @@ create_joker({
 							currentCard:set_base(G.P_CARDS[suit_prefix .. '_unstb_0' ])
 							
 							--Un-stoned the stone card
-							print(currentCard.config.center.key)
-							print(chipsAbilityMatch[currentCard.config.center.key])
+							--print(currentCard.config.center.key)
+							--print(chipsAbilityMatch[currentCard.config.center.key])
 							if currentCard.config.center.key == 'm_unstb_slop' or chipsAbilityMatch[currentCard.config.center.key] then
 								currentCard:set_ability(G.P_CENTERS.c_base)
 							end
@@ -1859,7 +1863,7 @@ create_joker({
 	vars = {{target_rank = 2}, {odds_ticket = 6}},
 	
     custom_vars = function(self, info_queue, card)
-        return {vars = {SMODS.Ranks[card.ability.extra.target_rank].key, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_ticket}}
+        return {vars = {localize(card.ability.extra.target_rank, 'ranks'), G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_ticket}}
     end,
 	
     blueprint = false, eternal = true,
@@ -1998,10 +2002,6 @@ create_joker({
 			local sourceCard = {}
 		
 			for i = 1, #context.scoring_hand do
-				print(context.scoring_hand[i].config.center == G.P_CENTERS.m_stone)
-				print(context.scoring_hand[i].config.center.replace_base_card)
-				print(context.scoring_hand[i].config.center == G.P_CENTERS.m_stone or context.scoring_hand[i].config.center.replace_base_card)
-				print('---')
 				if not (context.scoring_hand[i].config.center == G.P_CENTERS.m_stone or context.scoring_hand[i].config.center.replace_base_card) then --Check if it is not a Stone card or have any weird enhancement
 					if sourceCard[context.scoring_hand[i].base.value..context.scoring_hand[i].base.suit] then --targetCard exists
 						
@@ -2072,6 +2072,10 @@ create_joker({
 
 --Deck Preview UI supports for hiding modded ranks
 filesystem.load(unStb.path..'/override/ui.lua')()
+
+--Reworked Vanilla Joker to support new features
+filesystem.load(unStb.path..'/override/vanilla_joker.lua')()
+
 
 ----------------------------------------------
 ------------MOD CODE END----------------------

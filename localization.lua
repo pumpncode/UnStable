@@ -279,4 +279,75 @@ return {
         }
     },
 	
+	
+	--Vanilla reworked joker
+	fibonacci = {
+        ['en-us'] = {
+            ['name'] = 'Fibonacci',
+            ['text'] = {
+                [1] = 'Each played {C:attention}Ace{},',
+				[2] = '{C:attention}2{}, {C:attention}3{}, {C:attention}5{}, or {C:attention}8{} gives',
+				[3] = 'gives {C:mult}+#1#{} Mult when scored',
+            }
+        }
+    },
+	
+	fibonacci_ex = {
+        ['en-us'] = {
+            ['name'] = 'Fibonacci',
+            ['text'] = {
+                [1] = 'Each played {C:attention}0{}, {C:attention}1{}, {C:attention}Ace{},',
+				[2] = '{C:attention}2{}, {C:attention}3{}, {C:attention}5{}, {C:attention}8{}, or {C:attention}21{}',
+				[3] = 'gives {C:mult}+#1#{} Mult when scored',
+            }
+        }
+    },
+	
+	odd_todd = {
+        ['en-us'] = {
+            ['name'] = 'Odd Todd',
+            ['text'] = {
+                [1] = 'Played cards with',
+				[2] = '{C:attention}odd{} rank gives',
+				[3] = '{C:chips}+#1#{} Chips when scored',
+				[4] = '{C:inactive}(A, 9, 7, 5, 3){}',
+            }
+        }
+    },
+	
+	odd_todd_ex = {
+        ['en-us'] = {
+            ['name'] = 'Odd Todd',
+            ['text'] = {
+                [1] = 'Played cards with',
+				[2] = '{C:attention}odd{} rank gives',
+				[3] = '{C:chips}+#1#{} Chips when scored',
+				[4] = '{C:inactive}(21, A, 9, 7, 5, 3, 1){}',
+            }
+        }
+    },
+	
+	even_steven = {
+        ['en-us'] = {
+            ['name'] = 'Even Steven',
+            ['text'] = {
+                [1] = 'Played cards with',
+				[2] = '{C:attention}even{} rank gives',
+				[3] = '{C:mult}+#1#{} Mult when scored',
+				[4] = '{C:inactive}(10, 8, 6, 4, 2){}',
+            }
+        }
+    },
+	
+	even_steven_ex = {
+        ['en-us'] = {
+            ['name'] = 'Even Steven',
+            ['text'] = {
+                [1] = 'Played cards with',
+				[2] = '{C:attention}even{} rank gives',
+				[3] = '{C:mult}+#1#{} Mult when scored',
+				[4] = '{C:inactive}(10, 8, 6, 4, 2, 0){}',
+            }
+        }
+    },
 }
