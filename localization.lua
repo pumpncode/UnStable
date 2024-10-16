@@ -266,6 +266,62 @@ return {
     },
 	
 	--Miscellaneous
+	
+	joker2 = {
+        ['en-us'] = {
+            ['name'] = 'Joker2',
+            ['text'] = {
+                [1] = '{C:mult}+#1#{} Mult',
+				[2] = '{X:mult,C:white}x#2#{} Mult',
+				[3] = '{C:green}#3# in #4#{} chance of destroying itself',
+				[4] = 'at the end of round',
+            }
+        }
+    },
+	
+	joker_stairs = {
+        ['en-us'] = {
+            ['name'] = 'Joker Stairs',
+            ['text'] = {
+                [1] = 'Gain {C:mult}+#1#{} Mult when buying a joker',
+				[2] = 'with {C:attention}"Joker"{} in the name.',
+				[3] = '{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult){}',
+            }
+        }
+    },
+	
+	spectre = {
+        ['en-us'] = {
+            ['name'] = 'Spectre',
+            ['text'] = {
+                [1] = '{X:mult,C:white}x#1#{} Mult per {C:spectral}Spectral{}',
+				[2] = 'card used this run',
+				[3] = '{C:inactive}(Currently {X:mult,C:white}x#2#{C:inactive} Mult){}',
+            }
+        }
+    },
+	
+	throwing_hands = {
+        ['en-us'] = {
+            ['name'] = 'Throwing Hands',
+            ['text'] = {
+                [1] = '{X:mult,C:white}x#1#{} Mult if the played hand is {C:attention}#3#{}',
+				[2] = '{X:mult,C:white}x#2#{} Mult otherwise',
+				[3] = '{C:inactive}(Hand changes at the end of round){}',
+            }
+        }
+    },
+	
+	salmon_run = {
+        ['en-us'] = {
+            ['name'] = 'Salmon Run',
+            ['text'] = {
+                [1] = '{C:green}#1# in #2#{} chance of',
+				[2] = 'duplicating any scored {C:attention}7{}',
+            }
+        }
+    },
+	
 	inductor = {
         ['en-us'] = {
             ['name'] = 'Inductor',

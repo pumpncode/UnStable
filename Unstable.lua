@@ -932,6 +932,14 @@ SMODS.Enhancement {
     end
  }
  
+ --Add proper tag to stone cards, nothing should change gameplay-wise
+SMODS.Enhancement:take_ownership('m_stone', {
+    replace_base_card = true,
+    no_suit = true,
+    no_rank = true,
+    always_scores = true,
+    }, true)
+ 
 --New Ranks
 
 --Pool flag wrapper function to help assist managing ranks enable / disable
@@ -1229,7 +1237,7 @@ local function blackJack_evalrank(hand, bustAmount)
 	
 	for i = 1, #hand do
 		local currentCard = hand[i]
-		if (currentCard.config.center ~= G.P_CENTERS.m_stone or currentCard.config.center.no_rank) and not currentCard.debuff  then
+		if not (currentCard.config.center == G.P_CENTERS.m_stone or currentCard.config.center.no_rank) and not currentCard.debuff  then
 			
 			if currentCard.base.value ~= 'Ace' then
 				rank = rank + (SMODS.Ranks[currentCard.base.value].nominal or 0) --Supports modded ranks as well, just in case
@@ -1928,7 +1936,7 @@ create_joker({
 --New Anti-Enhancement Stuff
 
 create_joker({
-    name = 'Kaiju', id = 0, no_art = true,
+    name = 'Kaiju', id = 1, no_art = true,
     rarity = 'Uncommon', cost = 4,
 	
 	vars = {{add_slot = 3}},
@@ -1976,6 +1984,261 @@ create_joker({
 })
 
 --Miscellaneous
+
+-- Joker 2
+
+create_joker({
+    name = 'Joker2', id = 1, no_art = true,
+    rarity = 'Common', cost = 4,
+	
+	vars = {{mult = 4}, {xmult = 2}, {odds_destroy = 4}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.mult, card.ability.extra.xmult, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_destroy}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+    calculate = function(self, card, context)
+		
+		--Main context
+		if context.joker_main then
+		
+			--Add mult first
+			SMODS.eval_this(card, {mult_mod = card.ability.extra.mult, message = localize{type='variable',key='a_mult',vars={card.ability.extra.mult}}} )
+		
+			--Then Xmult
+			return {
+				Xmult_mod = card.ability.extra.xmult,
+				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.xmult } }
+			}
+		end
+		
+		--End of round check, make sure it's checked absolutely once per round
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			if pseudorandom('joker2'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_destroy then
+				event({func = function()
+							
+						play_sound('tarot1')
+						card.T.r = -0.2
+						card:juice_up(0.3, 0.4)
+						card.states.drag.is = true
+						card.children.center.pinch.x = true
+						
+						--Destroy Card
+						event({trigger = 'after', delay = 0.3,  func = function()
+							
+							G.jokers:remove_card(card)
+							card:remove()
+							card = nil
+							return true end })
+						
+						return true end })
+				return {
+				  message = 'Flopped',
+				  colour = G.C.ORANGE
+				}
+			else
+				return {
+				  message = 'Safe!',
+				  colour = G.C.GREEN
+				}
+			end
+		end
+    end
+})
+
+-- Joker Stairs
+create_joker({
+    name = 'Joker Stairs', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+	vars = {{mult_rate = 4}, {mult = 0}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.mult_rate, card.ability.extra.mult}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+    calculate = function(self, card, context)
+		--Shop
+		if context.buying_card and context.card ~= card then
+			--get name
+			local jokerName = string.lower(localize{type = 'name_text', key = context.card.config.center.key, set = 'Joker'})
+			
+			if string.match(jokerName, "joker") then
+				--print("Joker Stair Triggered!")
+				card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_rate
+				   event({
+					func = function()
+							big_juice(card)
+							forced_message("Upgraded!", card, G.C.MULT, true)
+							--card_eval_status_text(card,'extra',nil, nil, nil,{message = "Upgraded", colour = G.C.MULT, instant = true})
+							return true end})
+			end
+		end
+		
+		--Main context
+		if context.joker_main then
+			if card.ability.extra.mult > 0 then
+				return {
+					mult_mod = card.ability.extra.mult,
+					message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } }
+				}
+			end
+		end
+		
+    end
+})
+
+--Spectre
+create_joker({
+    name = 'Spectre', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+	vars = {{xmult_rate = 0.25}, {xmult = 1}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.xmult_rate, card.ability.extra.xmult}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+		if G.GAME and G.GAME.consumeable_usage_total then
+			card.ability.extra.xmult = 1 + G.GAME.consumeable_usage_total.spectral * card.ability.extra.xmult_rate
+		else
+			card.ability.extra.xmult = 1
+		end
+    end,
+	
+    calculate = function(self, card, context)
+		
+		--Upgrades
+		if context.using_consumeable and not context.blueprint then
+                if context.consumeable.ability.set == "Spectral" then
+				   card.ability.extra.xmult = card.ability.extra.xmult + card.ability.extra.xmult_rate
+				   event({
+					func = function()
+							big_juice(card)
+							forced_message("Upgraded!", card, G.C.MULT, true)
+							--card_eval_status_text(card,'extra',nil, nil, nil,{message = "Upgraded", colour = G.C.MULT, instant = true})
+							return true end})
+				end
+		end
+		
+		--Main context
+		if context.joker_main then
+			return {
+				Xmult_mod = card.ability.extra.xmult,
+				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.xmult } }
+			}
+		end
+		
+    end
+})
+
+local function get_random_hand(current_hand, seed)
+	local _poker_hands = {}
+	
+	--Populate list
+    for k, v in pairs(G.GAME.hands) do
+        if v.visible then _poker_hands[#_poker_hands+1] = k end
+    end
+       
+	local new_hand = nil
+    while not new_hand do
+        new_hand = pseudorandom_element(_poker_hands, pseudoseed(seed or 'rand_hand'))
+        if new_hand == current_hand then new_hand = nil end
+    end
+	
+	return new_hand
+end
+
+--Throwing Hands
+create_joker({
+    name = 'Throwing Hands', id = 1, no_art = true,
+    rarity = 'Rare', cost = 4,
+	
+	vars = {{target_hand = 'High Card'}, {xmult_bad = 0.5}, {xmult_good = 5}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.xmult_good, card.ability.extra.xmult_bad, card.ability.extra.target_hand}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+	set_ability = function(self,card, initial, delay_sprites)
+	
+		--Random Poker Hand
+        card.ability.extra.target_hand = get_random_hand(card.ability.extra.target_hand, 'throwinghands'..G.SEED)
+    end,
+	
+    calculate = function(self, card, context)
+		
+		if context.joker_main and context.scoring_name ~= nil and context.scoring_hand then
+		
+			local xmult = card.ability.extra.xmult_bad
+		
+			if context.scoring_name == card.ability.extra.target_hand then
+				xmult = card.ability.extra.xmult_good
+			end
+		
+			return {
+				Xmult_mod = xmult,
+				message = localize { type = 'variable', key = 'a_xmult', vars = { xmult } }
+			}
+		end
+		
+		if context.end_of_round and not (context.individual or context.repetition or context.blueprint) then
+            card.ability.extra.target_hand = get_random_hand(card.ability.extra.target_hand, 'throwinghands'..G.SEED)
+			
+            return {
+                message = card.ability.extra.target_hand
+            }
+        end
+    end
+})
+
+--Salmon Run
+create_joker({
+    name = 'Salmon Run', id = 1, no_art = true,
+    rarity = 'Rare', cost = 4,
+	
+	vars = {{odds = 7}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+    calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			local currentCard = context.other_card
+			
+			if not currentCard.config.center.no_rank and currentCard.base.value == '7' then
+				local isActivated = pseudorandom('salmonrun'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds
+				
+				if isActivated then
+					event({func = function()
+									--Copy Card
+									local _card = copy_card(currentCard, nil, nil, G.playing_card)
+									_card:start_materialize({G.C.SECONDARY_SET.Enhanced})
+									G.play:emplace(_card)
+									table.insert(G.playing_cards, _card)
+									
+									return true end
+							})
+
+					event({func = function()
+						G.deck.config.card_limit = G.deck.config.card_limit + 1
+						draw_card(G.play,G.deck, 90,'up', nil)  
+						return true end
+						})
+						
+					playing_card_joker_effects({true})
+				end
+			end
+		end
+    end
+})
 
 --Inductor
 create_joker({
