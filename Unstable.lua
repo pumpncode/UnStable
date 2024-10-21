@@ -1865,7 +1865,7 @@ function get_valid_card_from_deck(seed)
 end
 
 create_joker({
-    name = 'Joker Island', id = 1, no_art = true,
+    name = 'Joker Island', id = 7,
     rarity = 'Uncommon', cost = 4,
 	
 	vars = {{target_rank = 2}, {odds_ticket = 6}},
@@ -1988,7 +1988,7 @@ create_joker({
 -- Joker 2
 
 create_joker({
-    name = 'Joker2', id = 1, no_art = true,
+    name = 'Joker2', id = 11,
     rarity = 'Common', cost = 4,
 	
 	vars = {{mult = 4}, {xmult = 2}, {odds_destroy = 4}},
@@ -2049,7 +2049,7 @@ create_joker({
 
 -- Joker Stairs
 create_joker({
-    name = 'Joker Stairs', id = 1, no_art = true,
+    name = 'Joker Stairs', id = 12,
     rarity = 'Uncommon', cost = 4,
 	
 	vars = {{mult_rate = 4}, {mult = 0}},
@@ -2092,7 +2092,7 @@ create_joker({
 
 --Spectre
 create_joker({
-    name = 'Spectre', id = 1, no_art = true,
+    name = 'Spectre', id = 9,
     rarity = 'Uncommon', cost = 4,
 	
 	vars = {{xmult_rate = 0.25}, {xmult = 1}},
@@ -2155,7 +2155,7 @@ end
 
 --Throwing Hands
 create_joker({
-    name = 'Throwing Hands', id = 1, no_art = true,
+    name = 'Throwing Hands', id = 8,
     rarity = 'Rare', cost = 4,
 	
 	vars = {{target_hand = 'High Card'}, {xmult_bad = 0.5}, {xmult_good = 5}},
@@ -2199,7 +2199,7 @@ create_joker({
 
 --Salmon Run
 create_joker({
-    name = 'Salmon Run', id = 1, no_art = true,
+    name = 'Salmon Run', id = 10,
     rarity = 'Rare', cost = 4,
 	
 	vars = {{odds = 7}},
