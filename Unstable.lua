@@ -104,6 +104,18 @@ SMODS.Atlas {
   py = 95
 }
 
+--Atlas for Suit Seals
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "suit_seal",
+  -- The name of the file, for the code to pull the atlas from
+  path = "suit_seal.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
 --Atlas for extra ranks
 SMODS.Atlas {
   -- Key for code to find it with
@@ -282,6 +294,66 @@ local function create_joker(joker)
         effect = joker.effect
         }
 end
+
+
+--Suit Seals
+
+--Global table for Suit Seals-related stuff
+SuitSeal = {}
+
+SuitSeal.suit_seal_colors = {
+	Spades = HEX "603de8",
+	Hearts = HEX "e83d61",
+	Clubs = HEX "19b8a1",
+	Diamonds = HEX "e8793d",
+}
+
+--External function to supports register more suits (especially modded) if needed
+function SuitSeal.registerSealColor(suit, color)
+	SuitSeal.suit_seal_colors[suit] = HEX(color)
+end
+
+--Creating an actual SMODS Seal object
+function SuitSeal.initSeal(suit, atlas, posX)
+	SMODS.Seal({
+    key = string.lower(suit),
+    atlas = atlas or "suit_seal",
+	
+	--Extra field for suit seal only, 
+	suit_seal = suit,
+	
+    pos = { x = posX or 0, y = 0 },
+    badge_colour = SuitSeal.suit_seal_colors[suit],
+    weight = 0,
+    config = {extra = {}},
+    loc_txt = loc["seal_"..string.lower(suit)],
+    loc_vars = function(self, info_queue, card)
+        return {vars = {localize(self.suit_seal, 'suits_plural'), colours = {G.C.SUITS[self.suit_seal]}}}
+    end,
+    --[[calculate = function(self, card, context)
+        if context.cardarea and context.cardarea == G.play and not context.repetition and not context.individual then
+            return {
+                message = localize({type = 'variable', key = 'a_mult', vars = {self.config.extra.balloon_mult * Balloons.modifiers.values}}),
+                mult = self.config.extra.balloon_mult * Balloons.modifiers.values,
+                colour = G.C.MULT,
+                func = check_floated_away(self, card)
+            }
+        end
+    end]]
+	
+	--This cannot spawn naturally at all
+	in_pool = function(self, args)
+        return false
+    end
+	})
+end
+
+local suit_seal_list = {"Spades", "Hearts", "Clubs", "Diamonds"}
+
+for i = 1, #suit_seal_list do
+	SuitSeal.initSeal(suit_seal_list[i], "suit_seal", (i+2)%4 )
+end
+
 
 --New Enhancements
  
@@ -688,7 +760,7 @@ SMODS.Enhancement {
 			if context.scoring_hand then
 				for i = 1, #context.scoring_hand do
 					local currentCard = context.scoring_hand[i]
-					if currentCard ~= card and currentCard.config.center ~= G.P_CENTERS.m_unstb_resource and currentCard.base.suit == card.ability.extra.suit then				
+					if currentCard ~= card and currentCard.config.center ~= G.P_CENTERS.m_unstb_resource and currentCard:is_suit(card.ability.extra.suit) then				
 						has_suit = true
 						break
 					end
@@ -2339,6 +2411,8 @@ filesystem.load(unStb.path..'/override/ui.lua')()
 --Reworked Vanilla Joker to support new features
 filesystem.load(unStb.path..'/override/vanilla_joker.lua')()
 
+--Suits, supports for Suit Seals, a lot of suit-based Joker, and modded suits support for Smeared
+filesystem.load(unStb.path..'/override/suits.lua')()
 
 ----------------------------------------------
 ------------MOD CODE END----------------------

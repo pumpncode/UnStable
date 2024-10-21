@@ -114,6 +114,49 @@ return {
         }
 	},
 	
+	--Suit Seals
+	
+	seal_spades = {
+		['en-us'] = {
+			['label'] = 'Spade Seal',
+            ['name'] = 'Spade Seal',
+            ['text'] = {
+				[1] = 'This card also',
+				[2] = 'counts as {V:1}#1#',
+            }
+        }
+	},
+	seal_hearts = {
+		['en-us'] = {
+			['label'] = 'Heart Seal',
+            ['name'] = 'Heart Seal',
+            ['text'] = {
+				[1] = 'This card also',
+				[2] = 'counts as {V:1}#1#',
+            }
+        }
+	},
+	seal_clubs = {
+		['en-us'] = {
+			['label'] = 'Club Seal',
+            ['name'] = 'Club Seal',
+            ['text'] = {
+				[1] = 'This card also',
+				[2] = 'counts as {V:1}#1#',
+            }
+        }
+	},
+	seal_diamonds = {
+		['en-us'] = {
+			['label'] = 'Diamond Seal',
+            ['name'] = 'Diamond Seal',
+            ['text'] = {
+				[1] = 'This card also',
+				[2] = 'counts as {V:1}#1#',
+            }
+        }
+	},
+	
 	-- Ranks
 
     ranks = {
