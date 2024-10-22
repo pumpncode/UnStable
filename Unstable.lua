@@ -295,6 +295,44 @@ local function create_joker(joker)
         }
 end
 
+--Face Seal
+
+SMODS.Seal({
+    key = "face",
+    atlas = "suit_seal",
+	
+    pos = { x = 0 or 0, y = 0 },
+    badge_colour = HEX "f59c00",
+	shiny = true,
+	
+    weight = 0,
+    config = {extra = {}},
+    loc_txt = loc["seal_face"],
+    loc_vars = function(self, info_queue, card)
+        return {vars = {}}
+    end,
+    --[[calculate = function(self, card, context)
+
+    end]]
+	
+	--This cannot spawn naturally at all
+	in_pool = function(self, args)
+        return false
+    end
+	})
+
+--Hook into is_face to account for Face Seal
+local card_isfaceref = Card.is_face
+
+function Card:is_face(from_boss)
+    if self.debuff and not from_boss then return end
+	
+	if self.seal == 'unstb_face' then
+		return true
+	end
+	
+	return card_isfaceref(self, from_boss)
+end
 
 --Suit Seals
 
@@ -330,16 +368,6 @@ function SuitSeal.initSeal(suit, atlas, posX)
     loc_vars = function(self, info_queue, card)
         return {vars = {localize(self.suit_seal, 'suits_plural'), colours = {G.C.SUITS[self.suit_seal]}}}
     end,
-    --[[calculate = function(self, card, context)
-        if context.cardarea and context.cardarea == G.play and not context.repetition and not context.individual then
-            return {
-                message = localize({type = 'variable', key = 'a_mult', vars = {self.config.extra.balloon_mult * Balloons.modifiers.values}}),
-                mult = self.config.extra.balloon_mult * Balloons.modifiers.values,
-                colour = G.C.MULT,
-                func = check_floated_away(self, card)
-            }
-        end
-    end]]
 	
 	--This cannot spawn naturally at all
 	in_pool = function(self, args)

@@ -122,7 +122,7 @@ return {
             ['name'] = 'Spade Seal',
             ['text'] = {
 				[1] = 'This card also',
-				[2] = 'counts as {V:1}#1#',
+				[2] = 'counts as {V:1}#1#{}',
             }
         }
 	},
@@ -132,7 +132,7 @@ return {
             ['name'] = 'Heart Seal',
             ['text'] = {
 				[1] = 'This card also',
-				[2] = 'counts as {V:1}#1#',
+				[2] = 'counts as {V:1}#1#{}',
             }
         }
 	},
@@ -142,7 +142,7 @@ return {
             ['name'] = 'Club Seal',
             ['text'] = {
 				[1] = 'This card also',
-				[2] = 'counts as {V:1}#1#',
+				[2] = 'counts as {V:1}#1#{}',
             }
         }
 	},
@@ -152,7 +152,18 @@ return {
             ['name'] = 'Diamond Seal',
             ['text'] = {
 				[1] = 'This card also',
-				[2] = 'counts as {V:1}#1#',
+				[2] = 'counts as {V:1}#1#{}',
+            }
+        }
+	},
+	
+	seal_face = {
+		['en-us'] = {
+			['label'] = 'Face Seal',
+            ['name'] = 'Face Seal',
+            ['text'] = {
+				[1] = 'This card also',
+				[2] = 'counts as {C:attention}face card{}',
             }
         }
 	},
