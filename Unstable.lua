@@ -591,7 +591,7 @@ SMODS.Enhancement {
 		if not isCollection and card.ability and card.ability.extra then
 			local suit = (card.base and card.base.suit) or 'Spades'
 			
-			local pos  = {x = self.suit_map[suit]+1 or 0, y = 0}
+			local pos  = {x = (self.suit_map[suit] or -1) +1, y = 0}
 				
 			card.children.center:set_sprite_pos(pos)
 		end
@@ -631,7 +631,7 @@ SMODS.Enhancement {
 				card.ability.extra.chips = SMODS.Ranks[card.ability.extra.rank].nominal
 				
 				local suit = (card.base and card.base.suit) or 'Spades'
-				local pos  = {x = self.suit_map[suit]+1 or 0, y = 0}	
+				local pos  = {x = (self.suit_map[suit] or -1)+1, y = 0}	
 				card.children.center:set_sprite_pos(pos)
 			end
 		end
@@ -729,7 +729,7 @@ SMODS.Enhancement {
 			
 			card.ability.extra.suit = suit
 				
-			local pos  = {x = self.suit_map[suit]+2 or 1, y = 0}
+			local pos  = {x = (self.suit_map[suit] or -1)+2 or 1, y = 0}
 				
 			card.children.center:set_sprite_pos(pos)
 		end
@@ -742,7 +742,7 @@ SMODS.Enhancement {
 		
 			if not isCollection then
 				card.ability.extra.suit = card.base.suit
-				card.children.center:set_sprite_pos({x = self.suit_map[card.base.suit]+2 or 1, y = 0})
+				card.children.center:set_sprite_pos({x = (self.suit_map[card.base.suit] or -1)+2, y = 0})
 			else 
 				card.ability.extra.suit = "(Corresponding Suit)"
 			end
@@ -1967,7 +1967,7 @@ create_joker({
     calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
 			local currentCard = context.other_card
-			if currentCard.base.value == card.ability.extra.target_rank then
+			if currentCard.base.value == card.ability.extra.target_rank and not currentCard.config.center.no_rank then
 				
 				local isActivated = pseudorandom('jokerisland'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_ticket
 				
@@ -2413,6 +2413,7 @@ filesystem.load(unStb.path..'/override/vanilla_joker.lua')()
 
 --Suits, supports for Suit Seals, a lot of suit-based Joker, and modded suits support for Smeared
 filesystem.load(unStb.path..'/override/suits.lua')()
+
 
 ----------------------------------------------
 ------------MOD CODE END----------------------

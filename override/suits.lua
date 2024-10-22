@@ -1,3 +1,7 @@
+local function print(message)
+    sendDebugMessage('[Unstable_Suit] - '..(tostring(message) or '???'))
+end
+
 local suit_group = {} --Store each suit group, and store a map of suits inside
 local suit_group_map = {} -- A map pointing from suit name (key) directly to suit group name
 
@@ -6,6 +10,9 @@ suit_group.suit_red = {}
 suit_group.no_smear = {}
 
 function register_suit_group(type, suit)
+
+	print('Registering suit: '..suit..' with the type '..type)
+
     local suit_table = suit_group[type] or {}
     
     suit_table[suit] = true
@@ -32,6 +39,7 @@ local card_issuit_ref = Card.is_suit
 function Card:is_suit(suit, bypass_debuff, flush_calc)
 	--Modified from SMODS-patched version of is_suit, completely re-implemented to supports the new smear system
 	if flush_calc then
+	
         if self.ability.effect == 'Stone Card' or self.config.center.no_suit then
             return false
         end
@@ -57,7 +65,7 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 			--Has seal, is modded seal, and has suit_seal property
 			if self.seal and SMODS.Seals[self.seal] and SMODS.Seals[self.seal].suit_seal and not self.debuff then
 				local targetGroup = get_suit_group(SMODS.Seals[self.seal].suit_seal)
-				
+
 				--returns true immediately if the suit is in the same suit group
 				if suit_group[targetGroup][suit] then
 					return true
@@ -73,7 +81,8 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
         end
 		
 		--fallback - go back to the main reference, in case other mood hook it as well
-		return card_issuit_ref(self, suit, bypass_debuff, flush_calc)
+		local fallback_res = card_issuit_ref(self, suit, bypass_debuff, flush_calc)
+		return fallback_res
     else
         if self.debuff and not bypass_debuff then return end
         if self.ability.effect == 'Stone Card' or self.config.center.no_suit then
@@ -101,7 +110,6 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
             --Has seal, is modded seal, and has suit_seal property
 			if self.seal and SMODS.Seals[self.seal] and SMODS.Seals[self.seal].suit_seal then
 				local targetGroup = get_suit_group(SMODS.Seals[self.seal].suit_seal)
-				
 				--returns true immediately if the suit is in the same suit group
 				if suit_group[targetGroup][suit] then
 					return true
@@ -109,7 +117,7 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 			end
 			
 			local targetGroup = get_suit_group(self.base.suit)
-			
+
 			--returns true if the suit is in the same suit group
 			if suit_group[targetGroup][suit] then
 				return true
