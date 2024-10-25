@@ -364,6 +364,16 @@ return {
         }
     },
 	
+	aux_upgrade = {
+        ['en-us'] = {
+            ['name'] = 'Monkey Paw',
+            ['text'] = {
+                [1] = 'Selects {C:attention}1{} card to {C:attention}upgrade edition{}',
+				[2] = 'Turns two adjacent cards into Poison Card',
+            }
+        }
+    },
+	
 	-- Other Consumable Additions
 	
 	--Jokers

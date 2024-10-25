@@ -371,6 +371,19 @@ local function blackJack_evalrank(hand, bustAmount)
 	
 end
 
+--"Upgrade" function, used on card
+local function edition_upgrade(card)
+	local edition = (card.edition or {}).key
+
+	if not edition then
+		card:set_edition("e_foil", true, false)
+	elseif edition=="e_foil" then
+		card:set_edition("e_holo", true, false)
+	elseif edition=="e_holo" then
+		card:set_edition("e_polychrome", true, false)
+	end
+end
+
 --Face Seal
 
 SMODS.Seal({
@@ -1071,7 +1084,7 @@ SMODS.Enhancement {
 	loc_vars = function(self, info_queue, card)
 	
 		local chip = 0
-		if card.base then
+		if card and card.base then
 			chip = card.base.nominal
 		end
 	
@@ -1958,6 +1971,101 @@ SMODS.Consumable{
 	pos = get_coordinates(1),
 }
 
+--Monkey Paw
+SMODS.Consumable{
+	set = 'Auxiliary', atlas = 'auxiliary',
+	key = 'aux_upgrade', loc_txt = loc['aux_upgrade'],
+
+	config = {extra = {}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+	
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_poison']
+	
+		return {vars = {}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted == 1) then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+			
+		local selected_card = G.hand.highlighted[1]
+		local selected_index
+			
+		local poisoned_card = {}
+		
+		--look for two adjacent cards in hand
+		for i=1, #G.hand.cards do
+			if G.hand.cards[i] == selected_card then
+				selected_index = i
+			end
+		end
+		
+		print(selected_index)
+		
+		--Cover edge cases
+		
+		local handCount = #G.hand.cards
+		
+		if handCount >=3 then --If the hand has 3 cards or more, pick two adjacent cards to poison
+			if selected_index>1 then
+				poisoned_card[1] = G.hand.cards[selected_index-1]
+			else
+				poisoned_card[1] = G.hand.cards[handCount]
+			end
+			
+			if selected_index<handCount then
+				poisoned_card[2] = G.hand.cards[selected_index+1]
+			else
+				poisoned_card[2] = G.hand.cards[1]
+			end
+		elseif #G.hand.cards ==2 then --If the hand has only 2 cards, only one other card can be poisoned
+			if selected_index == 1 then
+				poisoned_card[1] = G.hand.cards[2]
+			else
+				poisoned_card[1] = G.hand.cards[1]
+			end
+		end
+		
+		for i=1, #poisoned_card do
+            local percent = 1.15 - (i-0.999)/(#poisoned_card-0.998)*0.3
+            event({trigger = 'after',delay = 0.15,func = function() poisoned_card[i]:flip();play_sound('card1', percent);poisoned_card[i]:juice_up(0.3, 0.3);return true end })
+        end
+        delay(0.2)
+		
+		--Handle the conversion
+		event({trigger = 'after',delay = 0.1,func = function()
+                    edition_upgrade(selected_card)
+                    return true end })
+		for i=1, #poisoned_card do
+		event({trigger = 'after',delay = 0.1,func = function()
+                    poisoned_card[i]:set_ability(G.P_CENTERS.m_unstb_poison)
+                    return true end })
+		end
+		
+		for i=1, #poisoned_card do
+            local percent = 0.85 + (i-0.999)/(#poisoned_card-0.998)*0.3
+            event({trigger = 'after',delay = 0.15,func = function() poisoned_card[i]:flip();play_sound('tarot2', percent, 0.6);poisoned_card[i]:juice_up(0.3, 0.3);return true end })
+        end
+        event({trigger = 'after', delay = 0.2,func = function() G.hand:unhighlight_all(); return true end })
+        delay(0.5)
+		
+		
+	end,
+
+	pos = get_coordinates(1),
+}
+
 
 -------- Joker Code Starts Here ------
 
@@ -2447,19 +2555,6 @@ create_joker({
 })
 
 --Edition-line Jokers
-
---"Upgrade" function, used on card
-local function edition_upgrade(card)
-	local edition = (card.edition or {}).key
-
-	if not edition then
-		card:set_edition("e_foil", true, false)
-	elseif edition=="e_foil" then
-		card:set_edition("e_holo", true, false)
-	elseif edition=="e_holo" then
-		card:set_edition("e_polychrome", true, false)
-	end
-end
 
 --Connoiseur
 create_joker({
