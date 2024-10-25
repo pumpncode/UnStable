@@ -181,7 +181,190 @@ return {
 		Pi = "Pi",
 	},
 	
-	--Enchancements
+	
+	--Booster Pack 
+	auxpack = {
+        ['en-us'] = {
+            ['group_name'] = 'Auxiliary Pack',
+            ['name'] = 'Auxiliary Pack',
+            ['text'] = {
+                [1] = 'Choose {C:attention}#1#{} of up to',
+                [2] = '{C:attention}#2#{C:green} Auxiliary{} cards to',
+                [3] = 'be used immediately'
+            }
+        }
+    },
+    auxpack_jumbo = {
+        ['en-us'] = {
+            ['group_name'] = 'Auxiliary Pack',
+            ['name'] = 'Jumbo Auxiliary Pack',
+            ['text'] = {
+                [1] = 'Choose {C:attention}#1#{} of up to',
+                [2] = '{C:attention}#2#{C:green} Auxiliary{} cards to',
+                [3] = 'be used immediately'
+            }
+        }
+    },
+    auxpack_mega = {
+        ['en-us'] = {
+            ['group_name'] = 'Auxiliary Pack',
+            ['name'] = 'Mega Auxiliary Pack',
+            ['text'] = {
+                [1] = 'Choose {C:attention}#1#{} of up to',
+                [2] = '{C:attention}#2#{C:green} Auxiliary{} cards to',
+                [3] = 'be used immediately'
+            }
+        }
+    },
+	
+	
+	-- New Consumables
+
+    auxiliary = {
+        ['en-us'] = {
+            ['name'] = 'Auxiliary',
+            ['collection'] = 'Auxiliary Cards',
+            ['undiscovered'] = {
+                ['name'] = 'Not Discovered',
+                ['text'] = {
+                    [1] = 'Purchase or use',
+                    [2] = 'this card in an',
+                    [3] = 'unseeded run to',
+                    [4] = 'learn what it does'
+                }
+            }
+        }
+    },
+	
+	aux_spades = {
+        ['en-us'] = {
+            ['name'] = 'Essence of Spades',
+            ['text'] = {
+                [1] = 'Adds {V:1}#2#{} onto',
+                [2] = '{C:attention}#1#{} selected cards.'
+            }
+        }
+    },
+	
+	aux_hearts = {
+        ['en-us'] = {
+            ['name'] = 'Essence of Hearts',
+            ['text'] = {
+                [1] = 'Adds {V:1}#2#{} onto',
+                [2] = '{C:attention}#1#{} selected cards.'
+            }
+        }
+    },
+	
+	aux_clubs = {
+        ['en-us'] = {
+            ['name'] = 'Essence of Clubs',
+            ['text'] = {
+                [1] = 'Adds {V:1}#2#{} onto',
+                [2] = '{C:attention}#1#{} selected cards.'
+            }
+        }
+    },
+	
+	aux_diamonds = {
+        ['en-us'] = {
+            ['name'] = 'Essence of Diamonds',
+            ['text'] = {
+                [1] = 'Adds {V:1}#2#{} onto',
+                [2] = '{C:attention}#1#{} selected cards.'
+            }
+        }
+    },
+	
+	aux_face = {
+        ['en-us'] = {
+            ['name'] = 'Possessions',
+            ['text'] = {
+                [1] = 'Adds {C:attention}Face Seal{} onto',
+                [2] = '{C:attention}#1#{} selected cards.'
+            }
+        }
+    },
+	
+	aux_plus_two = {
+        ['en-us'] = {
+            ['name'] = '+2',
+            ['text'] = {
+                [1] = 'Adds {C:attention}#1#{} cards of any ranks',
+                [2] = 'with same suit of selected card to hand'
+            }
+        }
+    },
+	
+	aux_plus_four_wild = {
+        ['en-us'] = {
+            ['name'] = 'Wild +4',
+            ['text'] = {
+                [1] = 'Adds {C:attention}#1#{} cards of any suits',
+                [2] = 'with same rank of selected card to hand'
+            }
+        }
+    },
+	
+	aux_inst_disc = {
+        ['en-us'] = {
+            ['name'] = 'The Past',
+            ['text'] = {
+                [1] = '{C:red}+#1#{} discards this round',
+            }
+        }
+    },
+	
+	aux_inst_hsize = {
+        ['en-us'] = {
+            ['name'] = 'The Present',
+            ['text'] = {
+                [1] = '{C:attention}+#1#{} hand size this round',
+            }
+        }
+    },
+	
+	aux_inst_hand = {
+        ['en-us'] = {
+            ['name'] = 'The Future',
+            ['text'] = {
+                [1] = '{C:blue}+#1#{} hands this round',
+            }
+        }
+    },
+	
+	aux_seal_move = {
+        ['en-us'] = {
+            ['name'] = 'Seal Exchange',
+            ['text'] = {
+                [1] = 'Swaps {C:attention}seal{} between two selected cards',
+            }
+        }
+    },
+	
+	aux_conv_1 = {
+        ['en-us'] = {
+            ['name'] = 'All for One',
+            ['text'] = {
+                [1] = 'Selects up to {C:attention}#1#{} cards',
+				[2] = 'to converts into rank 1',
+            }
+        }
+    },
+	
+	aux_21 = {
+        ['en-us'] = {
+            ['name'] = 'The Twenty-One',
+            ['text'] = {
+                [1] = 'Selects up to {C:attention}#1#{} cards',
+				[2] = 'with total ranks of {C:attention}21 or more{}.',
+				[3] = 'Destroys all selected cards and gets one',
+				[4] = '{C:attention}rank 21{} card of a random suit.',
+            }
+        }
+    },
+	
+	-- Other Consumable Additions
 	
 	--Jokers
 	

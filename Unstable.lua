@@ -116,6 +116,30 @@ SMODS.Atlas {
   py = 95
 }
 
+--Atlas for Booster Pack
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "booster",
+  -- The name of the file, for the code to pull the atlas from
+  path = "booster.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
+--Atlas for Auxiliary Cards
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "auxiliary",
+  -- The name of the file, for the code to pull the atlas from
+  path = "auxiliary.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
 --Atlas for extra ranks
 SMODS.Atlas {
   -- Key for code to find it with
@@ -138,6 +162,19 @@ SMODS.Atlas {
   -- Height of each sprite in 1x size
   py = 95
 }
+
+--Music
+
+local aux_music_enable = true
+
+SMODS.Sound({
+	key = "music_aux",
+	path = "music_aux.ogg",
+	select_music_track = function()
+		return aux_music_enable
+			and ( G.pack_cards and G.pack_cards.cards and G.pack_cards.cards[1] and G.pack_cards.cards[1].ability.set == "Auxiliary")
+	end,
+})
 
 --Jokers
 --filesystem.load(unStb.path..'joker\\joker.lua')()
@@ -295,13 +332,52 @@ local function create_joker(joker)
         }
 end
 
+--Black Jack Rank Calculation
+local function blackJack_evalrank(hand, bustAmount)
+	--Black Jack-style total rank evaluation
+	
+	bustAmount = bustAmount or 21
+	
+	local aceCount = 0
+	local rank = 0
+	
+	for i = 1, #hand do
+		local currentCard = hand[i]
+		if not (currentCard.config.center == G.P_CENTERS.m_stone or currentCard.config.center.no_rank) and not currentCard.debuff  then
+			
+			if currentCard.base.value ~= 'Ace' then
+				rank = rank + (SMODS.Ranks[currentCard.base.value].nominal or 0) --Supports modded ranks as well, just in case
+			else
+				aceCount = aceCount + 1
+			end
+			
+		end
+	end
+	
+	--Handle Ace rank
+	while( aceCount > 0 )
+	do
+	   
+		if rank <= bustAmount-11 then
+			rank = rank + 11
+		else
+			rank = rank + 1
+		end
+		
+		aceCount = aceCount - 1
+	end
+	
+	return rank
+	
+end
+
 --Face Seal
 
 SMODS.Seal({
     key = "face",
     atlas = "suit_seal",
 	
-    pos = { x = 0 or 0, y = 0 },
+    pos = { x = 4, y = 0 },
     badge_colour = HEX "f59c00",
 	shiny = true,
 	
@@ -379,7 +455,7 @@ end
 local suit_seal_list = {"Spades", "Hearts", "Clubs", "Diamonds"}
 
 for i = 1, #suit_seal_list do
-	SuitSeal.initSeal(suit_seal_list[i], "suit_seal", (i+2)%4 )
+	SuitSeal.initSeal(suit_seal_list[i], "suit_seal", i-1 )
 end
 
 
@@ -1325,45 +1401,567 @@ SMODS.PokerHandPart:take_ownership('_straight', {
 })
 
 
---BlackJack + Question Mark Line Jokers
+--Auxiliary Card
 
-local function blackJack_evalrank(hand, bustAmount)
-	--Black Jack-style total rank evaluation
-	
-	bustAmount = bustAmount or 21
-	
-	local aceCount = 0
-	local rank = 0
-	
-	for i = 1, #hand do
-		local currentCard = hand[i]
-		if not (currentCard.config.center == G.P_CENTERS.m_stone or currentCard.config.center.no_rank) and not currentCard.debuff  then
-			
-			if currentCard.base.value ~= 'Ace' then
-				rank = rank + (SMODS.Ranks[currentCard.base.value].nominal or 0) --Supports modded ranks as well, just in case
-			else
-				aceCount = aceCount + 1
-			end
-			
-		end
+SMODS.ConsumableType{
+    key = 'Auxiliary',
+    primary_colour = HEX('424e54'),
+    secondary_colour = HEX('00a669'),
+    loc_txt = loc.auxiliary,
+    collection_rows = {5, 5}
+}
+
+SMODS.UndiscoveredSprite{
+    key = 'Auxiliary',
+    atlas = 'auxiliary',
+    pos = get_coordinates(0)
+}
+
+--Booster Pack for Auxiliary Cards
+for i = 1, 4 do
+    SMODS.Booster{
+        key = 'aux_'..(i <= 2 and i or i == 3 and 'jumbo' or 'mega'), loc_txt = loc['auxpack'..(i <= 2 and '' or i == 3 and '_jumbo' or '_mega')],
+
+        config = {extra = i <= 2 and 3 or 5, choose =  i <= 3 and 1 or 2},
+        draw_hand = false,
+
+        create_card = function(self, card)
+            return create_card('Auxiliary', G.pack_cards, nil, nil, true, true, nil, 'aux')
+            -- return {set = 'Polymino', area = G.pack_cards, skip_materialize = nil, soulable = nil, key_append = 'vir'}
+        end,
+
+        ease_background_colour = function(self)
+            --ease_colour(G.C.DYN_UI.MAIN, G.C.BUNCO_VIRTUAL)
+            ease_background_colour{new_colour = HEX('00a669'), special_colour = HEX('7e9999'), contrast = 2}
+        end,
+
+        pos = get_coordinates(i-1),
+        atlas = 'booster',
+
+        in_pool = function() return (pseudorandom('aux'..G.SEED) < 0.5) end
+    }
+end
+
+--Original Reserve Card Button Code from MoreFluff (Credits to John Cryptid and Betmma)
+G.FUNCS.can_take_card = function(e)
+	if #G.consumeables.cards < G.consumeables.config.card_limit then
+		  e.config.colour = G.C.GREEN
+		  e.config.button = "take_card"
+	else
+		  e.config.colour = G.C.UI.BACKGROUND_INACTIVE
+		  e.config.button = nil
 	end
+end
+
+G.FUNCS.take_card = function(e)
+local c1 = e.config.ref_table
+G.E_MANAGER:add_event(Event({
+  trigger = "after",
+  delay = 0.1,
+  func = function()
+	c1.area:remove_card(c1)
+	c1:add_to_deck()
+	if c1.children.price then
+	  c1.children.price:remove()
+	end
+	c1.children.price = nil
+	if c1.children.buy_button then
+	  c1.children.buy_button:remove()
+	end
+	c1.children.buy_button = nil
+	remove_nils(c1.children)
 	
-	--Handle Ace rank
-	while( aceCount > 0 )
-	do
-	   
-		if rank <= bustAmount-11 then
-			rank = rank + 11
-		else
-			rank = rank + 1
+	play_sound('generic1')
+	
+	G.consumeables:emplace(c1)
+	G.GAME.pack_choices = G.GAME.pack_choices - 1
+	if G.GAME.pack_choices <= 0 then
+	  G.FUNCS.end_consumeable(nil, delay_fac)
+	end
+	return true
+  end,
+}))
+end
+
+local G_UIDEF_use_and_sell_buttons_ref = G.UIDEF.use_and_sell_buttons
+function G.UIDEF.use_and_sell_buttons(card)
+	if (card.area == G.pack_cards and G.pack_cards) and card.ability.consumeable then --Add a use button
+	  if card.ability.set == "Auxiliary" then
+		return {
+		  n = G.UIT.ROOT,
+		  config = { padding = -0.1, colour = G.C.CLEAR },
+		  nodes = {
+			{
+			  n = G.UIT.R,
+			  config = {
+				ref_table = card,
+				r = 0.08,
+				padding = 0.1,
+				align = "bm",
+				minw = 0.5 * card.T.w - 0.15,
+				minh = 0.7 * card.T.h,
+				maxw = 0.7 * card.T.w - 0.15,
+				hover = true,
+				shadow = true,
+				colour = G.C.UI.BACKGROUND_INACTIVE,
+				one_press = true,
+				button = "use_card",
+				func = "can_take_card",
+			  },
+			  nodes = {
+				{
+				  n = G.UIT.T,
+				  config = {
+					text = 'SELECT',
+					colour = G.C.UI.TEXT_LIGHT,
+					scale = 0.55,
+					shadow = true,
+				  },
+				},
+			  },
+			},
+		  },
+		}
+	  end
+	end
+	return G_UIDEF_use_and_sell_buttons_ref(card)
+end
+
+--Auxiliary Cards Code Starts Here--
+
+--Suit Seals Addition Cards
+for i = 1, #suit_seal_list do
+	SMODS.Consumable{
+		set = 'Auxiliary', atlas = 'auxiliary',
+		key = 'aux_'..string.lower(suit_seal_list[i]), loc_txt = loc['aux_'..string.lower(suit_seal_list[i])],
+
+		config = {extra = {count = 2, seal = 'unstb_'..string.lower(suit_seal_list[i])}},
+		discovered = true,
+
+		loc_vars = function(self, info_queue, card)
+			local suit = localize(suit_seal_list[i], 'suits_singular') ..' Seal'
+			local suit_color = G.C.SUITS[suit_seal_list[i]]
+			
+			return {vars = {card.ability.extra.count, suit, colours = {suit_color}}}
+		end,
+
+		can_use = function(self, card)
+			if G.hand and (#G.hand.highlighted == card.ability.extra.count) then
+				return true
+			end
+			return false
+		end,
+
+		use = function(self, card)
+			
+			event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+			
+			for i = 1, #G.hand.highlighted do
+			event({trigger = 'after', delay = 0.2,
+				func = function()
+						G.hand.highlighted[i]:set_seal(card.ability.extra.seal, nil, true)
+				return true end })
+			end
+				
+			delay(0.5)
+			event({trigger = 'after', delay = 0.2,
+				func = function()
+					G.hand:unhighlight_all();
+				return true end })
+			
+			
+		end,
+
+		pos = get_coordinates(i+1),
+	}
+end
+
+--Face Seal Card
+SMODS.Consumable{
+	set = 'Auxiliary', atlas = 'auxiliary',
+	key = 'aux_face', loc_txt = loc['aux_face'],
+
+	config = {extra = {count = 2, seal = 'unstb_face'}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.count}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted == card.ability.extra.count) then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		for i = 1, #G.hand.highlighted do
+		event({trigger = 'after', delay = 0.2,
+			func = function()
+					G.hand.highlighted[i]:set_seal(card.ability.extra.seal, nil, true)
+			return true end })
+		end
+			
+		delay(0.5)
+		event({trigger = 'after', delay = 0.2,
+			func = function()
+				G.hand:unhighlight_all();
+			return true end })
+		
+		
+	end,
+
+	pos = get_coordinates(6),
+}
+
+-- +2
+SMODS.Consumable{
+	set = 'Auxiliary', atlas = 'auxiliary',
+	key = 'aux_plus_two', loc_txt = loc['aux_plus_two'],
+
+	config = {extra = {count = 2}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.count}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted == 1) then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		local targetCard = G.hand.highlighted[1]
+		
+		event({
+                trigger = 'after',
+                delay = 0.7,
+                func = function() 
+                    local cards = {}
+                    for i=1, card.ability.extra.count do
+                        cards[i] = true
+                        local _rank = pseudorandom_element(SMODS.Ranks, pseudoseed('aux_plus_two')) or SMODS.Ranks['2']
+                        local _suit = SMODS.Suits[targetCard.base.suit]
+						
+                        create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = G.P_CENTERS.c_base}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
+                    end
+                    playing_card_joker_effects(cards)
+                    return true end })
+	end,
+
+	pos = get_coordinates(1),
+}
+
+-- Wild +4
+SMODS.Consumable{
+	set = 'Auxiliary', atlas = 'auxiliary',
+	key = 'aux_plus_four_wild', loc_txt = loc['aux_plus_four_wild'],
+
+	config = {extra = {count = 4}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.count}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted == 1) then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		local targetCard = G.hand.highlighted[1]
+		
+		event({
+                trigger = 'after',
+                delay = 0.7,
+                func = function() 
+                    local cards = {}
+                    for i=1, card.ability.extra.count do
+                        cards[i] = true
+                        local _rank = SMODS.Ranks[targetCard.base.value]
+                        local _suit = pseudorandom_element(SMODS.Suits, pseudoseed('aux_wild_plus_four')) or SMODS.Suits['Spades']
+						
+                        create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = G.P_CENTERS.c_base}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
+                    end
+                    playing_card_joker_effects(cards)
+                    return true end })
+	end,
+
+	pos = get_coordinates(1),
+}
+
+-- In-round Instants
+local function get_instant_effect(id, amount)
+	if id == 3 then
+		ease_hands_played(amount)
+	elseif id == 1 then
+		ease_discard(amount)
+	elseif id == 2 then
+		--Base game has this for tags, so I utilize them here
+		G.hand:change_size(amount)
+		G.FUNCS.draw_from_deck_to_hand(amount)
+		
+        G.GAME.round_resets.temp_handsize = (G.GAME.round_resets.temp_handsize or 0) + amount
+	else
+		forced_message("Nope!", currentCard, G.C.PURPLE, true)
+	end
+end
+
+local aux_instants = {'aux_inst_disc', 'aux_inst_hsize', 'aux_inst_hand'}
+
+for i = 1, #aux_instants do
+	SMODS.Consumable{
+		set = 'Auxiliary', atlas = 'auxiliary',
+		key = aux_instants[i], loc_txt = loc[aux_instants[i]],
+
+		config = {extra = {amount = 3}},
+		discovered = true,
+
+		loc_vars = function(self, info_queue, card)
+			return {vars = {card.ability.extra.amount}}
+		end,
+
+		can_use = function(self, card)
+			--Only usable in-round. I can't believe it had to be checked *this much*
+			return G.hand and not G.blind_select and G.STATE ~= G.STATES.ROUND_EVAL and not G.shop and not G.booster_pack
+		end,
+
+		use = function(self, card)
+			
+			event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+			
+			event({
+					trigger = 'after',
+					delay = 0.2,
+					func = function() 
+							play_sound('generic1')
+					
+							get_instant_effect(i, card.ability.extra.amount)
+					return true end })
+		end,
+
+		pos = get_coordinates(1),
+	}
+end
+
+--Seal Swap
+SMODS.Consumable{
+	set = 'Auxiliary', atlas = 'auxiliary',
+	key = 'aux_seal_move', loc_txt = loc['aux_seal_move'],
+
+	config = {extra = {}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+		return {vars = {}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted == 2) then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		local card_l_seal = G.hand.highlighted[1].seal
+		
+		--Animation code mostly ported from basegame tarot
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+			
+        for i=1, #G.hand.highlighted do
+            local percent = 1.15 - (i-0.999)/(#G.hand.highlighted-0.998)*0.3
+            event({trigger = 'after',delay = 0.15,func = function() G.hand.highlighted[i]:flip();play_sound('card1', percent);G.hand.highlighted[i]:juice_up(0.3, 0.3);return true end })
+        end
+        delay(0.2)
+		
+		--Handle the conversion
+		event({trigger = 'after',delay = 0.1,func = function()
+                    G.hand.highlighted[1]:set_seal(G.hand.highlighted[2].seal, true, true)
+					 G.hand.highlighted[2]:set_seal(card_l_seal, true, true)
+                    return true end })
+		
+		for i=1, #G.hand.highlighted do
+            local percent = 0.85 + (i-0.999)/(#G.hand.highlighted-0.998)*0.3
+            event({trigger = 'after',delay = 0.15,func = function() G.hand.highlighted[i]:flip();play_sound('tarot2', percent, 0.6);G.hand.highlighted[i]:juice_up(0.3, 0.3);return true end })
+        end
+        event({trigger = 'after', delay = 0.2,func = function() G.hand:unhighlight_all(); return true end })
+        delay(0.5)
+	end,
+
+	pos = get_coordinates(1),
+}
+
+--All for One
+SMODS.Consumable{
+	set = 'Auxiliary', atlas = 'auxiliary',
+	key = 'aux_conv_1', loc_txt = loc['aux_conv_1'],
+
+	config = {extra = {count = 5}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.count}}
+	end,
+	
+	add_to_deck = function(self, card, from_debuff)
+		--Enable rank 1 card in pools
+		if not from_debuff then
+			setPoolRankFlagEnable('unstb_1', true);
+		end
+    end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted >= 1) and (#G.hand.highlighted <= card.ability.extra.count) then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		--Animation code mostly ported from basegame tarot
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+			
+        for i=1, #G.hand.highlighted do
+            local percent = 1.15 - (i-0.999)/(#G.hand.highlighted-0.998)*0.3
+            event({trigger = 'after',delay = 0.15,func = function() G.hand.highlighted[i]:flip();play_sound('card1', percent);G.hand.highlighted[i]:juice_up(0.3, 0.3);return true end })
+        end
+        delay(0.2)
+		
+		--Handle the conversion
+		for i=1, #G.hand.highlighted do
+		event({trigger = 'after',delay = 0.1,func = function()
+                    SMODS.change_base(G.hand.highlighted[i], G.hand.highlighted[i].base.suit, 'unstb_1')
+                    return true end })
 		end
 		
-		aceCount = aceCount - 1
-	end
+		for i=1, #G.hand.highlighted do
+            local percent = 0.85 + (i-0.999)/(#G.hand.highlighted-0.998)*0.3
+            event({trigger = 'after',delay = 0.15,func = function() G.hand.highlighted[i]:flip();play_sound('tarot2', percent, 0.6);G.hand.highlighted[i]:juice_up(0.3, 0.3);return true end })
+        end
+        event({trigger = 'after', delay = 0.2,func = function() G.hand:unhighlight_all(); return true end })
+        delay(0.5)
+	end,
+
+	pos = get_coordinates(1),
+}
+
+--The Twenty-One
+SMODS.Consumable{
+	set = 'Auxiliary', atlas = 'auxiliary',
+	key = 'aux_21', loc_txt = loc['aux_21'],
+
+	config = {extra = {count = 5}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.count}}
+	end,
 	
-	return rank
-	
-end
+	add_to_deck = function(self, card, from_debuff)
+		--Enable rank 21 card in pools
+		if not from_debuff then
+			setPoolRankFlagEnable('unstb_21', true);
+		end
+    end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted >= 1) and (#G.hand.highlighted <= card.ability.extra.count) and blackJack_evalrank(G.hand.highlighted, 21)>=21 then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		--Populate removed cards
+		local destroyed_cards = {}
+		for i = 1, #G.hand.highlighted do destroyed_cards[#destroyed_cards+1] = G.hand.highlighted[i] end
+		
+		--Destroy Selected Card
+		event({
+                trigger = 'after',
+                delay = 0.1,
+                func = function() 
+                    for i=#destroyed_cards, 1, -1 do
+                        local c = destroyed_cards[i]
+                        if c.ability.name == 'Glass Card' then 
+                            c:shatter()
+                        else
+                            c:start_dissolve(nil, i == #destroyed_cards)
+                        end
+                    end
+                    return true end })
+		--Adds Card
+		event({
+                trigger = 'after',
+                delay = 0.7,
+                func = function() 
+                    local cards = {true}
+					local _rank = SMODS.Ranks['unstb_21']
+					local _suit = pseudorandom_element(SMODS.Suits, pseudoseed('aux_21')) or SMODS.Suits['Spades']
+					
+					create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = G.P_CENTERS.c_base}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
+                    playing_card_joker_effects(cards)
+                    return true end })
+					
+		--Call joker calculations for post-destroyed stuff
+		delay(0.3)
+        for i = 1, #G.jokers.cards do
+            G.jokers.cards[i]:calculate_joker({remove_playing_cards = true, removed = destroyed_cards})
+        end
+	end,
+
+	pos = get_coordinates(1),
+}
+
+
+-------- Joker Code Starts Here ------
+
+--BlackJack + Question Mark Line Jokers
 
 --Black Jack
 create_joker({
