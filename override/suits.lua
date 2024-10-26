@@ -40,13 +40,6 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 	--Modified from SMODS-patched version of is_suit, completely re-implemented to supports the new smear system
 	if flush_calc then
 	
-        if self.ability.effect == 'Stone Card' or self.config.center.no_suit then
-            return false
-        end
-        if (self.ability.name == 'Wild Card' or self.config.center.any_suit) and not self.debuff then
-            return true
-        end
-		
 		--Has seal, is modded seal, and has suit_seal property
 		if self.seal and SMODS.Seals[self.seal] and SMODS.Seals[self.seal].suit_seal and not self.debuff then
 			--returns true immediately if the suit is equal
@@ -54,6 +47,13 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 				return true
 			end
 		end
+	
+        if self.ability.effect == 'Stone Card' or self.config.center.no_suit then
+            return false
+        end
+        if (self.ability.name == 'Wild Card' or self.config.center.any_suit) and not self.debuff then
+            return true
+        end
 		
 		--If the suit is equal, returns immediately
 		if self.base.suit == suit then
@@ -85,12 +85,6 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 		return fallback_res
     else
         if self.debuff and not bypass_debuff then return end
-        if self.ability.effect == 'Stone Card' or self.config.center.no_suit then
-            return false
-        end
-        if self.ability.name == 'Wild Card' or self.config.center.any_suit then
-            return true
-        end
 		
 		--Has seal, is modded seal, and has suit_seal property
 		if self.seal and SMODS.Seals[self.seal] and SMODS.Seals[self.seal].suit_seal then
@@ -99,6 +93,13 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 				return true
 			end
 		end
+		
+        if self.ability.effect == 'Stone Card' or self.config.center.no_suit then
+            return false
+        end
+        if self.ability.name == 'Wild Card' or self.config.center.any_suit then
+            return true
+        end
 		
 		--If the suit is equal, returns immediately
 		if self.base.suit == suit then

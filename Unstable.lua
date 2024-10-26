@@ -639,7 +639,9 @@ SMODS.Enhancement {
 		
 		if context.cardarea == G.hand and not context.repetition then
 			--Hacky way to make it grant money from hand
-			ret.dollars = card.ability.extra.gold
+			if not card.debuff then
+				ret.dollars = card.ability.extra.gold
+			end
 		end
 		
     end,
@@ -1057,7 +1059,9 @@ SMODS.Enhancement {
 		
 		if context.cardarea == G.hand and not context.repetition then
 			--Hacky way to make it grant money from hand
-			ret.dollars = -card.ability.extra.h_money
+			if not card.debuff then
+				ret.dollars = -card.ability.extra.h_money
+			end
 		end
     end,
 	
@@ -2772,6 +2776,96 @@ create_joker({
 							
 						return true end}
 					)
+		end
+    end
+})
+
+create_joker({
+    name = 'Poison the Well', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+	vars = {{discard_size = 3}},
+	
+    custom_vars = function(self, info_queue, card)
+	
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_poison']
+	
+        return {vars = {card.ability.extra.discard_size}}
+    end,
+	
+    blueprint = false, eternal = true,
+	
+	add_to_deck = function(self, card, from_debuff)
+		if not G.GAME.pool_flags.poison_enabled then
+			G.GAME.pool_flags.poison_enabled = true
+		end
+		
+		 G.GAME.round_resets.discards = G.GAME.round_resets.discards + card.ability.extra.discard_size
+		 ease_discard(3)
+	end,
+	
+	remove_from_deck = function(self, card, from_debuff)
+		G.GAME.round_resets.discards = G.GAME.round_resets.discards - card.ability.extra.discard_size
+		ease_discard(-3)
+	end,
+	
+    calculate = function(self, card, context)
+		if context.pre_discard and not context.blueprint then
+			local target_card = pseudorandom_element(G.hand.highlighted, pseudoseed(seed or 'poisonwell'..G.GAME.round_resets.ante))
+			
+			event({trigger = 'after',  func = function()
+							play_sound('generic1')
+							target_card:juice_up(0.3, 0.3);
+							target_card:set_ability(G.P_CENTERS.m_unstb_poison , nil, true)
+							
+							return true end })
+		end
+    end
+})
+
+create_joker({
+    name = 'Petri Dish', id = 0, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+	vars = {{adds_hand = 3}, {odds = 2}},
+	
+    custom_vars = function(self, info_queue, card)
+	
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_biohazard']
+	
+        return {vars = {card.ability.extra.adds_hand, 1, card.ability.extra.odds}}
+    end,
+	
+    blueprint = false, eternal = true,
+	
+	add_to_deck = function(self, card, from_debuff)
+		if not G.GAME.pool_flags.biohazard_enabled then
+			G.GAME.pool_flags.biohazard_enabled = true
+		end
+		
+		 G.GAME.round_resets.hands = G.GAME.round_resets.hands + card.ability.extra.adds_hand
+		 ease_hands_played(3)
+	end,
+	
+	remove_from_deck = function(self, card, from_debuff)
+		G.GAME.round_resets.hands = G.GAME.round_resets.hands - card.ability.extra.adds_hand
+		ease_hands_played(-3)
+	end,
+	
+    calculate = function(self, card, context)
+		if context.after and not context.blueprint then
+			if pseudorandom('petridish'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds then
+				local target_card = pseudorandom_element(context.full_hand, pseudoseed(seed or 'petridishtarget'..G.SEED))
+			
+				event({trigger = 'after',  func = function()
+								play_sound('generic1')
+								target_card:juice_up(0.3, 0.3);
+								target_card:set_ability(G.P_CENTERS.m_unstb_biohazard)
+								
+								return true end })
+
+				forced_message("Infected", target_card, G.C.RED, true)
+			end
 		end
     end
 })

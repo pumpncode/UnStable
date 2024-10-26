@@ -369,7 +369,8 @@ return {
             ['name'] = 'Monkey Paw',
             ['text'] = {
                 [1] = 'Selects {C:attention}1{} card to {C:attention}upgrade edition{}',
-				[2] = 'Turns two adjacent cards into Poison Card',
+				[2] = 'Turns adjacent cards into {C:attention}Poison Card{}',
+				[3] = '{C:inactive}(Loops around){}',
             }
         }
     },
@@ -508,6 +509,29 @@ return {
 				[2] = 'Turns one random card',
 				[3] = 'into {C:attention}Radioactive Card{} when',
 				[4] = 'first hand is drawn',
+            }
+        }
+    },
+	
+	poison_the_well = {
+        ['en-us'] = {
+            ['name'] = 'Poison the Well',
+            ['text'] = {
+                [1] = '{C:red}+#1#{} Discards',
+				[2] = 'Turns one random card in each discarded hand',
+				[3] = 'into {C:attention}Poison Card{}'
+            }
+        }
+    },
+	
+	petri_dish = {
+        ['en-us'] = {
+            ['name'] = 'Petri Dish',
+            ['text'] = {
+                [1] = '{C:blue}+#1#{} Hands',
+				[2] = '{C:green}#2# in #3#{} chance of turning',
+				[3] = 'one random played card',
+				[4] = 'into {C:attention}Biohazard Card{}'
             }
         }
     },
