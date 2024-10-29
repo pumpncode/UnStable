@@ -451,6 +451,31 @@ return {
         }
     },
 	
+	power_of_one = {
+        ['en-us'] = {
+            ['name'] = 'Power of One',
+            ['text'] = {
+                [1] = 'Gains {C:mult}+#1#{} Mult for each',
+				[2] = '{C:attention}1{} in your {C:attention}full deck{}',
+				[3] = "{C:inactive}(Currently {C:mult}+#2#{C:inactive})",
+            }
+        }
+    },
+	
+	binary_number = {
+        ['en-us'] = {
+            ['name'] = 'Binary Number',
+            ['text'] = {
+                [1] = 'If the {C:attention}full played hand{} only have {C:attention}four or less{} cards',
+				[2] = 'and only consists of {C:attention}rank 0{} and {C:attention}1{} cards',
+				[3] = "Creates a card with rank equal",
+				[4] = "to number represented in binary",
+				[5] = "({C:red}Ex:{} {C:attention}1001{} -> {C:attention}9{})",
+				[6] = "{C:inactive}[Jack, Queen, King, Ace is 11-14, respectively]{}",
+            }
+        }
+    },
+	
 	quintuplets = {
         ['en-us'] = {
             ['name'] = 'Quintuplets',

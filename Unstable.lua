@@ -23,7 +23,7 @@ unstb_global.loc = loc
 -- Debug message
 
 local function print(message)
-    sendDebugMessage('[Unstable] - '..(tostring(message) or '???'))
+    sendDebugMessage('[UnStable] - '..(tostring(message) or '???'))
 end
 
 print("Starting Unstable")
@@ -1151,6 +1151,7 @@ local function unstb_rankCheck(self, args)
 	if args and args.initial_deck then
         return false
     end
+	
 	return getPoolRankFlagEnable(self.key)
 end
 
@@ -1276,7 +1277,7 @@ SMODS.Rank {
     pos = { x = 0 }, -- x position on the card atlas
     nominal = 21,  -- the number of chips this card scores
     next = { 'unstb_???' }, -- the next rank directly above it, used for Strength Tarot
-    shorthand = '21', -- used for deck preview (ex. 1 of Spades)
+    shorthand = '21', -- used for deck preview
 	
 	in_pool = unstb_rankCheck,
 }
@@ -1849,7 +1850,7 @@ SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
 	key = 'aux_conv_1', loc_txt = loc['aux_conv_1'],
 
-	config = {extra = {count = 5}},
+	config = {extra = {count = 3}},
 	discovered = true,
 
 	loc_vars = function(self, info_queue, card)
@@ -2501,6 +2502,150 @@ create_joker({
 			end
 		
 		end
+		
+    end
+})
+
+create_joker({
+    name = 'Power of One', id = 13,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = {{mult_rate = '2'}, {mult = '0'}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		--Check the number of 1 in the deck
+		local one_count=0
+		if (G.playing_cards) then
+			for _, v in pairs(G.playing_cards) do
+				if v.base.value == 'unstb_1' then one_count = one_count + 1 end
+			end
+			return { vars = {card.ability.extra.mult_rate, one_count*card.ability.extra.mult_rate}}
+		else
+			return { vars = {card.ability.extra.mult_rate, 0}}
+		end 
+    end,
+	
+	
+    calculate = function(self, card, context)
+		--Main context
+		if context.joker_main then
+			local one_count=0
+			for _, v in pairs(G.playing_cards) do
+				if v.base.value == 'unstb_1' then one_count = one_count + 1 end
+			end
+			
+			card.ability.extra.mult = one_count*card.ability.extra.mult_rate
+		
+			return {
+				mult_mod = card.ability.extra.mult,
+				message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } }
+			}
+		end
+		
+    end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one rank 1 card
+		for _, v in pairs(G.playing_cards) do
+			if v.base.value == 'unstb_1' then return true end
+		end
+		return false
+		
+    end
+})
+
+local binary_rank = {'unstb_0', 'unstb_1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace', 'unstb_???'}
+
+create_joker({
+    name = 'Binary Number', id = 5,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = {},
+	
+	
+    calculate = function(self, card, context)
+		--Main context
+		if context.after then
+			local hand = context.full_hand
+			
+			--Parse the hand and check if it's eligible in one go
+			
+			--Ineligible hand
+			if #hand > 4 then return end
+			
+			local is_binary = true
+			local final_rank = 0
+			local suit_list = {}
+			
+			for i=1, #hand do
+				local rank = hand[i].base.value
+				
+				if rank == 'unstb_1' then
+					final_rank = final_rank + 2 ^ (#hand-i)
+					suit_list[#suit_list+1] = hand[1].base.suit
+				elseif rank == 'unstb_0' then
+					--Do nothing, really
+					suit_list[#suit_list+1] = hand[1].base.suit
+				else
+					is_binary = false
+					break
+				end
+			end
+			
+			--If the hand is binary number, create card accordingly
+			if is_binary then
+				
+				local target_rank = binary_rank[final_rank+1] or 'unstb_???'
+				
+				print(final_rank)
+				print(target_rank)
+				
+				--Create Card
+				event({func = function()
+								local rank = SMODS.Ranks[target_rank].card_key
+								local suit = SMODS.Suits[pseudorandom_element(suit_list, pseudoseed('binary')..G.SEED)].card_key
+								
+								local _card = Card(G.play.T.x + G.play.T.w/2, G.play.T.y, G.CARD_W, G.CARD_H, G.P_CARDS[suit..'_'..rank], G.P_CENTERS.c_base, {playing_card = G.playing_card})
+								
+								
+								--Juice up the Joker
+								card:juice_up(0.3, 0.3)
+								
+								_card:start_materialize({G.C.SECONDARY_SET.Enhanced})
+								G.play:emplace(_card)
+								table.insert(G.playing_cards, _card)
+								
+								return true end
+						})
+				
+				event({func = function()
+					G.deck.config.card_limit = G.deck.config.card_limit + 1
+					return true end
+					})
+				
+				delay(1)
+
+				event({func = function()
+					draw_card(G.play,G.deck, 90,'up', nil)  
+					return true end
+					})
+					
+				playing_card_joker_effects({true})
+			end
+			
+		end
+		
+    end,
+	
+	custom_in_pool = function(self, args)
+		--If rank 0 and 1 is unlocked this run
+		return getPoolRankFlagEnable('unstb_0') and getPoolRankFlagEnable('unstb_1')
 		
     end
 })
