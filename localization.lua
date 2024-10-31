@@ -586,6 +586,17 @@ return {
         }
     },
 	
+	jackhammer = {
+        ['en-us'] = {
+            ['name'] = 'Jackhammer',
+            ['text'] = {
+                [1] = 'If the {C:attention}scoring hand{} has only one {C:attention}Jack{}',
+				[2] = 'retrigger it {C:attention}#1#{} more times ',
+				[3] = 'and {C:red}destroy it{} afterward',
+            }
+        }
+    },
+	
 	spectre = {
         ['en-us'] = {
             ['name'] = 'Spectre',
@@ -614,6 +625,30 @@ return {
             ['text'] = {
                 [1] = '{C:green}#1# in #2#{} chance of',
 				[2] = 'duplicating any scored {C:attention}7{}',
+            }
+        }
+    },
+	
+	j2048 = {
+        ['en-us'] = {
+            ['name'] = '2048',
+            ['text'] = {
+                [1] = 'If played hand contains {C:attention}Pair{} of rank ',
+				[2] = 'with power of two {C:attention}(2, 4, 8){}',
+				[3] = 'destroy the left one and gives all chips to another',
+				[4] = '{C:inactive}(Drag to rearrange){}',
+            }
+        }
+    },
+	
+	j2048_ex = {
+        ['en-us'] = {
+            ['name'] = '2048',
+            ['text'] = {
+                [1] = 'If played hand contains {C:attention}Pair{} of rank ',
+				[2] = 'with power of two {C:attention}(0, 1, 2, 4, 8){}',
+				[3] = 'destroy the left one and gives all chips to another',
+				[4] = '{C:inactive}(Drag to rearrange){}',
             }
         }
     },

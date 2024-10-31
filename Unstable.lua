@@ -2724,8 +2724,8 @@ create_joker({
 			  card = context.other_card
 			}
 		  end
-    end
-  end
+		end
+	end
 })
 
 --Jeweler
@@ -3122,6 +3122,62 @@ create_joker({
     end
 })
 
+--Jackhammer
+create_joker({
+    name = 'Jackhammer', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+	vars = {{retrigger_times = 5}, {is_activate = false}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.retrigger_times}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+    calculate = function(self, card, context)
+		
+		--Pre-hand check
+		if context.before and not context.blueprint then
+			card.ability.extra.is_activate = false
+		
+			local jack_count = 0
+			for i=1, #context.scoring_hand do
+				if context.scoring_hand[i].base.value == 'Jack' then
+					jack_count = jack_count + 1
+				end
+			end
+			
+			if jack_count==1 then
+				card.ability.extra.is_activate = true
+			end
+			
+		end
+		
+		--Main context
+		if context.cardarea == G.play and context.repetition and not context.repetition_only and card.ability.extra.is_activate then
+		  if context.other_card.base.value == 'Jack' then
+			card.ability.extra.target_jack = context.other_card
+
+			return {
+			  message = 'Again!',
+			  repetitions = card.ability.extra.retrigger_times,
+			  card = context.other_card
+			}
+		  end
+		end
+		
+		if context.destroying_card and not context.blueprint then
+				--This context is called on every single card in the scoring hand
+				--Check if the card called is the same as target card
+				if context.destroying_card == card.ability.extra.target_jack then
+					card.ability.extra.target_jack = nil
+					return true --Destroy the card
+				end
+		end
+		
+    end
+})
+
 --Spectre
 create_joker({
     name = 'Spectre', id = 9,
@@ -3266,6 +3322,87 @@ create_joker({
 						})
 						
 					playing_card_joker_effects({true})
+				end
+			end
+		end
+    end
+})
+
+local rank_2048 = { unstb_0 = true, unstb_1 = true, ['2'] = true, ['4'] = true, ['8'] = true}
+
+--2048
+create_joker({
+    name = 'j2048', id = 3,
+    rarity = 'Uncommon', cost = 4,
+	
+	vars = {{card_to_destroy = {}}},
+	
+	custom_vars = function(self, info_queue, card)
+		
+		local key = self.key
+		if getPoolRankFlagEnable('unstb_0') or getPoolRankFlagEnable('unstb_1') then
+			key = self.key..'_ex'
+		end
+	
+		return { key = key, vars = {} }
+	end,
+	process_loc_text = function(self)
+        SMODS.Joker.process_loc_text(self)
+        SMODS.process_loc_text(G.localization.descriptions.Joker, self.key..'_ex', loc.j2048_ex)
+    end,
+	
+    blueprint = true, eternal = true,
+	
+    calculate = function(self, card, context)
+		if context.before and context.scoring_hand and not context.blueprint then
+			local card_list = {}
+			local card_to_destroy = {}
+			
+			for i = 1, #context.scoring_hand do
+				local c = context.scoring_hand[i]
+				local key = c.base.value
+				
+				print(rank_2048[c.base.value])
+				
+				if rank_2048[c.base.value] then
+					if card_list[key] then
+						print('found the card list: '..c.base.value)
+					
+						local prev_card = card_list[key]
+						card_to_destroy[#card_to_destroy+1] = prev_card
+						
+						--Transfer chips
+						local bonusChip = prev_card.ability.perma_bonus or 0
+						local baseChip = SMODS.Ranks[prev_card.base.value].nominal
+						
+						--Delay the chip adding, so it does not get evaluated
+						event({delay = 0.1, func = function()
+						c.ability.perma_bonus = (c.ability.perma_bonus or 0) + baseChip + bonusChip
+						return true end
+						})
+						
+						--Erase the slot, if there's the next one then it counts as a new pair
+						card_list[key] = nil
+					else
+						print('adding to card list: '..c.base.value)
+						card_list[key] = c
+					end
+				end
+			end
+			
+			print('done')
+			--print(inspectDepth(card_to_destroy, nil, 1))
+			
+			card.ability.extra.card_to_destroy = card_to_destroy
+		end
+		
+		if context.destroying_card and not context.blueprint then
+			print('check card to destroy main')
+			for i = 1, #card.ability.extra.card_to_destroy do
+				print('check card to destroy')
+				print(context.destroying_card == card.ability.extra.card_to_destroy[i])
+				if context.destroying_card == card.ability.extra.card_to_destroy[i] then
+					return true
 				end
 			end
 		end
