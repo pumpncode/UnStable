@@ -1054,7 +1054,7 @@ SMODS.Enhancement {
 	
 	disenhancement = true, --exclusive property to check if it's disenhancement or not
 	
-	config = {extra = { chips = 13, odds_conv = 2, odds_mult = 3, mult_good = 2, mult_bad = 0.5 }, h_x_mult = 1},
+	config = {extra = { chips = 13, odds_conv = 2, odds_mult = 3, mult_good = 1.75, mult_bad = 0.5 }, h_x_mult = 1},
 	
 	loc_vars = function(self)
         return {
@@ -1153,8 +1153,11 @@ SMODS.Enhancement {
 		end
 
 		if context.discard then
+		
+			local is_neutralized = next(SMODS.find_card('j_unstb_vaccination_card'))
+		
 			--check if it is activated
-			if pseudorandom('biohazard'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_conv then
+			if pseudorandom('biohazard'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_conv and not is_neutralized then
 			
 				--check hand card
 				local hand_card = {}
@@ -1180,8 +1183,11 @@ SMODS.Enhancement {
 		end
 		
 		if context.cardarea == G.hand and not card.healed and not context.repetition then
+		
+			local is_neutralized = next(SMODS.find_card('j_unstb_vaccination_card'))
+		
 			--Hacky way to make it grant money from hand
-			if not card.debuff then
+			if not card.debuff and not is_neutralized then
 				ret.dollars = -card.ability.extra.h_money
 			end
 		end
@@ -3136,6 +3142,174 @@ create_joker({
 				forced_message("Infected", target_card, G.C.RED, true)
 			end
 		end
+    end
+})
+
+--Anti-Enhancement Supports
+create_joker({
+    name = 'Geiger Counter', id = 20,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = {{mult_rate = '4'}, {mult = '0'}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_radioactive']
+		
+		--Check the number of radioactive card in the deck
+		local count =0
+		if (G.playing_cards) then
+			for _, v in pairs(G.playing_cards) do
+				if v.config.center == G.P_CENTERS.m_unstb_radioactive then count = count + 1 end
+			end
+			return { vars = {card.ability.extra.mult_rate, count*card.ability.extra.mult_rate}}
+		else
+			return { vars = {card.ability.extra.mult_rate, 0}}
+		end 
+    end,
+	
+	
+    calculate = function(self, card, context)
+		--Main context
+		if context.joker_main then
+			local count=0
+			for _, v in pairs(G.playing_cards) do
+				if v.config.center == G.P_CENTERS.m_unstb_radioactive then count = count + 1 end
+			end
+			
+			card.ability.extra.mult = count*card.ability.extra.mult_rate
+		
+			return {
+				mult_mod = card.ability.extra.mult,
+				message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } }
+			}
+		end
+		
+    end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one radioactive card
+		for _, v in pairs(G.playing_cards) do
+			if v.config.center == G.P_CENTERS.m_unstb_radioactive then return true end
+		end
+		return false
+		
+    end
+})
+
+create_joker({
+    name = 'Strych Nine', id = 21,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = {{chip_rate = '9'}, {chip = '0'}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_poison']
+		
+		--Check the number of poison card in the deck
+		local count =0
+		if (G.playing_cards) then
+			for _, v in pairs(G.playing_cards) do
+				if v.config.center == G.P_CENTERS.m_unstb_poison then count = count + 1 end
+			end
+			return { vars = {card.ability.extra.chip_rate, count*card.ability.extra.chip_rate}}
+		else
+			return { vars = {card.ability.extra.chip_rate, 0}}
+		end 
+    end,
+	
+	
+    calculate = function(self, card, context)
+		--Main context
+		if context.joker_main then
+			local count=0
+			for _, v in pairs(G.playing_cards) do
+				if v.config.center == G.P_CENTERS.m_unstb_poison then count = count + 1 end
+			end
+			
+			card.ability.extra.chip = count*card.ability.extra.chip_rate
+		
+			return {
+				chip_mod = card.ability.extra.chip,
+				message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.chip } }
+			}
+		end
+		
+    end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one poison card
+		for _, v in pairs(G.playing_cards) do
+			if v.config.center == G.P_CENTERS.m_unstb_poison then return true end
+		end
+		return false
+		
+    end
+})
+
+create_joker({
+    name = 'Vaccination Card', id = 22,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = {{xmult_rate = '0.25'}, {xmult = '1'}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_biohazard']
+		
+		--Check the number of biohazard card on hand
+		local count = 0
+		if (G.hand) then
+			for i = 1, #G.hand.cards do
+				if G.hand.cards[i].config.center == G.P_CENTERS.m_unstb_biohazard and not G.hand.cards[i].healed then
+					count = count+1
+				end
+			end
+			return { vars = {card.ability.extra.xmult_rate, 1+count*card.ability.extra.xmult_rate}}
+		else
+			return { vars = {card.ability.extra.xmult_rate, 1}}
+		end 
+    end,
+	
+	
+    calculate = function(self, card, context)
+		--Main context
+		if context.joker_main then
+			local count=0
+			
+			for i = 1, #G.hand.cards do
+				if G.hand.cards[i].config.center == G.P_CENTERS.m_unstb_biohazard and not G.hand.cards[i].healed then
+					count = count+1
+				end
+			end
+			
+			card.ability.extra.xmult = 1+count*card.ability.extra.xmult_rate
+		
+			return {
+				xmult_mod = card.ability.extra.xmult,
+				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.xmult } }
+			}
+		end
+		
+    end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one biohazard card
+		for _, v in pairs(G.playing_cards) do
+			if v.config.center == G.P_CENTERS.m_unstb_biohazard then return true end
+		end
+		return false
+		
     end
 })
 

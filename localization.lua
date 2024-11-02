@@ -573,6 +573,40 @@ return {
         }
     },
 	
+	geiger_counter = {
+        ['en-us'] = {
+            ['name'] = 'Geiger Counter',
+            ['text'] = {
+                [1] = 'Gives {C:mult}+#1#{} Mult for each',
+				[2] = '{C:attention}Radioactive Card{} in your {C:attention}full deck{}',
+				[3] = "{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)",
+            }
+        }
+    },
+	
+	strych_nine = {
+        ['en-us'] = {
+            ['name'] = 'Strych-Nine',
+            ['text'] = {
+                [1] = 'Gives {C:chips}+#1#{} Chips for each',
+				[2] = '{C:attention}Poison Card{} in your {C:attention}full deck{}',
+				[3] = "{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
+            }
+        }
+    },
+	
+	vaccination_card = {
+        ['en-us'] = {
+            ['name'] = 'Vaccination Card',
+            ['text'] = {
+				[1] = 'Neutralize all {C:attention}Biohazard Card{} passive effects',
+                [2] = 'Gives additional {X:mult,C:white}x#1#{} Mult for each',
+				[3] = '{C:attention}Biohazard Card{} held in hand.',
+				[4] = "{C:inactive}(Currently {X:mult,C:white}x#2#{C:inactive} Mult)",
+            }
+        }
+    },
+	
 	--Miscellaneous
 	
 	joker2 = {
