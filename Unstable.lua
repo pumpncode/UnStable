@@ -176,6 +176,12 @@ SMODS.Sound({
 	end,
 })
 
+--SFXs
+
+SMODS.Sound({key = 'heal', path = 'heal.ogg'})
+SMODS.Sound({key = 'poison', path = 'poison.ogg'})
+
+
 --Jokers
 --filesystem.load(unStb.path..'joker\\joker.lua')()
 
@@ -470,6 +476,72 @@ local suit_seal_list = {"Spades", "Hearts", "Clubs", "Diamonds"}
 for i = 1, #suit_seal_list do
 	SuitSeal.initSeal(suit_seal_list[i], "suit_seal", i-1 )
 end
+
+--Heal Seal
+
+function Card:heal(initial, delay_sprites)
+	local prev_center = self.config.prev_center or G.P_CENTERS.c_base
+	
+	--Nullify hand xmult just in case
+	if self.ability.h_x_mult then
+		self.ability.h_x_mult = 0
+	end
+	
+	self:set_ability(prev_center, initial, delay_sprites)
+end
+
+SMODS.Seal({
+    key = "heal",
+    atlas = "suit_seal",
+	
+    pos = { x = 5, y = 0 },
+    badge_colour = HEX "7ce83d",
+	
+    weight = 0,
+    config = {extra = {}},
+    loc_txt = loc["seal_heal"],
+    loc_vars = function(self, info_queue, card)
+        return {vars = {}}
+    end,
+    calculate = function(self, card, context)
+		if context.cardarea == G.play and not context.repetition then
+		
+			local valid_cards = {}
+			for i = 1, #G.hand.cards do
+				if G.hand.cards[i].config.center.disenhancement and not G.hand.cards[i].healed then
+					valid_cards[#valid_cards+1] = G.hand.cards[i]
+				end
+			end
+			
+			if valid_cards[1] then 
+				local target_card = pseudorandom_element(valid_cards, pseudoseed('heal'..G.GAME.round_resets.ante))
+				--Set variable in advance because events are delayed
+				target_card.healed = true
+				
+				--Nullify hand xmult in advance
+				if target_card.config.center == G.P_CENTERS.m_unstb_radioactive then
+					target_card.ability.h_x_mult = 0
+				end
+				
+				event({func = function()
+						target_card:heal()
+						play_sound('unstb_heal', 1, 0.3)
+						target_card:juice_up()
+						target_card.healed = nil
+						return true
+					end
+				})
+				
+				forced_message("Healed!", target_card, G.C.GREEN, true)	
+			end
+		end
+    end,
+	
+	--This cannot spawn naturally at all
+	in_pool = function(self, args)
+        return false
+    end
+	})
 
 
 --New Enhancements
@@ -926,6 +998,47 @@ SMODS.Enhancement {
  
 --"Negative" Enhancements
 
+--Global function wrapper to set DisEnhancements
+function Card:set_disenhancement(center, initial, delay_sprites)
+	
+	--If the card has heal seal
+	if self.seal and self.seal == 'unstb_heal' then
+		
+		if self.debuff then
+			--If debuff, remove the seal and proceed through the rest of the process
+			self.seal = nil
+		else
+			--If the card is on hand, show resisting animation
+			if self.area == G.hand then
+				event({func = function() play_sound('unstb_heal', 1, 0.3) return true end})
+				forced_message("Resist!", self, G.C.GREEN, true)	
+			elseif self.area == G.play then
+				--Play healing sound effect if it's in play
+				event({func = function() play_sound('unstb_heal', 1, 0.3) return true end})
+			end
+			
+			--Don't turn the card into DisEnhancements
+			return
+		end
+		
+	end
+	
+	--If the card is debuffed, removed the heal seal entirely
+	if self.seal and self.seal == 'unstb_heal' and  self.debuff then
+		self.seal = nil
+	end
+
+	local old_center = self.config.center
+	
+	--Set the previous enhancement to keep track
+	if not old_center.disenhancement then
+		self.config.prev_center = old_center
+	end
+
+	--Calling appropriate set_ability
+	self:set_ability(center, initial, delay_sprites)
+end
+
 --Radioactive
 SMODS.Enhancement {
 	key = "radioactive",
@@ -938,6 +1051,8 @@ SMODS.Enhancement {
     no_suit = true,
     no_rank = true,
     always_scores = true,
+	
+	disenhancement = true, --exclusive property to check if it's disenhancement or not
 	
 	config = {extra = { chips = 13, odds_conv = 2, odds_mult = 3, mult_good = 2, mult_bad = 0.5 }, h_x_mult = 1},
 	
@@ -974,7 +1089,7 @@ SMODS.Enhancement {
 					
 					event({trigger = 'after', delay = 0.05,  func = function()
 					
-						target:set_ability(G.P_CENTERS.m_unstb_radioactive)
+						target:set_disenhancement(G.P_CENTERS.m_unstb_radioactive)
 						
 						return true end })
 					
@@ -991,7 +1106,7 @@ SMODS.Enhancement {
 			
         end
 		
-		if context.cardarea == G.hand and not context.repetition then
+		if context.cardarea == G.hand and not card.healed and not context.repetition then
 			--Xmult handling ability is built-in, so this one just checks for odds and alter it respectively.
 			if pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_mult then
 				card.ability.h_x_mult = card.ability.extra.mult_good
@@ -1018,11 +1133,13 @@ SMODS.Enhancement {
     no_rank = true,
     always_scores = true,
 	
-	config = {extra = { xmult = 0.9, h_money = 1}},
+	disenhancement = true,
+	
+	config = {extra = { xmult = 0.9, h_money = 1, odds_conv = 2}},
 	
 	loc_vars = function(self)
         return {
-            vars = { self.config.extra.xmult, self.config.extra.h_money }
+            vars = { self.config.extra.xmult, self.config.extra.h_money, (G.GAME and G.GAME.probabilities.normal or 1), self.config.extra.odds_conv }
         }
     end,
 	
@@ -1036,28 +1153,33 @@ SMODS.Enhancement {
 		end
 
 		if context.discard then
-			--check hand card
-			local hand_card = {}
-			for i = 1, #G.hand.cards do
-				hand_card[G.hand.cards[i]] = true
-			end
+			--check if it is activated
+			if pseudorandom('biohazard'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_conv then
 			
-			--populate valid cards
-			local valid_cards = {}
-			for k, v in ipairs(G.playing_cards) do
-				if v.config.center ~= G.P_CENTERS.m_unstb_biohazard and not hand_card[v] then --Excludes all cards with replace_base_card enhancements
-					valid_cards[#valid_cards+1] = v
+				--check hand card
+				local hand_card = {}
+				for i = 1, #G.hand.cards do
+					hand_card[G.hand.cards[i]] = true
 				end
-			end
+				
+				--populate valid cards
+				local valid_cards = {}
+				for k, v in ipairs(G.playing_cards) do
+					if v.config.center ~= G.P_CENTERS.m_unstb_biohazard and not hand_card[v] then --Excludes all cards with replace_base_card enhancements
+						valid_cards[#valid_cards+1] = v
+					end
+				end
+				
+				if valid_cards[1] then 
+					local target_card = pseudorandom_element(valid_cards, pseudoseed(seed or 'validcard'..G.GAME.round_resets.ante))
+					target_card:set_disenhancement(G.P_CENTERS.m_unstb_biohazard , nil, true)
+				end
 			
-			if valid_cards[1] then 
-				local target_card = pseudorandom_element(valid_cards, pseudoseed(seed or 'validcard'..G.GAME.round_resets.ante))
-				target_card:set_ability(G.P_CENTERS.m_unstb_biohazard , nil, true)
 			end
 			
 		end
 		
-		if context.cardarea == G.hand and not context.repetition then
+		if context.cardarea == G.hand and not card.healed and not context.repetition then
 			--Hacky way to make it grant money from hand
 			if not card.debuff then
 				ret.dollars = -card.ability.extra.h_money
@@ -1080,6 +1202,8 @@ SMODS.Enhancement {
     no_suit = false,
     no_rank = false,
     always_scores = true,
+	
+	disenhancement = true,
 	
 	override_chip = 0,
 	
@@ -1686,7 +1810,7 @@ SMODS.Consumable{
                     return true end })
 	end,
 
-	pos = get_coordinates(1),
+	pos = get_coordinates(7),
 }
 
 -- Wild +4
@@ -1733,7 +1857,7 @@ SMODS.Consumable{
                     return true end })
 	end,
 
-	pos = get_coordinates(1),
+	pos = get_coordinates(8),
 }
 
 -- In-round Instants
@@ -1789,7 +1913,7 @@ for i = 1, #aux_instants do
 					return true end })
 		end,
 
-		pos = get_coordinates(1),
+		pos = get_coordinates(8+i),
 	}
 end
 
@@ -1842,7 +1966,7 @@ SMODS.Consumable{
         delay(0.5)
 	end,
 
-	pos = get_coordinates(1),
+	pos = get_coordinates(12),
 }
 
 --All for One
@@ -1900,7 +2024,7 @@ SMODS.Consumable{
         delay(0.5)
 	end,
 
-	pos = get_coordinates(1),
+	pos = get_coordinates(13),
 }
 
 --The Twenty-One
@@ -1973,7 +2097,7 @@ SMODS.Consumable{
         end
 	end,
 
-	pos = get_coordinates(1),
+	pos = get_coordinates(14),
 }
 
 --Monkey Paw
@@ -2054,7 +2178,7 @@ SMODS.Consumable{
                     return true end })
 		for i=1, #poisoned_card do
 		event({trigger = 'after',delay = 0.1,func = function()
-                    poisoned_card[i]:set_ability(G.P_CENTERS.m_unstb_poison)
+                    poisoned_card[i]:set_disenhancement(G.P_CENTERS.m_unstb_poison)
                     return true end })
 		end
 		
@@ -2068,7 +2192,7 @@ SMODS.Consumable{
 		
 	end,
 
-	pos = get_coordinates(1),
+	pos = get_coordinates(15),
 }
 
 
@@ -2078,7 +2202,7 @@ SMODS.Consumable{
 
 --Black Jack
 create_joker({
-    name = 'Black Jack', id = 1, no_art = true,
+    name = 'Black Jack', id = 15,
     rarity = 'Common', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -2147,7 +2271,7 @@ create_joker({
 
 --What
 create_joker({
-    name = 'What', id = 1, no_art = true,
+    name = 'What', id = 14,
     rarity = 'Rare', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -2878,7 +3002,7 @@ create_joker({
 --New Anti-Enhancement Stuff
 
 create_joker({
-    name = 'Kaiju', id = 1, no_art = true,
+    name = 'Kaiju', id = 17,
     rarity = 'Uncommon', cost = 4,
 	
 	vars = {{add_slot = 3}},
@@ -2914,7 +3038,7 @@ create_joker({
 							end
 							if #eligible_list>0 then
 								local enhanced_card = pseudorandom_element(eligible_list, pseudoseed('kaiju'..G.SEED))
-								enhanced_card:set_ability(G.P_CENTERS.m_unstb_radioactive , nil, true)
+								enhanced_card:set_disenhancement(G.P_CENTERS.m_unstb_radioactive , nil, true)
 								play_sound('tarot1')
 								enhanced_card:juice_up()
 							end
@@ -2926,7 +3050,7 @@ create_joker({
 })
 
 create_joker({
-    name = 'Poison the Well', id = 1, no_art = true,
+    name = 'Poison the Well', id = 18,
     rarity = 'Uncommon', cost = 4,
 	
 	vars = {{discard_size = 3}},
@@ -2961,7 +3085,7 @@ create_joker({
 			event({trigger = 'after',  func = function()
 							play_sound('generic1')
 							target_card:juice_up(0.3, 0.3);
-							target_card:set_ability(G.P_CENTERS.m_unstb_poison , nil, true)
+							target_card:set_disenhancement(G.P_CENTERS.m_unstb_poison , nil, true)
 							
 							return true end })
 		end
@@ -2969,7 +3093,7 @@ create_joker({
 })
 
 create_joker({
-    name = 'Petri Dish', id = 0, no_art = true,
+    name = 'Petri Dish', id = 19,
     rarity = 'Uncommon', cost = 4,
 	
 	vars = {{adds_hand = 3}, {odds = 2}},
@@ -3005,7 +3129,7 @@ create_joker({
 				event({trigger = 'after',  func = function()
 								play_sound('generic1')
 								target_card:juice_up(0.3, 0.3);
-								target_card:set_ability(G.P_CENTERS.m_unstb_biohazard)
+								target_card:set_disenhancement(G.P_CENTERS.m_unstb_biohazard)
 								
 								return true end })
 
@@ -3124,7 +3248,7 @@ create_joker({
 
 --Jackhammer
 create_joker({
-    name = 'Jackhammer', id = 1, no_art = true,
+    name = 'Jackhammer', id = 16,
     rarity = 'Uncommon', cost = 4,
 	
 	vars = {{retrigger_times = 5}, {is_activate = false}},

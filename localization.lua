@@ -97,7 +97,7 @@ return {
             ['text'] = {
                 [1] = '{X:mult,C:white}X#1#{} Mult, no rank or suit',
 				[2] = 'Lose {C:red}-$#2#{} on hand',
-				[3] = 'When discarded, turns one random',
+				[3] = 'When discarded, {C:green}#3# in #4#{} chance to turns one random',
 				[4] = 'card in the deck into {C:attention}Biohazard Card{}',
             }
         }
@@ -164,6 +164,18 @@ return {
             ['text'] = {
 				[1] = 'This card also',
 				[2] = 'counts as {C:attention}face card{}',
+            }
+        }
+	},
+	
+	seal_heal = {
+		['en-us'] = {
+			['label'] = 'Heal Seal',
+            ['name'] = 'Heal Seal',
+            ['text'] = {
+				[1] = 'Removes {C:red}Disenhancement{} from one',
+				[2] = 'of random cards held in hand when scored.',
+				[3] = 'This card also cannot be {C:red}Disenhanced{}.',
             }
         }
 	},
