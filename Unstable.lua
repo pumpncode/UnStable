@@ -9,16 +9,26 @@
 ----------------------------------------------
 ------------MOD CODE -------------------------
 
-local unStb = SMODS.current_mod
+local unstb = SMODS.current_mod
 local filesystem = NFS or love.filesystem
-local path = unStb.path
+local path = unstb.path
 
 --Global Table
 unstb_global = {}
 
 --Localization Messages
-local loc = filesystem.load(unStb.path..'localization.lua')()
+local loc = filesystem.load(unstb.path..'localization.lua')()
 unstb_global.loc = loc
+
+--Dictionary wrapper, based on Bunco
+function unstb.process_loc_text()
+    SMODS.process_loc_text(G.localization.misc.dictionary, 'unstb', loc.dictionary)
+
+    loc.dictionary = G.localization.misc.dictionary.unstb
+
+    -- Other localization
+
+end
 
 -- Debug message
 
@@ -140,6 +150,18 @@ SMODS.Atlas {
   py = 95
 }
 
+--Atlas for Other Consumable Cards
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "consumable",
+  -- The name of the file, for the code to pull the atlas from
+  path = "consumable.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
 --Atlas for extra ranks
 SMODS.Atlas {
   -- Key for code to find it with
@@ -183,7 +205,7 @@ SMODS.Sound({key = 'poison', path = 'poison.ogg'})
 
 
 --Jokers
---filesystem.load(unStb.path..'joker\\joker.lua')()
+--filesystem.load(unstb.path..'joker\\joker.lua')()
 
 --Utility
 
@@ -596,7 +618,7 @@ SMODS.Enhancement {
 	
 	loc_vars = function(self, info_queue, card)
         return {
-            vars = { card.base.nominal*2 }
+            vars = { (card and card.base.nominal*2) or 0 }
         }
     end,
 	
@@ -641,8 +663,13 @@ SMODS.Enhancement {
 	
 	loc_vars = function(self, info_queue, card)
 		
-		local odds_current = card.ability.extra.current_odd or 0
-		local destroy_rate = card.ability.extra.destroy_rate
+		local odds_current = 0
+		local destroy_rate = 1
+		
+		if card then
+			odds_current = card.ability.extra.current_odd or 0
+			destroy_rate = card.ability.extra.destroy_rate
+		end
 		
 		if G.GAME and G.GAME.probabilities.normal then
 			odds_current = odds_current * G.GAME.probabilities.normal
@@ -650,7 +677,7 @@ SMODS.Enhancement {
 		end
 	
         return {
-            vars = { card.ability.extra.chip_gain_rate, odds_current, card.ability.extra.odd_destroy, destroy_rate}
+            vars = { self.config.extra.chip_gain_rate, odds_current, self.config.extra.odd_destroy, destroy_rate}
         }
     end,
 	
@@ -695,7 +722,7 @@ SMODS.Enhancement {
 	
 	loc_vars = function(self, info_queue, card)
         return {
-            vars = { card.ability.extra.gold, card.ability.extra.gold_rate, (G.GAME and G.GAME.probabilities.normal or 1), card.ability.extra.odds_destroy }
+            vars = { (card and card.ability and card.ability.extra.gold) or 0, self.config.extra.gold_rate, (G.GAME and G.GAME.probabilities.normal or 1), self.config.extra.odds_destroy }
         }
     end,
 	
@@ -2201,6 +2228,369 @@ SMODS.Consumable{
 	pos = get_coordinates(15),
 }
 
+--Heal Seal Card
+SMODS.Consumable{
+	set = 'Auxiliary', atlas = 'auxiliary',
+	key = 'aux_heal', loc_txt = loc['aux_heal'],
+
+	config = {extra = {count = 1, seal = 'unstb_heal'}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.count}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted == card.ability.extra.count) then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		for i = 1, #G.hand.highlighted do
+		event({trigger = 'after', delay = 0.2,
+			func = function()
+					G.hand.highlighted[i]:set_seal(card.ability.extra.seal, nil, true)
+					
+					--If the selected card has DisEnhancements, heal it
+					if G.hand.highlighted[i].config.center.disenhancement then
+						G.hand.highlighted[i]:heal()
+						play_sound('unstb_heal', 1, 0.3)
+						
+						forced_message("Healed!", G.hand.highlighted[i], G.C.GREEN, true)	
+					end
+			return true end })
+		end
+			
+		delay(0.5)
+		event({trigger = 'after', delay = 0.2,
+			func = function()
+				G.hand:unhighlight_all();
+			return true end })
+		
+		
+	end,
+
+	pos = get_coordinates(1),
+	
+	--Can spawn only when more than 10 cards the deck is Disenhanced
+	in_pool = function(self, args)
+	
+		local count = 0
+		
+		for k, v in ipairs(G.playing_cards) do
+			if v.config.center.disenhancement then
+				count = count+1
+			end
+		end
+	
+        return count > 10
+    end,
+}
+
+--Heal Hand
+SMODS.Consumable{
+	set = 'Auxiliary', atlas = 'auxiliary',
+	key = 'aux_heal_hand', loc_txt = loc['aux_heal_hand'],
+
+	config = {extra = {}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.count}}
+	end,
+
+	can_use = function(self, card)
+		--Usable only in-game
+		if G.hand and not G.blind_select and G.STATE ~= G.STATES.ROUND_EVAL and not G.shop and not G.booster_pack then
+			
+			--Check if the hand contains at least one DisEnhancements
+			for i = 1, #G.hand.cards do
+				if G.hand.cards[i].config.center.disenhancement then
+					return true
+				end
+			end
+			
+			return false
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		--Populate List of cards to heal
+		local heal_cards = {}
+		for i = 1, #G.hand.cards do
+				if G.hand.cards[i].config.center.disenhancement then
+					heal_cards[#heal_cards+1] = G.hand.cards[i]
+				end
+			end
+		
+		if #heal_cards>0 then
+			play_sound('unstb_heal', 1, 0.3)
+		end
+		
+		for i = 1, #heal_cards do
+			event({trigger = 'after', delay = 0.1, func = function()
+						heal_cards[i]:heal()
+						play_sound('tarot2', 1, 0.4)
+						heal_cards[i]:juice_up()
+						return true
+					end
+				})
+		end
+		
+	end,
+
+	pos = get_coordinates(1),
+	
+	--Can spawn only when more than 1/4 of deck is Disenhanced
+	in_pool = function(self, args)
+	
+		local count = 0
+		
+		for k, v in ipairs(G.playing_cards) do
+			if v.config.center.disenhancement then
+				count = count+1
+			end
+		end
+	
+        return count > #G.playing_cards * 0.25
+    end,
+}
+
+--Other Basegame Consumable Supports for new features
+
+--Tarots
+
+--main function for all three tarots
+local function conversionTarot(hand, newcenter)
+	--Animation ported from basegame Tarot
+	
+	for i=1, #hand do
+		local percent = 1.15 - (i-0.999)/(#hand-0.998)*0.3
+		event({trigger = 'after',delay = 0.15,func = function() hand[i]:flip();play_sound('card1', percent);hand[i]:juice_up(0.3, 0.3);return true end })
+	end
+	delay(0.2)
+	
+	--Handle the conversion
+	for i=1, #hand do
+	event({trigger = 'after',delay = 0.1,func = function()
+				hand[i]:set_ability(G.P_CENTERS[newcenter])
+				return true end })
+	end
+	
+	for i=1, #hand do
+		local percent = 0.85 + (i-0.999)/(#hand-0.998)*0.3
+		event({trigger = 'after',delay = 0.15,func = function() hand[i]:flip();play_sound('tarot2', percent, 0.6);hand[i]:juice_up(0.3, 0.3);return true end })
+	end
+	event({trigger = 'after', delay = 0.2,func = function() G.hand:unhighlight_all(); return true end })
+	delay(0.5)
+end
+
+
+--The Time
+SMODS.Consumable{
+	set = 'Tarot', atlas = 'consumable',
+	key = 'trt_time', loc_txt = loc['trt_time'],
+	set_card_type_badge = function(self, card, badges)
+        badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
+    end,
+
+	config = {extra = {count = 2}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+	
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_vintage']
+	
+		return {vars = {card.ability.extra.count}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted >= 1) and (#G.hand.highlighted <= card.ability.extra.count) then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+			conversionTarot(G.hand.highlighted, 'm_unstb_vintage')
+	end,
+
+	pos = get_coordinates(0),
+}
+
+--The Acorn
+SMODS.Consumable{
+	set = 'Tarot', atlas = 'consumable',
+	key = 'trt_acorn', loc_txt = loc['trt_acorn'],
+	set_card_type_badge = function(self, card, badges)
+        badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
+    end,
+
+	config = {extra = {count = 1}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+	
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_acorn']
+	
+		return {vars = {card.ability.extra.count}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted >= 1) and (#G.hand.highlighted <= card.ability.extra.count) then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+			conversionTarot(G.hand.highlighted, 'm_unstb_acorn')
+	end,
+
+	pos = get_coordinates(1),
+}
+
+--The Greed
+SMODS.Consumable{
+	set = 'Tarot', atlas = 'consumable',
+	key = 'trt_greed', loc_txt = loc['trt_greed'],
+	set_card_type_badge = function(self, card, badges)
+        badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
+    end,
+
+	config = {extra = {count = 2}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+	
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_promo']
+	
+		return {vars = {card.ability.extra.count}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted >= 1) and (#G.hand.highlighted <= card.ability.extra.count) then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+			conversionTarot(G.hand.highlighted, 'm_unstb_promo')
+	end,
+
+	pos = get_coordinates(2),
+}
+
+--Spectral
+
+--Elixir of Life
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'consumable',
+	key = 'spc_elixir', loc_txt = loc['spc_elixir'],
+
+	config = {extra = {}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.count}}
+	end,
+
+	can_use = function(self, card)
+		--Check the entire deck
+		for k, v in ipairs(G.playing_cards) do
+			if v.config.center.disenhancement then
+				return true
+			end
+		end
+			
+		return false
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		--Populate List of cards to heal
+		local heal_cards = {}
+		
+		for k, v in ipairs(G.playing_cards) do
+			if v.config.center.disenhancement then
+				heal_cards[#heal_cards+1] = v
+			end
+		end
+		
+		if #heal_cards>0 then
+			play_sound('unstb_heal', 1, 0.3)
+		end
+		
+		for i = 1, #heal_cards do
+			if heal_cards[i].area == G.hand then --If card is in hand, play animation
+				event({trigger = 'after', delay = 0.1, func = function()
+						heal_cards[i]:heal()
+						play_sound('tarot2', 1, 0.4)
+						heal_cards[i]:juice_up()
+						return true
+					end
+				})
+			else --Otherwise, just heal
+				heal_cards[i]:heal()
+			end
+			
+		end
+		
+		--Reduce Money if it's greater than 0, otherwise do nothing
+		if G.GAME.dollars > 0 then
+            ease_dollars(-math.ceil(G.GAME.dollars*0.5), true)
+        end
+	end,
+
+	pos = get_coordinates(3),
+	
+	--Can spawn only when more than 1/3 of deck is Disenhanced
+	in_pool = function(self, args)
+	
+		local count = 0
+		
+		for k, v in ipairs(G.playing_cards) do
+			if v.config.center.disenhancement then
+				count = count+1
+			end
+		end
+	
+        return count > #G.playing_cards * 0.3
+    end,
+}
 
 -------- Joker Code Starts Here ------
 
@@ -3801,13 +4191,13 @@ create_joker({
 --Compatibility / Tweaks / Rework Stuff
 
 --Deck Preview UI supports for hiding modded ranks
-filesystem.load(unStb.path..'/override/ui.lua')()
+filesystem.load(unstb.path..'/override/ui.lua')()
 
 --Reworked Vanilla Joker to support new features
-filesystem.load(unStb.path..'/override/vanilla_joker.lua')()
+filesystem.load(unstb.path..'/override/vanilla_joker.lua')()
 
 --Suits, supports for Suit Seals, a lot of suit-based Joker, and modded suits support for Smeared
-filesystem.load(unStb.path..'/override/suits.lua')()
+filesystem.load(unstb.path..'/override/suits.lua')()
 
 
 ----------------------------------------------

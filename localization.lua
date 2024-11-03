@@ -12,6 +12,7 @@ return {
             requires_restart = '(Requires game restart)',
 
             -- Miscellaneous
+			tarot_exclaim = 'Tarot!?',
             upgrade = 'Upgrade!'
         },
     },
@@ -387,7 +388,71 @@ return {
         }
     },
 	
+	aux_heal = {
+        ['en-us'] = {
+            ['name'] = 'Heal Guardian',
+            ['text'] = {
+                [1] = 'Adds {C:attention}Heal Seal{} onto',
+                [2] = '{C:attention}#1#{} selected cards.'
+            }
+        }
+    },
+	
+	aux_heal_hand = {
+        ['en-us'] = {
+            ['name'] = 'Heal Aura',
+            ['text'] = {
+                [1] = 'Heal all {C:attention}Disenhanced Cards{}',
+                [2] = 'holding in hand'
+            }
+        }
+    },
+	
 	-- Other Consumable Additions
+	
+	--Tarots
+	trt_time = {
+        ['en-us'] = {
+            ['name'] = 'The Time',
+            ['text'] = {
+                [1] = 'Enhances {C:attention}#1#{} ',
+				[2] = 'selected cards to',
+				[3] = '{C:attention}Vintage Cards{}',
+            }
+        }
+    },
+	
+	trt_acorn = {
+        ['en-us'] = {
+            ['name'] = 'The Acorn',
+            ['text'] = {
+                [1] = 'Enhances {C:attention}#1#{} ',
+				[2] = 'selected cards to',
+				[3] = '{C:attention}Acorn Mark Cards{}',
+            }
+        }
+    },
+	
+	trt_greed = {
+        ['en-us'] = {
+            ['name'] = 'The Greed',
+            ['text'] = {
+                [1] = 'Enhances {C:attention}#1#{} ',
+				[2] = 'selected cards to',
+				[3] = '{C:attention}Promo Cards{}',
+            }
+        }
+    },
+	
+	spc_elixir = {
+        ['en-us'] = {
+            ['name'] = 'Elixir of Life',
+            ['text'] = {
+                [1] = 'Heal all {C:attention}Disenhanced Cards{} in the deck',
+                [2] = 'Reduce money by half (rounded up)'
+            }
+        }
+    },
 	
 	--Jokers
 	
