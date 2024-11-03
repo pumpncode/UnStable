@@ -618,7 +618,7 @@ SMODS.Enhancement {
 	
 	loc_vars = function(self, info_queue, card)
         return {
-            vars = { (card and card.base.nominal*2) or 0 }
+            vars = { (card and (card.base.nominal + (card.ability.perma_bonus or 0)) *2) or 0 }
         }
     end,
 	
@@ -632,17 +632,28 @@ SMODS.Enhancement {
 	
 	calculate = function(self, card, context, ret)
         if context.cardarea == G.play and not context.repetition then
-            --SMODS.eval_this(card, {chip_mod = card.ability.extra.chips, message = localize{type='variable',key='a_chips',vars={card.ability.extra.chips}}} )	
+			local rulesJoker = SMODS.find_card('j_unstb_rules_errata')
+		
+			if next(rulesJoker) then
 			
-			event({trigger = 'after', delay = 0.05,  func = function()
+				--Makes the Joker bounce when this card score
+				event({trigger = 'after',  func = function()
+				big_juice(rulesJoker[1])
+				return true end })
+				
+				SMODS.eval_this(card, {mult_mod = card.base.nominal * 0.5, message = localize{type='variable',key='a_mult',vars={card.base.nominal * 0.5}}} )		
+			
+			else
+				event({trigger = 'after', delay = 0.05,  func = function()
 				play_sound('tarot2', 1, 0.4);
 				return true end })
 			
-			forced_message("Not Allowed!", card, G.C.RED, true)				
+				forced_message("Not Allowed!", card, G.C.RED, true)		
+			end
         end
 		
 		if context.cardarea == G.hand and not context.repetition then
-			card.ability.extra.totalchips = card.base.nominal * 2
+			card.ability.extra.totalchips = (card.base.nominal + (card.ability.perma_bonus or 0)) * 2
 			
 			if not card.debuff then
 				ret.h_chips = card.ability.extra.totalchips
@@ -693,7 +704,10 @@ SMODS.Enhancement {
         end
     end,
 	
-	after_play = function(self, card, context) 
+	after_play = function(self, card, context)
+	
+		print('Trigger afterplay')
+	
 		local isDestroy = pseudorandom('vintage'..G.SEED) < card.ability.extra.current_odd * G.GAME.probabilities.normal / card.ability.extra.odd_destroy
 		
 		if isDestroy then
@@ -1246,7 +1260,7 @@ SMODS.Enhancement {
 	
 		local chip = 0
 		if card and card.base then
-			chip = card.base.nominal
+			chip = card.base.nominal + (card.ability.perma_bonus or 0)
 		end
 	
         return {
@@ -1265,7 +1279,7 @@ SMODS.Enhancement {
 	calculate = function(self, card, context, ret)
 
 		if context.cardarea == G.play and not context.repetition then
-			local totalChip = card.base.nominal
+			local totalChip = card.base.nominal + (card.ability.perma_bonus or 0) --Counted bonus chips too, go crying
 			SMODS.eval_this(card, {chip_mod = -totalChip})
 			forced_message('-'..totalChip, card, G.C.RED, true) --Tried to sent color, but it got override with chips color	fsr	
 		end
@@ -1988,7 +2002,16 @@ SMODS.Consumable{
 		--Handle the conversion
 		event({trigger = 'after',delay = 0.1,func = function()
                     G.hand.highlighted[1]:set_seal(G.hand.highlighted[2].seal, true, true)
-					 G.hand.highlighted[2]:set_seal(card_l_seal, true, true)
+					G.hand.highlighted[2]:set_seal(card_l_seal, true, true)
+					
+					--If a heal seal is on disenhanced card, heal it
+					for i=1, #G.hand.highlighted do
+						if G.hand.highlighted[i].config.center.disenhancement and G.hand.highlighted[i].seal == 'unstb_heal' then
+							G.hand.highlighted[i]:heal()
+						end
+					end
+					
+					
                     return true end })
 		
 		for i=1, #G.hand.highlighted do
@@ -3326,6 +3349,138 @@ function get_valid_card_from_deck(seed)
 	return {suit = res_suit, rank = res_rank}
 end
 
+--Vintage Joker
+create_joker({
+    name = 'Vintage Joker', id = 23,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = {{chance_fix = '4'}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_vintage']
+		
+		return { vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.chance_fix}}
+    end,
+	
+	
+    calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card.config.center == G.P_CENTERS.m_unstb_vintage then
+				if pseudorandom('vintagejoker'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.chance_fix then
+					context.other_card.ability.extra.current_odd = math.ceil(context.other_card.ability.extra.current_odd * 0.5)
+					
+					event({trigger = 'after',  func = function()
+								play_sound('tarot2', 1, 0.6);
+								big_juice(context.blueprint_card or card)
+								return true end })
+					forced_message("Restored!", context.other_card, G.C.GREEN, true)
+				end
+			end
+		end
+		
+    end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one vintage card
+		for _, v in pairs(G.playing_cards) do
+			if v.config.center == G.P_CENTERS.m_unstb_vintage then return true end
+		end
+		return false
+		
+    end
+})
+
+--Rules Errata
+create_joker({
+    name = 'Rules Errata', id = 24,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = false, eternal = true,
+	
+	--vars = {{}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_acorn']
+		
+		return { vars = {}}
+    end,
+	
+	--This Joker's effect is in Acorn Mark Card's code itself
+    --[[calculate = function(self, card, context)
+	
+		if context.individual and context.cardarea == G.play then
+			
+		end
+		
+    end,]]
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one acorn card
+		for _, v in pairs(G.playing_cards) do
+			if v.config.center == G.P_CENTERS.m_unstb_acorn then return true end
+		end
+		return false
+		
+    end
+})
+
+--Auction Winner
+create_joker({
+    name = 'Auction Winner', id = 25,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	--vars = {{}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_promo']
+		
+		return { vars = {}}
+    end,
+	
+    calculate = function(self, card, context)
+	
+		if context.remove_playing_cards then
+		
+			local money = 0
+		
+			for _, v in pairs(context.removed) do
+				if v.config.center == G.P_CENTERS.m_unstb_promo then
+					money = money + v.ability.extra.gold
+				end
+			end
+			
+			if money>0 then
+				event({trigger = 'after',  func = function()
+								ease_dollars(money, true)
+								big_juice(context.blueprint_card or card)
+								return true end })
+				forced_message('$'..money, context.blueprint_card or card, G.C.GOLD, true)
+			end
+			 
+		end
+		
+    end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one promo card
+		for _, v in pairs(G.playing_cards) do
+			if v.config.center == G.P_CENTERS.m_unstb_promo then return true end
+		end
+		return false
+		
+    end
+})
+
 create_joker({
     name = 'Joker Island', id = 7,
     rarity = 'Uncommon', cost = 4,
@@ -3498,7 +3653,7 @@ create_joker({
 	
 		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_biohazard']
 	
-        return {vars = {card.ability.extra.adds_hand, 1, card.ability.extra.odds}}
+        return {vars = {card.ability.extra.adds_hand, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
     end,
 	
     blueprint = false, eternal = true,

@@ -11,7 +11,7 @@ pattern = '''if destroyed then'''
 position = 'before'
 match_indent = true
 payload = '''
-if scoring_hand[i].config.center.after_play and not scoring_hand[i].debuff then
+if scoring_hand[i].config.center.after_play and not scoring_hand[i].debuff and not destroyed then
     scoring_hand[i].config.center:after_play(scoring_hand[i], {scoring_hand = scoring_hand})
 	destroyed = scoring_hand[i].to_destroy
 end'''

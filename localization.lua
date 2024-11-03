@@ -672,6 +672,39 @@ return {
         }
     },
 	
+	--New Enhancement Supports
+	vintage_joker = {
+        ['en-us'] = {
+            ['name'] = 'Vintage Joker',
+            ['text'] = {
+				[1] = 'Scored {C:attention}Vintage Cards{} have',
+                [2] = '{C:green}#1# in #2#{} chance to reduce',
+				[3] = 'the destroyed chance by half',
+            }
+        }
+    },
+	
+	rules_errata = {
+        ['en-us'] = {
+            ['name'] = 'Rules Errata',
+            ['text'] = {
+				[1] = '{C:attention}Acorn Mark Cards{} give {C:attention}half{} of a',
+                [2] = "rank's value as Mult when scored",
+            }
+        }
+    },
+	
+	auction_winner = {
+        ['en-us'] = {
+            ['name'] = 'Auction Winner',
+            ['text'] = {
+				[1] = 'If {C:attention}Promo Card{} is destroyed after scored',
+                [2] = "gains {C:gold}money{} equals to amount the card",
+				[3] = "gives before breaks",
+            }
+        }
+    },
+	
 	--Miscellaneous
 	
 	joker2 = {
