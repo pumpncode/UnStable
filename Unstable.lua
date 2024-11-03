@@ -1785,7 +1785,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted == 1) then
+		if G.hand and (#G.hand.highlighted == 1) and not G.hand.highlighted[1].config.center.no_suit then
 			return true
 		end
 		return false
@@ -1832,7 +1832,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted == 1) then
+		if G.hand and (#G.hand.highlighted == 1) and not G.hand.highlighted[1].config.center.no_rank then
 			return true
 		end
 		return false
