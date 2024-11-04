@@ -2476,7 +2476,7 @@ SMODS.Consumable{
 	
 		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_acorn']
 	
-		return {vars = {card.ability.extra.count}}
+		return {vars = {card and card.ability.extra.count or self.config.extra.count}}
 	end,
 
 	can_use = function(self, card)

@@ -47,6 +47,11 @@ SMODS.Joker:take_ownership('fibonacci', {
 				  card = context.other_card
 				}
 				
+			else
+				--Failsafe for mod compat
+				return {
+					mult = 0
+				}
 			end
 		end
 		
@@ -62,6 +67,11 @@ unstb_global.face_rank = {Jack = true, Queen = true, King = true}
 
 --Check for a modulo and remainder of the card's rank - used for both odd and even check
 function unstb_global.modulo_check(card, mod, remainder)
+
+	print('unstb modulo check')
+	print(card.config.center.no_rank)
+	print(card.base.nominal)
+	print('===')
 
 	if card.config.center.no_rank then
 		return false
@@ -107,6 +117,11 @@ SMODS.Joker:take_ownership('odd_todd', {
 				  card = context.other_card
 				}
 				
+			else
+				--Failsafe for mod compat
+				return {
+					chips = 0
+				}
 			end
 		end
 		
@@ -142,6 +157,11 @@ SMODS.Joker:take_ownership('even_steven', {
 				  card = context.other_card
 				}
 				
+			else
+				--Failsafe for mod compat
+				return {
+					mult = 0
+				}
 			end
 		end
 		
