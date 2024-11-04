@@ -6,6 +6,7 @@
 --- DEPENDENCIES: [Steamodded>=1.0.0~ALPHA-0812d]
 --- BADGE_COLOR: 41c300
 --- PREFIX: unstb
+--- PRIORITY: 777
 ----------------------------------------------
 ------------MOD CODE -------------------------
 
