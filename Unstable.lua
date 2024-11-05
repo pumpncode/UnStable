@@ -152,11 +152,26 @@ SMODS.Atlas {
 }
 
 --Atlas for Other Consumable Cards
+
+--Tarot
 SMODS.Atlas {
   -- Key for code to find it with
-  key = "consumable",
+  key = "tarot",
   -- The name of the file, for the code to pull the atlas from
-  path = "consumable.png",
+  path = "tarot.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
+
+--Spectral
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "spectral",
+  -- The name of the file, for the code to pull the atlas from
+  path = "spectral.png",
   -- Width of each sprite in 1x size
   px = 71,
   -- Height of each sprite in 1x size
@@ -2427,7 +2442,7 @@ end
 
 --The Time
 SMODS.Consumable{
-	set = 'Tarot', atlas = 'consumable',
+	set = 'Tarot', atlas = 'tarot',
 	key = 'trt_time', loc_txt = loc['trt_time'],
 	set_card_type_badge = function(self, card, badges)
         badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
@@ -2463,7 +2478,7 @@ SMODS.Consumable{
 
 --The Acorn
 SMODS.Consumable{
-	set = 'Tarot', atlas = 'consumable',
+	set = 'Tarot', atlas = 'tarot',
 	key = 'trt_acorn', loc_txt = loc['trt_acorn'],
 	set_card_type_badge = function(self, card, badges)
         badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
@@ -2499,7 +2514,7 @@ SMODS.Consumable{
 
 --The Greed
 SMODS.Consumable{
-	set = 'Tarot', atlas = 'consumable',
+	set = 'Tarot', atlas = 'tarot',
 	key = 'trt_greed', loc_txt = loc['trt_greed'],
 	set_card_type_badge = function(self, card, badges)
         badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
@@ -2537,7 +2552,7 @@ SMODS.Consumable{
 
 --Elixir of Life
 SMODS.Consumable{
-	set = 'Spectral', atlas = 'consumable',
+	set = 'Spectral', atlas = 'spectral',
 	key = 'spc_elixir', loc_txt = loc['spc_elixir'],
 
 	config = {extra = {}},
@@ -2599,7 +2614,7 @@ SMODS.Consumable{
         end
 	end,
 
-	pos = get_coordinates(3),
+	pos = get_coordinates(0),
 	
 	--Can spawn only when more than 1/3 of deck is Disenhanced
 	in_pool = function(self, args)
