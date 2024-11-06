@@ -2892,7 +2892,7 @@ SMODS.Consumable{
 
 	loc_vars = function(self, info_queue, card)
 
-		return {vars = {}}
+		return {vars = {card and card.ability.extra.count or self.config.extra.count, card and card.ability.extra.cost or self.config.extra.cost}}
 	end,
 
 	can_use = function(self, card)
@@ -2961,7 +2961,7 @@ SMODS.Consumable{
 
 	loc_vars = function(self, info_queue, card)
 
-		return {vars = {}}
+		return {vars = {card and card.ability.extra.count or self.config.extra.count}}
 	end,
 
 	can_use = function(self, card)
@@ -3034,7 +3034,7 @@ SMODS.Consumable{
 
 	loc_vars = function(self, info_queue, card)
 
-		return {vars = {}}
+		return {vars = {card and card.ability.extra.destroy_count or self.config.extra.destroy_count, card and card.ability.extra.create_count or self.config.extra.create_count}}
 	end,
 
 	can_use = function(self, card)
@@ -3125,7 +3125,7 @@ SMODS.Consumable{
 
 	loc_vars = function(self, info_queue, card)
 
-		return {vars = {}}
+		return {vars = {card and card.ability.extra.upgrade_count or self.config.extra.upgrade_count, card and card.ability.extra.disenc_count or self.config.extra.disenc_count}}
 	end,
 
 	can_use = function(self, card)
@@ -3272,7 +3272,7 @@ SMODS.Consumable{
 
 	loc_vars = function(self, info_queue, card)
 
-		return {vars = {}}
+		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card and card.ability.extra.odds_break or self.config.extra.odds_break}}
 	end,
 
 	can_use = function(self, card)
@@ -3371,7 +3371,7 @@ SMODS.Consumable{
 
 	loc_vars = function(self, info_queue, card)
 
-		return {vars = {}}
+		return {vars = {card and card.ability.extra.count or self.config.extra.count}}
 	end,
 
 	can_use = function(self, card)

@@ -473,7 +473,7 @@ return {
             ['name'] = 'Elixir of Life',
             ['text'] = {
                 [1] = 'Heal all {C:attention}Disenhanced Cards{} in the deck',
-                [2] = 'Reduce money by half (rounded up)'
+                [2] = 'Reduce money by half {C:inactive}(rounded up){}'
             }
         }
     },
@@ -482,7 +482,11 @@ return {
         ['en-us'] = {
             ['name'] = 'Vessel',
             ['text'] = {
-                [1] = 'snip',
+                [1] = 'Selects {C:attention}2{} card,',
+				[2] = 'destroy the {C:attention}left{} card',
+				[3] = 'and gives corresponding {C:red}Suit Seal{}',
+				[4] = 'to the {C:attention}right{} card',
+				[5] = '{C:inactive}(Drags to rearrange){}',
             }
         }
     },
@@ -491,7 +495,10 @@ return {
         ['en-us'] = {
             ['name'] = 'Conferment',
             ['text'] = {
-                [1] = 'snip',
+                [1] = 'Add a {C:attention}Face Seal{}',
+				[2] = 'to {C:attention}#1#{} random cards',
+				[3] = 'in your hand,',
+				[4] = '{C:red}-$#2#{} {C:inactive}(no debt limit){}'
             }
         }
     },
@@ -500,7 +507,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Amnesia',
             ['text'] = {
-                [1] = 'snip',
+				[1] = 'Converts {C:attention}#1#{} random',
+				[2] = 'cards in your hand',
+				[3] = 'to {C:attention}Rank 0{}',
             }
         }
     },
@@ -509,7 +518,10 @@ return {
         ['en-us'] = {
             ['name'] = 'Altar',
             ['text'] = {
-                [1] = 'snip',
+                [1] = 'Destroy {C:attention}#1#{} random',
+				[2] = 'cards in your hand,',
+				[3] = 'add {C:attention}#2#{} random {C:attention}Enhanced{}',
+				[4] = '{C:attention}21s{} to your hand'
             }
         }
     },
@@ -518,7 +530,11 @@ return {
         ['en-us'] = {
             ['name'] = "Devil's Contract",
             ['text'] = {
-                [1] = 'snip',
+                [1] = '{C:purple}Upgrades {C:attention}#1#{} random',
+				[2] = 'cards in your hand,',
+				[3] = 'converts {C:attention}#2#{} random',
+				[4] = 'cards in your hand into',
+				[5] = '{C:attention}random {C:red}DisEnhancement{}',
             }
         }
     },
@@ -527,7 +543,8 @@ return {
         ['en-us'] = {
             ['name'] = "Poltergeist",
             ['text'] = {
-                [1] = 'snip',
+                [1] = 'Shuffles all',
+				[2] = "Joker's {C:dark_edition}edition{}",
             }
         }
     },
@@ -536,7 +553,11 @@ return {
         ['en-us'] = {
             ['name'] = "Astral Projection",
             ['text'] = {
-                [1] = 'snip',
+                [1] = 'Swap {C:dark_edition}editions{} between',
+				[2] = 'the {C:attention}selected Joker{}',
+				[3] = 'and the one {C:attention}on the right{}',
+				[4] = '{C:green}#1# in #2#{} chance that',
+				[5] = 'one of the Jokers are {C:red}destroyed{}',
             }
         }
     },
@@ -545,7 +566,11 @@ return {
         ['en-us'] = {
             ['name'] = "Siphon",
             ['text'] = {
-                [1] = 'snip',
+                [1] = 'Destroy a selected {C:attention}Joker{}',
+				[2] = 'with {C:dark_edition}edition{}',
+				[3] = "Gives the {C:attention}Joker's {C:dark_edition}edition{} to",
+				[4] = '{C:attention}#1#{} random card in your hand',
+				[5] = '{C:inactive}({C:dark_edition}Negative{} excluded){}',
             }
         }
     },
