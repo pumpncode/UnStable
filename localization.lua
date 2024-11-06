@@ -13,7 +13,11 @@ return {
 
             -- Miscellaneous
 			tarot_exclaim = 'Tarot!?',
-            upgrade = 'Upgrade!'
+            upgrade = 'Upgrade!',
+			
+			decimal_rank_ability = {['text'] = {[1] = 'Can act as {C:attention}different rank{}',
+												[2] = 'when played in {C:purple}Straight{} hand',
+												[3] = '{C:inactive}[#1#, #2#, #3#]{}',}}
         },
     },
 	

@@ -28,7 +28,7 @@ function unstb.process_loc_text()
     loc.dictionary = G.localization.misc.dictionary.unstb
 
     -- Other localization
-
+	SMODS.process_loc_text(G.localization.descriptions.Other, 'decimal_rank_ability', loc.dictionary.decimal_rank_ability)
 end
 
 -- Debug message
@@ -1329,6 +1329,22 @@ SMODS.Enhancement:take_ownership('m_stone', {
  
 --New Ranks
 
+--Hook for Card:get_id()
+
+local decimal_rank_map = { ['unstb_0.5'] = 17, unstb_e = 3, unstb_Pi = 4}
+
+local ref_getid = Card.get_id
+function Card:get_id()
+
+	local engineer_joker = false
+	if engineer_joker and SMODS.Ranks[self.base.value].is_decimal then
+		return decimal_rank_map[self.base.value]
+	end
+
+	return ref_getid(self)
+end
+
+
 --Pool flag wrapper function to help assist managing ranks enable / disable
 function setPoolRankFlagEnable(rank, isEnable)
 	if not G.GAME or G.GAME.pool_flags[rank] == isEnable then return end
@@ -1360,10 +1376,11 @@ SMODS.Rank {
     card_key = '0.5',
     pos = { x = 2 },
     nominal = 0.5,
-    next = { 'unstb_1' },
+    next = {'unstb_1', '2', 'unstb_e' },
     shorthand = '0.5',
 	
 	is_decimal = true,
+	rank_act = {'0', '0.5', '1'},
 	
 	in_pool = unstb_rankCheck,
 }
@@ -1379,7 +1396,12 @@ SMODS.Rank {
     card_key = '0',
     pos = { x = 6 },
     nominal = 0,
-    next = { 'unstb_1' },
+	strength_effect = {
+            fixed = 2,
+            random = false,
+            ignore = false
+        },
+    next = { 'unstb_0.5', 'unstb_1' },
     shorthand = '0',
 	
 	straight_edge = true,
@@ -1398,7 +1420,7 @@ SMODS.Rank {
     card_key = '1',
     pos = { x = 5 },
     nominal = 1,
-    next = { '2' },
+    next = { '2', 'unstb_e' },
     shorthand = '1',
 	
 	in_pool = unstb_rankCheck,
@@ -1415,10 +1437,11 @@ SMODS.Rank {
     card_key = 'E',
     pos = { x = 3 },
     nominal = 2.72,
-    next = { '3' },
+    next = { '3', 'unstb_Pi', '4' },
     shorthand = 'e',
 	
 	is_decimal = true,
+	rank_act = {'2', '2.72', '3'},
 	
 	in_pool = unstb_rankCheck,
 }
@@ -1434,10 +1457,11 @@ SMODS.Rank {
     card_key = 'P',
     pos = { x = 4 },
     nominal = 3.14,
-    next = { '4' },
+    next = { '4', '5' },
     shorthand = 'Pi',
 	
 	is_decimal = true,
+	rank_act = {'3', '3.14', '4'},
 	
 	in_pool = unstb_rankCheck,
 }
@@ -1477,9 +1501,26 @@ SMODS.Rank {
 }
 
 --Change straight edge off from Ace, so it start to look at rank 0 instead
-SMODS.Rank:take_ownership('Ace', {
+--[[SMODS.Rank:take_ownership('Ace', {
 	straight_edge = false
-}, true)
+}, true)]]
+
+SMODS.Ranks['2'].strength_effect = {
+            fixed = 2,
+            random = false,
+            ignore = false
+        }
+SMODS.Ranks['2'].next = {'unstb_e', '3', 'unstb_Pi'}
+
+SMODS.Ranks['3'].strength_effect = {
+            fixed = 2,
+            random = false,
+            ignore = false
+        }
+SMODS.Ranks['3'].next = {'unstb_Pi', '4'}
+
+SMODS.Ranks['Ace'].straight_edge = false
+SMODS.Ranks['Ace'].next = {'2', 'unstb_e'}
 
 -- Poker Hand Rewrite to support new ranks probably?
 
@@ -1508,13 +1549,15 @@ function ustb_get_straight(hand)
 		end
 	end
 	
-	if hasDecimal then
+	return ustb_straight_decimal(hand) 
+	
+	--[[if hasDecimal then
 		--print('Has decimal')
 		return ustb_straight_decimal(hand) 
 	else
 		--print('do not has decimal')
 		return get_straight(hand) 
-	end
+	end]]
 end
 
 function ustb_straight_decimal(hand) 
@@ -1560,6 +1603,8 @@ function ustb_straight_decimal(hand)
 	local end_iter = false
 	local i = 0
 	
+	print(inspect(RANKS))
+	
 	while 1 do
 		end_iter = false
 		if straight_length >= (5 - (four_fingers and 1 or 0)) then
@@ -1569,6 +1614,8 @@ function ustb_straight_decimal(hand)
 		if br or (i > #SMODS.Rank.obj_buffer + 1) then break end
 		if not next(vals) then break end
 		for _, val in ipairs(vals) do
+			print(val)
+			print('===')
 			if init_vals[val] and not initial then br = true end
 			if RANKS[val] then
 				straight_length = straight_length + 1
@@ -1578,6 +1625,9 @@ function ustb_straight_decimal(hand)
 				end
 				
 				vals = SMODS.Ranks[val].next
+				
+				print(inspect(vals))
+				print('---')
 				
 				initial = false
 				end_iter = true

@@ -28,3 +28,18 @@ payload = '''
 		nominal = 0.31 + nominal*0.1
 	end
 	return 10*(nominal)*rank_mult + self.base.suit_nominal*mult + (self.base.suit_nominal_original or 0)*0.0001*mult + 10*self.base.face_nominal*rank_mult + 0.000001*self.unique_val'''
+
+
+# Adds ability text for decimal ranks
+# function generate_card_ui()
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if main_end then"
+position = "before"
+match_indent = true
+payload = """
+if (_c.set == 'Default' or _c.set == 'Enhanced') and card and card.ability and type(card.ability) == 'table' and SMODS.Ranks[card.base.value].is_decimal and not card.config.center.no_rank and not card.debuff then
+	local rank_act = SMODS.Ranks[card.base.value].rank_act or {'0', '0', '0'}
+    localize{type = 'other', key = 'decimal_rank_ability', nodes = desc_nodes, vars = {rank_act[1], rank_act[2], rank_act[3]}}
+end"""
