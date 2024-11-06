@@ -532,9 +532,9 @@ return {
         }
     },
 	
-	spc_market = {
+	spc_projection = {
         ['en-us'] = {
-            ['name'] = "Black Market",
+            ['name'] = "Astral Projection",
             ['text'] = {
                 [1] = 'snip',
             }

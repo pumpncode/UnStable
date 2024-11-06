@@ -1035,7 +1035,7 @@ SMODS.Enhancement {
 				play_sound('tarot2', 1, 0.4);
 				return true end })
 
-				forced_message("Invalid", card, G.C.GRAY, true)
+				forced_message("Invalid", card, G.C.ORANGE, true)
 			end
 			
 			return {
@@ -2726,7 +2726,7 @@ SMODS.Consumable{
 	pos = get_coordinates(3),
 }
 
---Spectral
+--"Rebundant" Spectral (Same ability set as some Auxiliary exclusives, but worse)
 
 --Elixir of Life
 SMODS.Consumable{
@@ -3130,23 +3130,12 @@ SMODS.Consumable{
 
 	can_use = function(self, card)
 		if G.hand then
-		
-			--Check if the hand contains at least one non-face card
-			for i = 1, #G.hand.cards do
-				if not G.hand.cards[i]:is_face() then
-					return true
-				end
-			end
-			
-			return false
+			return true
 		end
 		return false
 	end,
 
 	use = function(self, card)
-		--Enable Rank Flag
-		setPoolRankFlagEnable('unstb_0', true);
-	
 		event({trigger = 'after', delay = 0.4, func = function()
             play_sound('tarot1')
 			card:juice_up(0.3, 0.5)
@@ -3193,6 +3182,240 @@ SMODS.Consumable{
 			end
 			delay(0.5)
 		end
+	end,
+
+	pos = get_coordinates(0),
+}
+
+--Other Spectrals
+
+--Poltergeist
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'spectral',
+	key = 'spc_poltergeist', loc_txt = loc['spc_poltergeist'],
+
+	config = {extra = {}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and #G.jokers.cards > 1 then
+		
+			--Check if there is at least one joker with edition
+			for i = 1, #G.jokers.cards do
+				if G.jokers.cards[i].edition then
+					return true
+				end
+			end
+			
+			return false
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		local joker_list = G.jokers.cards
+		
+		local temp_edition = {}
+		for k, v in ipairs(joker_list) do temp_edition[#temp_edition+1] = v.edition or 'none' end
+		pseudoshuffle(temp_edition, pseudoseed('poltergeist'))
+
+		--Give all joker new editions
+		--Animation from Basegame Tarot
+		for i=1, #joker_list do
+			local percent = 1.15 - (i-0.999)/(#joker_list-0.998)*0.3
+			event({trigger = 'after',delay = 0.15,func = function() joker_list[i]:flip();play_sound('card1', percent);joker_list[i]:juice_up(0.3, 0.3);return true end })
+		end
+		delay(0.2)
+		
+		--Set the new edition
+		for i=1, #joker_list do
+		event({trigger = 'after',delay = 0.1,func = function()	
+
+					local edition = temp_edition[i]
+					
+					if edition == 'none' then
+						edition =  nil
+					end
+		
+					joker_list[i]:set_edition(edition, true, true)
+					return true end })
+		end
+		
+		for i=1, #joker_list do
+			local percent = 0.85 + (i-0.999)/(#joker_list-0.998)*0.3
+			event({trigger = 'after',delay = 0.15,func = function() joker_list[i]:flip();play_sound('tarot2', percent, 0.6);joker_list[i]:juice_up(0.3, 0.3);return true end })
+		end
+		delay(0.5)
+	end,
+
+	pos = get_coordinates(0),
+}
+
+--Projection
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'spectral',
+	key = 'spc_projection', loc_txt = loc['spc_projection'],
+
+	config = {extra = {odds_break = 4}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and #G.jokers.cards > 1 and G.jokers.highlighted[1] then
+		
+			--Check if there is at least one of the selected jokers have edition and is not the same
+			local joker = G.jokers.highlighted[1]
+			local position = nil
+			
+			for i = 1, #G.jokers.cards do
+                if G.jokers.cards[i] == joker then position = i; break end
+            end
+			
+			--Selected Joker is at the rightmost
+			if position==#G.jokers.cards then
+				return false
+			end
+			
+			local nextjoker = G.jokers.cards[position+1]
+			
+			--If both has edition, see if it's the same
+			if joker.edition and nextjoker.edition then
+				return joker.edition.key ~= nextjoker.edition.key
+			end
+			
+			--Return true if at least one of them has edition
+			return joker.edition or nextjoker.edition 
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		local joker = G.jokers.highlighted[1]
+		local position = nil
+			
+		for i = 1, #G.jokers.cards do
+            if G.jokers.cards[i] == joker then position = i; break end
+        end
+		
+		local nextjoker = G.jokers.cards[position+1]
+		
+		local firstEdition = joker.edition
+		local nextEdition = nextjoker.edition
+		
+		local joker_list = {joker, nextjoker}
+		
+		--Animation from Basegame Tarot
+		for i=1, #joker_list do
+			local percent = 1.15 - (i-0.999)/(#joker_list-0.998)*0.3
+			event({trigger = 'after',delay = 0.15,func = function() joker_list[i]:flip();play_sound('card1', percent);joker_list[i]:juice_up(0.3, 0.3);return true end })
+		end
+		delay(0.2)
+		
+		--Set the new edition
+		for i=1, #joker_list do
+		event({trigger = 'after',delay = 0.1,func = function()	
+					joker:set_edition(nextEdition, true, true)
+					nextjoker:set_edition(firstEdition, true, true)
+					return true end })
+		end
+		
+		for i=1, #joker_list do
+			local percent = 0.85 + (i-0.999)/(#joker_list-0.998)*0.3
+			event({trigger = 'after',delay = 0.15,func = function() joker_list[i]:flip();play_sound('tarot2', percent, 0.6);joker_list[i]:juice_up(0.3, 0.3);return true end })
+		end
+		delay(0.5)
+		
+		--Destroy one of the joker
+		if pseudorandom('projection'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_break then
+			local target = pseudorandom_element(joker_list, pseudoseed('projection'))
+			event({func = function()
+                        target:start_dissolve({HEX("57ecab")}, nil, 1.6)
+                    return true end })
+			forced_message("Failed...", target, G.C.BLACK, true)
+		end
+		
+		
+	end,
+
+	pos = get_coordinates(0),
+}
+
+--Siphon
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'spectral',
+	key = 'spc_siphon', loc_txt = loc['spc_siphon'],
+
+	config = {extra = {count = 4}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and #G.jokers.cards > 1 and G.jokers.highlighted[1] then
+			return G.jokers.highlighted[1].edition and G.jokers.highlighted[1].edition.key ~= 'e_negative'
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		local edition_card = {}
+		local temp_hand = {}
+		
+		for k, v in ipairs(G.hand.cards) do temp_hand[#temp_hand+1] = v end
+		table.sort(temp_hand, function (a, b) return not a.playing_card or not b.playing_card or a.playing_card < b.playing_card end)
+		pseudoshuffle(temp_hand, pseudoseed('siphon'))
+
+		for i = 1, card.ability.extra.count do edition_card[#edition_card+1] = temp_hand[i] end
+		
+		local joker = G.jokers.highlighted[1]
+		local edition = joker.edition
+		
+		--Destroy the joker
+		
+		event({func = function()
+					joker:start_dissolve({HEX("57ecab")}, nil, 1.6)
+				return true end })
+		delay(0.5)
+		
+		--Upgrade the card
+		
+		event({trigger = 'after',delay = 0.1,func = function()
+					for i=1, #edition_card do
+						edition_card[i]:set_edition(edition, true, i==1)
+					end
+                    return true end })
+		
+		
 	end,
 
 	pos = get_coordinates(0),
@@ -3406,7 +3629,7 @@ create_joker({
 					
 					--Unflipping Animation
 					event({trigger = 'after', delay = 0.1, func = function() currentCard:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); currentCard:juice_up(0.3, 0.3); return true end })
-					forced_message("Zero!", currentCard, G.C.GRAY, true)
+					forced_message("Zero!", currentCard, G.C.GREY, true)
 				end
 			end
 		end
