@@ -1,0 +1,30 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# Fix the nominal sorting (Suit for high ranks)
+[[patches]]
+[patches.regex]
+target = 'card.lua'
+pattern = '''if mod == 'suit' (.*)'''
+position = 'at'
+payload = '''
+if mod == 'suit' then mult = 30000 end'''
+
+# Fix the nominal sorting (For low ranks)
+[[patches]]
+[patches.regex]
+target = 'card.lua'
+pattern = '''return 10\*self.base.nominal\*rank_mult(.*)'''
+position = 'at'
+payload = '''
+--Temporary fix so the card with the lowest nominal can still be sorted properly
+	local nominal = self.base.nominal
+	
+	if self.base.value == 'unstb_???' then
+		nominal = 0.3
+	elseif nominal < 0.4 then
+		nominal = 0.31 + nominal*0.1
+	end
+	return 10*(nominal)*rank_mult + self.base.suit_nominal*mult + (self.base.suit_nominal_original or 0)*0.0001*mult + 10*self.base.face_nominal*rank_mult + 0.000001*self.unique_val'''

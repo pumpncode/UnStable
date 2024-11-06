@@ -444,12 +444,108 @@ return {
         }
     },
 	
+	trt_half = {
+        ['en-us'] = {
+            ['name'] = 'The Half',
+            ['text'] = {
+                [1] = 'Splits the {C:attention}integer-numbered rank{} cards',
+				[2] = 'into two cards with {C:attention}half a rank{} (rounded down)',
+				[3] = 'If the initial rank is {C:attention}odd{},',
+				[4] = 'adds one {C:attention}0.5 rank{} card {C:attention}of the same enhancement{} as well',
+            }
+        }
+    },
+	
+	trt_knowledge = {
+        ['en-us'] = {
+            ['name'] = 'The Knowledge',
+            ['text'] = {
+                [1] = 'Adds one random {C:attention}decimal-rank{} card',
+				[2] = 'of the selected suit to hand',
+            }
+        }
+    },
+	
+	--Spectral
+	
 	spc_elixir = {
         ['en-us'] = {
             ['name'] = 'Elixir of Life',
             ['text'] = {
                 [1] = 'Heal all {C:attention}Disenhanced Cards{} in the deck',
                 [2] = 'Reduce money by half (rounded up)'
+            }
+        }
+    },
+	
+	spc_vessel = {
+        ['en-us'] = {
+            ['name'] = 'Vessel',
+            ['text'] = {
+                [1] = 'snip',
+            }
+        }
+    },
+	
+	spc_conferment = {
+        ['en-us'] = {
+            ['name'] = 'Conferment',
+            ['text'] = {
+                [1] = 'snip',
+            }
+        }
+    },
+	
+	spc_amnesia = {
+        ['en-us'] = {
+            ['name'] = 'Amnesia',
+            ['text'] = {
+                [1] = 'snip',
+            }
+        }
+    },
+	
+	spc_altar = {
+        ['en-us'] = {
+            ['name'] = 'Altar',
+            ['text'] = {
+                [1] = 'snip',
+            }
+        }
+    },
+	
+	spc_contract = {
+        ['en-us'] = {
+            ['name'] = "Devil's Contract",
+            ['text'] = {
+                [1] = 'snip',
+            }
+        }
+    },
+	
+	spc_poltergeist = {
+        ['en-us'] = {
+            ['name'] = "Poltergeist",
+            ['text'] = {
+                [1] = 'snip',
+            }
+        }
+    },
+	
+	spc_market = {
+        ['en-us'] = {
+            ['name'] = "Black Market",
+            ['text'] = {
+                [1] = 'snip',
+            }
+        }
+    },
+	
+	spc_siphon = {
+        ['en-us'] = {
+            ['name'] = "Siphon",
+            ['text'] = {
+                [1] = 'snip',
             }
         }
     },
