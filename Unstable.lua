@@ -2863,13 +2863,8 @@ SMODS.Consumable{
 			trigger = 'after',
 			delay = 0.1,
 			func = function() 
-				print('destroy card')
-				print(#destroyed_cards)
-				
 				for i=#destroyed_cards, 1, -1 do
 					local c = destroyed_cards[i]
-					print(c)
-					
 					if c.ability.name == 'Glass Card' then 
 						c:shatter()
 					else
@@ -2879,7 +2874,6 @@ SMODS.Consumable{
 				return true end })
 		--Calling Jokers to process the card destroying
 		delay(0.3)
-		print('joker')
 		for i = 1, #G.jokers.cards do
 			G.jokers.cards[i]:calculate_joker({remove_playing_cards = true, removed = destroyed_cards})
 		end
@@ -3022,6 +3016,180 @@ SMODS.Consumable{
 			for i=1, #converted_card do
 				local percent = 0.85 + (i-0.999)/(#converted_card-0.998)*0.3
 				event({trigger = 'after',delay = 0.15,func = function() converted_card[i]:flip();play_sound('tarot2', percent, 0.6);converted_card[i]:juice_up(0.3, 0.3);return true end })
+			end
+			delay(0.5)
+		end
+	end,
+
+	pos = get_coordinates(0),
+}
+
+--Altar
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'spectral',
+	key = 'spc_altar', loc_txt = loc['spc_altar'],
+
+	config = {extra = {destroy_count = 3, create_count = 2}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		--Enable Rank Flag
+		setPoolRankFlagEnable('unstb_21', true);
+	
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		--Based on Basegame's Immolate
+		local destroyed_cards = {}
+		
+		local temp_hand = {}
+		for k, v in ipairs(G.hand.cards) do temp_hand[#temp_hand+1] = v end
+		table.sort(temp_hand, function (a, b) return not a.playing_card or not b.playing_card or a.playing_card < b.playing_card end)
+		pseudoshuffle(temp_hand, pseudoseed('altar'))
+
+		for i = 1, card.ability.extra.destroy_count do destroyed_cards[#destroyed_cards+1] = temp_hand[i] end
+		
+		--Destroy Cards
+		event({
+			trigger = 'after',
+			delay = 0.1,
+			func = function() 
+				for i=#destroyed_cards, 1, -1 do
+					local c = destroyed_cards[i]
+					print(c)
+					
+					if c.ability.name == 'Glass Card' then 
+						c:shatter()
+					else
+						c:start_dissolve(nil, i == #destroyed_cards)
+					end
+				end
+				return true end })
+		--Calling Jokers to process the card destroying
+		delay(0.3)
+		print('joker')
+		for i = 1, #G.jokers.cards do
+			G.jokers.cards[i]:calculate_joker({remove_playing_cards = true, removed = destroyed_cards})
+		end
+		
+		--Adding New Cards
+		event({
+                trigger = 'after',
+                delay = 0.7,
+                func = function() 
+                    local cards = {}
+                    for i=1, card.ability.extra.create_count do
+                        cards[i] = true
+                        local _rank = SMODS.Ranks['unstb_21']
+                        local _suit = pseudorandom_element(SMODS.Suits, pseudoseed('altar')) or SMODS.Suits['Spades']
+						
+						--Pooling Enhancements
+						local cen_pool = {}
+                        for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+                            if not v.replace_base_card and not v.disenhancement then 
+                                cen_pool[#cen_pool+1] = v
+                            end
+                        end
+						
+                        create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = pseudorandom_element(cen_pool, pseudoseed('altar'))}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
+                    end
+                    playing_card_joker_effects(cards)
+                    return true end })
+		
+	end,
+
+	pos = get_coordinates(0),
+}
+
+--Devil's Contract
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'spectral',
+	key = 'spc_contract', loc_txt = loc['spc_contract'],
+
+	config = {extra = {upgrade_count = 1, disenc_count = 3}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand then
+		
+			--Check if the hand contains at least one non-face card
+			for i = 1, #G.hand.cards do
+				if not G.hand.cards[i]:is_face() then
+					return true
+				end
+			end
+			
+			return false
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		--Enable Rank Flag
+		setPoolRankFlagEnable('unstb_0', true);
+	
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		--Based on Basegame's Immolate
+		local upgrade_card = {}
+		local disenc_card = {}
+		
+		local temp_hand = {}
+		for k, v in ipairs(G.hand.cards) do temp_hand[#temp_hand+1] = v end
+		table.sort(temp_hand, function (a, b) return not a.playing_card or not b.playing_card or a.playing_card < b.playing_card end)
+		pseudoshuffle(temp_hand, pseudoseed('dvcontract'))
+
+		for i = 1, card.ability.extra.upgrade_count do upgrade_card[#upgrade_card+1] = temp_hand[i] end
+		for i = card.ability.extra.upgrade_count+1, card.ability.extra.upgrade_count+card.ability.extra.disenc_count  do disenc_card[#disenc_card+1] = temp_hand[i] end
+		
+		--Upgrade the card
+		for i=1, #upgrade_card do
+		event({trigger = 'after',delay = 0.1,func = function()
+                    edition_upgrade(upgrade_card[i])
+                    return true end })
+		end
+		
+		--Disenhanced the Remaining Cards
+		if #disenc_card > 0 then
+			--Animation from Basegame Tarot
+			for i=1, #disenc_card do
+				local percent = 1.15 - (i-0.999)/(#disenc_card-0.998)*0.3
+				event({trigger = 'after',delay = 0.15,func = function() disenc_card[i]:flip();play_sound('card1', percent);disenc_card[i]:juice_up(0.3, 0.3);return true end })
+			end
+			delay(0.2)
+			
+			--Handle the conversion
+			for i=1, #disenc_card do
+			event({trigger = 'after',delay = 0.1,func = function()		
+						disenc_card[i]:set_ability(G.P_CENTERS[pseudorandom_element({'m_unstb_radioactive', 'm_unstb_biohazard', 'm_unstb_poison'}, pseudoseed('dvcontract'))])
+						return true end })
+			end
+			
+			for i=1, #disenc_card do
+				local percent = 0.85 + (i-0.999)/(#disenc_card-0.998)*0.3
+				event({trigger = 'after',delay = 0.15,func = function() disenc_card[i]:flip();play_sound('tarot2', percent, 0.6);disenc_card[i]:juice_up(0.3, 0.3);return true end })
 			end
 			delay(0.5)
 		end
