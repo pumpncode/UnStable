@@ -616,6 +616,40 @@ return {
         }
     },
 	
+	research_paper = {
+        ['en-us'] = {
+            ['name'] = 'Research Paper',
+            ['text'] = {
+                [1] = 'Adds one random {C:attention}Enhanced Card{}',
+				[2] = 'with {C:attention}decimal rank{} to deck if',
+				[3] = 'the played hand does not have {C:attention}face card{}',
+				[4] = '{C:inactive}(Once per round. Currently {C:red}#1#/#2#{C:inactive})',
+            }
+        }
+    },
+	
+	engineer = {
+        ['en-us'] = {
+            ['name'] = 'Engineer',
+            ['text'] = {
+                [1] = 'Card with {C:attention}decimal ranks{} counts as',
+				[2] = 'the nearest {C:attention}integer rank{} rounded up when',
+				[3] = 'played in non-{C:purple}Straight{} hands.',
+				[4] = '{C:inactive}(EX: 3.14 -> 4)',
+            }
+        }
+    },
+	
+	thesis_proposal = {
+        ['en-us'] = {
+            ['name'] = 'Thesis Proposal',
+            ['text'] = {
+                [1] = 'Retrigger all played cards',
+                [2] = 'with {C:attention}decimal ranks{}',
+            }
+        }
+    },
+	
 	dummy_data = {
         ['en-us'] = {
             ['name'] = 'Dummy Data',
@@ -690,13 +724,12 @@ return {
         }
     },
 	
-	
 	connoiseur = {
         ['en-us'] = {
             ['name'] = 'Connoiseur',
             ['text'] = {
-                [1] = 'Retrigger all',
-                [2] = 'played cards with {C:attention}editions{}',
+                [1] = 'Retrigger all played cards',
+                [2] = 'with {C:dark_edition}editions{}',
             }
         }
     },

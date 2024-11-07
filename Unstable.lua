@@ -1336,7 +1336,7 @@ local decimal_rank_map = { ['unstb_0.5'] = 17, unstb_r2 = 2, unstb_e = 3, unstb_
 local ref_getid = Card.get_id
 function Card:get_id()
 
-	local engineer_joker = true
+	local engineer_joker = next(SMODS.find_card('j_unstb_engineer'))
 	
 	--If 'Engineer' Joker exists, returns rounded up rank instead
 	if engineer_joker and SMODS.Ranks[self.base.value].is_decimal then
@@ -1569,7 +1569,12 @@ SMODS.Ranks['3'].next = {'unstb_Pi', '4'}
 
 --Change straight edge off from Ace, so it start to look at rank 0 instead
 --SMODS.Ranks['Ace'].straight_edge = false
-SMODS.Ranks['Ace'].next = {'2', 'unstb_e'}
+SMODS.Ranks['Ace'].strength_effect = {
+            fixed = 2,
+            random = false,
+            ignore = false
+        }
+SMODS.Ranks['Ace'].next = {'unstb_r2', '2', 'unstb_e'}
 
 -- Poker Hand Rewrite to support new ranks probably?
 -- Currently unused: Straights use SMODS Implementation perfectly fine
@@ -2816,7 +2821,7 @@ SMODS.Consumable{
                     local cards = {}
                     for i=1, card.ability.extra.count do
                         cards[i] = true
-						local created_rank = pseudorandom_element({'unstb_0.5', 'unstb_e', 'unstb_Pi'}, pseudoseed('trt_knowledge'))
+						local created_rank = pseudorandom_element({'unstb_0.5', 'unstb_r2', 'unstb_e', 'unstb_Pi'}, pseudoseed('trt_knowledge'))
 						setPoolRankFlagEnable(created_rank, true)
 						
                         local _rank = SMODS.Ranks[created_rank]
@@ -3619,9 +3624,19 @@ create_joker({
 				  mult = card.ability.extra.mult,
 				  card = context.other_card
 				}
+			end
 		end
+	end,
+  
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one rank ??? card
+		for _, v in pairs(G.playing_cards) do
+			if v.base.value == 'unstb_???' then return true end
+		end
+		return false
+		
     end
-  end
 })
 
 --Decimal-line Jokers
@@ -3653,7 +3668,174 @@ create_joker({
                 }
 			end
 		end
-	end
+	end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one decimal card
+		for _, v in pairs(G.playing_cards) do
+			if is_decimal(v) then return true end
+		end
+		return false
+		
+    end
+})
+
+--Research Paper
+create_joker({
+    name = 'Research Paper', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {times_max = 1}},
+	
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.times_current, card.ability.extra.times_max}}
+    end,
+	
+	add_to_deck = function(self, card, from_debuff)
+		--Enable all decimal ranks card in pools
+		if not from_debuff then
+			setPoolRankFlagEnable('unstb_0.5', true);
+			setPoolRankFlagEnable('unstb_r2', true);
+			setPoolRankFlagEnable('unstb_e', true);
+			setPoolRankFlagEnable('unstb_Pi', true);
+		end
+    end,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+		--Initialize variables
+		card.ability.extra.times_current = 0
+    end,
+	
+    calculate = function(self, card, context)	
+		if context.before and not context.blueprint then
+			local is_active = true
+			
+			if card.ability.extra.times_current < card.ability.extra.times_max then
+				for i=1, #context.scoring_hand do
+					if context.scoring_hand[i]:is_face() then
+						is_active = false
+						break
+					end
+				end
+				
+				if is_active then
+					card.ability.extra.times_current = (card.ability.extra.times_current or 0) + 1
+				end
+			else
+				is_active = false
+			end
+			
+			card.ability.extra.is_active = is_active
+		end
+		
+		if context.after then
+			--Create Card if it activates
+			if card.ability.extra.is_active then
+				--Adds a card
+				event({trigger = 'after', func = function()
+							local rank = SMODS.Ranks[pseudorandom_element({'unstb_0.5', 'unstb_r2', 'unstb_e', 'unstb_Pi'}, pseudoseed('researchpaper')..G.SEED)].card_key
+							local suit = pseudorandom_element(SMODS.Suits, pseudoseed('researchpaper')..G.SEED).card_key
+							
+							--Pooling Enhancements
+							local cen_pool = {}
+							for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+								if not v.replace_base_card and not v.disenhancement then 
+									cen_pool[#cen_pool+1] = v
+								end
+							end
+							
+							local _card = Card(G.play.T.x + G.play.T.w/2, G.play.T.y, G.CARD_W, G.CARD_H, G.P_CARDS[suit..'_'..rank], pseudorandom_element(cen_pool, pseudoseed('researchpaper')..G.SEED), {playing_card = G.playing_card})
+							
+							_card:start_materialize({G.C.SECONDARY_SET.Enhanced})
+							G.play:emplace(_card)
+							table.insert(G.playing_cards, _card)
+							
+							big_juice(context.blueprint_card or card)
+							
+							return true end
+						})
+				delay(1.5)
+
+				event({trigger = 'after', func = function()
+					G.deck.config.card_limit = G.deck.config.card_limit + 1
+					draw_card(G.play,G.deck, 90,'up', nil)  
+					return true end
+					})
+					
+				playing_card_joker_effects({true})
+			end
+		end
+		
+		--End of round check, make sure it's checked absolutely once per round
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			if card.ability.extra.times_current > 0 then
+				card.ability.extra.times_current = 0
+				return {
+					  message = 'Reset!'
+				}
+			end
+		end
+	end,
+})
+
+--Engineer
+create_joker({
+    name = 'Engineer', id = 1, no_art = true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	--vars = { {times = 1}},
+	
+	--Engineer's actual ability is in Card:get_id hook above
+    --[[calculate = function(self, card, context)
+		
+	end,]]
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one decimal card
+		for _, v in pairs(G.playing_cards) do
+			if is_decimal(v) then return true end
+		end
+		return false
+		
+    end
+})
+
+--Thesis Proposal
+create_joker({
+    name = 'Thesis Proposal', id = 1, no_art = true,
+    rarity = 'Rare', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = {{ repetitions = 1 }},
+	
+    calculate = function(self, card, context)
+		if context.cardarea == G.play and context.repetition and not context.repetition_only then
+		  if is_decimal(context.other_card) then
+				return {
+				  message = 'Again!',
+				  repetitions = card.ability.extra.repetitions,
+				  card = context.blueprint_card or card
+				}
+		  end
+		end
+	end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one decimal card
+		for _, v in pairs(G.playing_cards) do
+			if is_decimal(v) then return true end
+		end
+		return false
+		
+    end
 })
 
 --Binary-line Jokers
@@ -4174,8 +4356,7 @@ create_joker({
 			return {
 			  message = 'Again!',
 			  repetitions = card.ability.extra.repetitions,
-			  -- The card the repetitions are applying to is context.other_card
-			  card = context.other_card
+			  card =  context.blueprint_card or card
 			}
 		  end
 		end
@@ -4915,7 +5096,7 @@ create_joker({
 			return {
 			  message = 'Again!',
 			  repetitions = card.ability.extra.retrigger_times,
-			  card = context.other_card
+			  card = context.blueprint_card or card
 			}
 		  end
 		end
