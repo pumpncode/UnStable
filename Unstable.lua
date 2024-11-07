@@ -1331,17 +1331,45 @@ SMODS.Enhancement:take_ownership('m_stone', {
 
 --Hook for Card:get_id()
 
-local decimal_rank_map = { ['unstb_0.5'] = 17, unstb_e = 3, unstb_Pi = 4}
+local decimal_rank_map = { ['unstb_0.5'] = 17, unstb_r2 = 2, unstb_e = 3, unstb_Pi = 4}
 
 local ref_getid = Card.get_id
 function Card:get_id()
 
-	local engineer_joker = false
+	local engineer_joker = true
+	
+	--If 'Engineer' Joker exists, returns rounded up rank instead
 	if engineer_joker and SMODS.Ranks[self.base.value].is_decimal then
 		return decimal_rank_map[self.base.value]
 	end
 
 	return ref_getid(self)
+end
+
+--Function wrapper to check if a card has decimal rank
+
+local function is_decimal(card)
+	return SMODS.Ranks[card.base.value].is_decimal
+end
+
+--Hook for Poker Hand name
+
+local ref_get_poker_hand_info = G.FUNCS.get_poker_hand_info
+
+G.FUNCS.get_poker_hand_info = function(_cards)
+    local text, loc_disp_text, poker_hands, scoring_hand, disp_text = ref_get_poker_hand_info(_cards)
+    --print(disp_text)
+	
+    if string.find(disp_text, 'Straight') then
+        for i=1, #scoring_hand do
+			if is_decimal(scoring_hand[i]) then
+				loc_disp_text = string.gsub(loc_disp_text, 'Straight', 'Gay')
+				break
+			end
+		end
+    end
+
+    return text, loc_disp_text, poker_hands, scoring_hand, disp_text
 end
 
 
@@ -1369,26 +1397,6 @@ SMODS.Rank {
 	hc_atlas = 'rank_ex_hc',
     lc_atlas = 'rank_ex',
 	
-	loc_txt = loc.ranks['Half'],
-	hidden = true,
-
-    key = '0.5',
-    card_key = '0.5',
-    pos = { x = 2 },
-    nominal = 0.5,
-    next = {'unstb_1', '2', 'unstb_e' },
-    shorthand = '0.5',
-	
-	is_decimal = true,
-	rank_act = {'0', '0.5', '1'},
-	
-	in_pool = unstb_rankCheck,
-}
-
-SMODS.Rank {
-	hc_atlas = 'rank_ex_hc',
-    lc_atlas = 'rank_ex',
-	
 	loc_txt = loc.ranks['0'],
 	hidden = true,
 
@@ -1401,10 +1409,30 @@ SMODS.Rank {
             random = false,
             ignore = false
         },
-    next = { 'unstb_0.5', 'unstb_1' },
+    next = { 'unstb_0.5', 'unstb_1', 'unstb_r2' },
     shorthand = '0',
 	
 	straight_edge = true,
+	
+	in_pool = unstb_rankCheck,
+}
+
+SMODS.Rank {
+	hc_atlas = 'rank_ex_hc',
+    lc_atlas = 'rank_ex',
+	
+	loc_txt = loc.ranks['Half'],
+	hidden = true,
+
+    key = '0.5',
+    card_key = '0.5',
+    pos = { x = 2 },
+    nominal = 0.5,
+    next = {'unstb_1', 'unstb_r2', '2', 'unstb_e' },
+    shorthand = '0.5',
+	
+	is_decimal = true,
+	rank_act = {'0', '0.5', '1'},
 	
 	in_pool = unstb_rankCheck,
 }
@@ -1420,8 +1448,33 @@ SMODS.Rank {
     card_key = '1',
     pos = { x = 5 },
     nominal = 1,
-    next = { '2', 'unstb_e' },
+	strength_effect = {
+            fixed = 2,
+            random = false,
+            ignore = false
+        },
+    next = {'unstb_r2', '2', 'unstb_e' },
     shorthand = '1',
+	
+	in_pool = unstb_rankCheck,
+}
+
+SMODS.Rank {
+	hc_atlas = 'rank_ex_hc',
+    lc_atlas = 'rank_ex',
+	
+	loc_txt = loc.ranks['Root'],
+	hidden = true,
+
+    key = 'r2',
+    card_key = 'R',
+    pos = { x = 7 },
+    nominal = 1.41,
+    next = {'2', 'unstb_e', '3', 'unstb_Pi' },
+    shorthand = '/2',
+	
+	is_decimal = true,
+	rank_act = {'1', '1.41', '2'},
 	
 	in_pool = unstb_rankCheck,
 }
@@ -1500,11 +1553,6 @@ SMODS.Rank {
 	in_pool = unstb_rankCheck,
 }
 
---Change straight edge off from Ace, so it start to look at rank 0 instead
---[[SMODS.Rank:take_ownership('Ace', {
-	straight_edge = false
-}, true)]]
-
 SMODS.Ranks['2'].strength_effect = {
             fixed = 2,
             random = false,
@@ -1519,10 +1567,12 @@ SMODS.Ranks['3'].strength_effect = {
         }
 SMODS.Ranks['3'].next = {'unstb_Pi', '4'}
 
-SMODS.Ranks['Ace'].straight_edge = false
+--Change straight edge off from Ace, so it start to look at rank 0 instead
+--SMODS.Ranks['Ace'].straight_edge = false
 SMODS.Ranks['Ace'].next = {'2', 'unstb_e'}
 
 -- Poker Hand Rewrite to support new ranks probably?
+-- Currently unused: Straights use SMODS Implementation perfectly fine
 
 local function get_keys(t)
   local keys={}
@@ -1536,7 +1586,8 @@ local isAllowDecimal = true
 
 local decimalHands = {['unstb_0.5'] = {0, 1}, ['unstb_e'] = {2, 3}, ['unstb_Pi'] = {3, 4}}
 
-function ustb_get_straight(hand)
+--Unused, redirect the entire straight calculation to ustb_get_straight instead due to straight_edge shenanigans
+function ustb_get_straight_wrapper(hand)
 
 	local ret = {}
 	if #hand < (5 - (four_fingers and 1 or 0)) then return ret end
@@ -1549,7 +1600,7 @@ function ustb_get_straight(hand)
 		end
 	end
 	
-	return ustb_straight_decimal(hand) 
+	return ustb_straight_calculation(hand) 
 	
 	--[[if hasDecimal then
 		--print('Has decimal')
@@ -1560,11 +1611,9 @@ function ustb_get_straight(hand)
 	end]]
 end
 
-function ustb_straight_decimal(hand) 
-
-	--TODO: Figure this out what to do later
-
-	--Basically SMOD's implementation of straight, but w/ extra implementations to support decimal ranks
+function ustb_get_straight(hand) 
+	--Basically SMOD's implementation of straight_edge
+	--But with a slightly different fix to make extra ranks work
 
 	local ret = {}
 	local four_fingers = next(SMODS.find_card('j_four_fingers'))
@@ -1603,7 +1652,15 @@ function ustb_straight_decimal(hand)
 	local end_iter = false
 	local i = 0
 	
-	print(inspect(RANKS))
+	--print(inspect(vals))
+	
+	--Manually swapping vals because it would not work properly if it starts at Ace
+	--However, Ace has to be kept otherwise it allows the loop back
+	
+	--TODO: Honestly could figure out the proper logic so it can be converted to lovely patch instead
+	
+	vals[1] = 'unstb_0'
+	vals[2] = 'Ace'
 	
 	while 1 do
 		end_iter = false
@@ -1614,8 +1671,8 @@ function ustb_straight_decimal(hand)
 		if br or (i > #SMODS.Rank.obj_buffer + 1) then break end
 		if not next(vals) then break end
 		for _, val in ipairs(vals) do
-			print(val)
-			print('===')
+			--print(val)
+			--print('===')
 			if init_vals[val] and not initial then br = true end
 			if RANKS[val] then
 				straight_length = straight_length + 1
@@ -1626,8 +1683,8 @@ function ustb_straight_decimal(hand)
 				
 				vals = SMODS.Ranks[val].next
 				
-				print(inspect(vals))
-				print('---')
+				--print(inspect(vals))
+				--print('---')
 				
 				initial = false
 				end_iter = true
@@ -3566,11 +3623,8 @@ create_joker({
     end
   end
 })
---Decimal-line Jokers
 
-local function is_decimal(card)
-	return SMODS.Ranks[card.base.value].is_decimal
-end
+--Decimal-line Jokers
 
 create_joker({
     name = 'Floating Point Error', id = 1, no_art = true,

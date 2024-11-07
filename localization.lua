@@ -194,6 +194,7 @@ return {
 		['0'] = '0',
 		Half = 'Half',
 		['1'] = '1',
+		Root = 'Root 2',
 		Euler = "e",
 		Pi = "Pi",
 	},
