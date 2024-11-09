@@ -13,7 +13,11 @@ return {
 
             -- Miscellaneous
 			tarot_exclaim = 'Tarot!?',
-            upgrade = 'Upgrade!'
+            upgrade = 'Upgrade!',
+			
+			decimal_rank_ability = {['text'] = {[1] = 'Can act as {C:attention}different rank{}',
+												[2] = 'when played in {C:purple}Straight{} hand',
+												[3] = '{C:inactive}[#1#, #2#, #3#]{}',}}
         },
     },
 	
@@ -190,6 +194,7 @@ return {
 		['0'] = '0',
 		Half = 'Half',
 		['1'] = '1',
+		Root = 'Root 2',
 		Euler = "e",
 		Pi = "Pi",
 	},
@@ -444,17 +449,173 @@ return {
         }
     },
 	
+	trt_half = {
+        ['en-us'] = {
+            ['name'] = 'The Half',
+            ['text'] = {
+                [1] = 'Splits the {C:attention}integer-numbered rank{} cards',
+				[2] = 'into two cards with {C:attention}half a rank{} (rounded down)',
+				[3] = 'If the initial rank is {C:attention}odd{},',
+				[4] = 'adds one {C:attention}0.5 rank{} card {C:attention}of the same enhancement{} as well',
+            }
+        }
+    },
+	
+	trt_knowledge = {
+        ['en-us'] = {
+            ['name'] = 'The Knowledge',
+            ['text'] = {
+                [1] = 'Adds one random {C:attention}decimal-rank{} card',
+				[2] = 'of the selected suit to hand',
+            }
+        }
+    },
+	
+	--Spectral
+	
 	spc_elixir = {
         ['en-us'] = {
             ['name'] = 'Elixir of Life',
             ['text'] = {
                 [1] = 'Heal all {C:attention}Disenhanced Cards{} in the deck',
-                [2] = 'Reduce money by half (rounded up)'
+                [2] = 'Reduce money by half {C:inactive}(rounded up){}'
+            }
+        }
+    },
+	
+	spc_vessel = {
+        ['en-us'] = {
+            ['name'] = 'Vessel',
+            ['text'] = {
+                [1] = 'Selects {C:attention}2{} card,',
+				[2] = 'destroy the {C:attention}left{} card',
+				[3] = 'and gives corresponding {C:red}Suit Seal{}',
+				[4] = 'to the {C:attention}right{} card',
+				[5] = '{C:inactive}(Drags to rearrange){}',
+            }
+        }
+    },
+	
+	spc_conferment = {
+        ['en-us'] = {
+            ['name'] = 'Conferment',
+            ['text'] = {
+                [1] = 'Add a {C:attention}Face Seal{}',
+				[2] = 'to {C:attention}#1#{} random cards',
+				[3] = 'in your hand,',
+				[4] = '{C:red}-$#2#{} {C:inactive}(no debt limit){}'
+            }
+        }
+    },
+	
+	spc_amnesia = {
+        ['en-us'] = {
+            ['name'] = 'Amnesia',
+            ['text'] = {
+				[1] = 'Converts {C:attention}#1#{} random',
+				[2] = 'cards in your hand',
+				[3] = 'to {C:attention}Rank 0{}',
+            }
+        }
+    },
+	
+	spc_altar = {
+        ['en-us'] = {
+            ['name'] = 'Altar',
+            ['text'] = {
+                [1] = 'Destroy {C:attention}#1#{} random',
+				[2] = 'cards in your hand,',
+				[3] = 'add {C:attention}#2#{} random {C:attention}Enhanced{}',
+				[4] = '{C:attention}21s{} to your hand'
+            }
+        }
+    },
+	
+	spc_contract = {
+        ['en-us'] = {
+            ['name'] = "Devil's Contract",
+            ['text'] = {
+                [1] = '{C:purple}Upgrades {C:attention}#1#{} random',
+				[2] = 'cards in your hand,',
+				[3] = 'converts {C:attention}#2#{} random',
+				[4] = 'cards in your hand into',
+				[5] = '{C:attention}random {C:red}DisEnhancement{}',
+            }
+        }
+    },
+	
+	spc_poltergeist = {
+        ['en-us'] = {
+            ['name'] = "Poltergeist",
+            ['text'] = {
+                [1] = 'Shuffles all',
+				[2] = "Joker's {C:dark_edition}edition{}",
+            }
+        }
+    },
+	
+	spc_projection = {
+        ['en-us'] = {
+            ['name'] = "Astral Projection",
+            ['text'] = {
+                [1] = 'Swap {C:dark_edition}editions{} between',
+				[2] = 'the {C:attention}selected Joker{}',
+				[3] = 'and the one {C:attention}on the right{}',
+				[4] = '{C:green}#1# in #2#{} chance that',
+				[5] = 'one of the Jokers are {C:red}destroyed{}',
+            }
+        }
+    },
+	
+	spc_siphon = {
+        ['en-us'] = {
+            ['name'] = "Siphon",
+            ['text'] = {
+                [1] = 'Destroy a selected {C:attention}Joker{}',
+				[2] = 'with {C:dark_edition}edition{}',
+				[3] = "Gives the {C:attention}Joker's {C:dark_edition}edition{} to",
+				[4] = '{C:attention}#1#{} random card in your hand',
+				[5] = '{C:inactive}({C:dark_edition}Negative{} excluded){}',
             }
         }
     },
 	
 	--Jokers
+	
+	vainglorious_joker = {
+        ['en-us'] = {
+            ['name'] = 'Vainglorious Joker',
+            ['text'] = {
+                [1] = 'Played cards with',
+				[2] = '{C:attention}Suit Seal{} gives',
+				[3] = "{C:attention}+#1#{} Mult when scored",
+            }
+        }
+    },
+	
+	acedia_joker = {
+        ['en-us'] = {
+            ['name'] = 'Acedia Joker',
+            ['text'] = {
+                [1] = 'Played cards with',
+				[2] = '{C:attention}Suit Seal{} in the same',
+				[3] = "{C:purple}suit category{} of the card's suit gives",
+				[4] = "{C:attention}+#1#{} Mult when scored",
+            }
+        }
+    },
+	
+	cinnabar = {
+        ['en-us'] = {
+            ['name'] = 'Cinnabar',
+            ['text'] = {
+                [1] = 'Played cards with',
+				[2] = '{C:attention}Suit Seal{} has',
+				[3] = "{C:green}#1# in #2#{} chance to create respective",
+				[4] = "{C:attention}Seal Auxiliary Card{} when scored",
+            }
+        }
+    },
 	
 	black_jack = {
         ['en-us'] = {
@@ -486,6 +647,40 @@ return {
             ['text'] = {
                 [1] = 'Scored cards with {C:attention}Decimal Rank{}',
 				[2] = 'Gains {C:chips}extra chips{} equal to its own {C:attention}rank{}',
+            }
+        }
+    },
+	
+	research_paper = {
+        ['en-us'] = {
+            ['name'] = 'Research Paper',
+            ['text'] = {
+                [1] = 'Adds one random {C:attention}Enhanced Card{}',
+				[2] = 'with {C:attention}decimal rank{} to deck if',
+				[3] = 'the played hand does not have {C:attention}face card{}',
+				[4] = '{C:inactive}(Once per round. Currently {C:red}#1#/#2#{C:inactive})',
+            }
+        }
+    },
+	
+	engineer = {
+        ['en-us'] = {
+            ['name'] = 'Engineer',
+            ['text'] = {
+                [1] = 'Card with {C:attention}decimal ranks{} counts as',
+				[2] = 'the nearest {C:attention}integer rank{} rounded up when',
+				[3] = 'played in non-{C:purple}Straight{} hands.',
+				[4] = '{C:inactive}(EX: 3.14 -> 4)',
+            }
+        }
+    },
+	
+	thesis_proposal = {
+        ['en-us'] = {
+            ['name'] = 'Thesis Proposal',
+            ['text'] = {
+                [1] = 'Retrigger all played cards',
+                [2] = 'with {C:attention}decimal ranks{}',
             }
         }
     },
@@ -564,13 +759,12 @@ return {
         }
     },
 	
-	
 	connoiseur = {
         ['en-us'] = {
             ['name'] = 'Connoiseur',
             ['text'] = {
-                [1] = 'Retrigger all',
-                [2] = 'played cards with {C:attention}editions{}',
+                [1] = 'Retrigger all played cards',
+                [2] = 'with {C:dark_edition}editions{}',
             }
         }
     },

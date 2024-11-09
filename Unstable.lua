@@ -28,7 +28,7 @@ function unstb.process_loc_text()
     loc.dictionary = G.localization.misc.dictionary.unstb
 
     -- Other localization
-
+	SMODS.process_loc_text(G.localization.descriptions.Other, 'decimal_rank_ability', loc.dictionary.decimal_rank_ability)
 end
 
 -- Debug message
@@ -152,11 +152,26 @@ SMODS.Atlas {
 }
 
 --Atlas for Other Consumable Cards
+
+--Tarot
 SMODS.Atlas {
   -- Key for code to find it with
-  key = "consumable",
+  key = "tarot",
   -- The name of the file, for the code to pull the atlas from
-  path = "consumable.png",
+  path = "tarot.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
+
+--Spectral
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "spectral",
+  -- The name of the file, for the code to pull the atlas from
+  path = "spectral.png",
   -- Width of each sprite in 1x size
   px = 71,
   -- Height of each sprite in 1x size
@@ -496,8 +511,19 @@ end
 
 local suit_seal_list = {"Spades", "Hearts", "Clubs", "Diamonds"}
 
+--Global Suit Seal map from suit
+unstb_global.SUIT_SEAL = {}
+
+--TODO: A function wrapper that registers extra suit seal, corresponding auxillary card at the same time
+--Might be a part of UnStableEX
+
 for i = 1, #suit_seal_list do
 	SuitSeal.initSeal(suit_seal_list[i], "suit_seal", i-1 )
+	
+	unstb_global.SUIT_SEAL[suit_seal_list[i]] = {}
+	
+	unstb_global.SUIT_SEAL[suit_seal_list[i]].seal_key = 'unstb_'..string.lower(suit_seal_list[i])
+	unstb_global.SUIT_SEAL[suit_seal_list[i]].aux_key = 'c_unstb_aux_'..string.lower(suit_seal_list[i])
 end
 
 --Heal Seal
@@ -1013,7 +1039,7 @@ SMODS.Enhancement {
 				play_sound('tarot2', 1, 0.4);
 				return true end })
 
-				forced_message("Invalid", card, G.C.GRAY, true)
+				forced_message("Invalid", card, G.C.ORANGE, true)
 			end
 			
 			return {
@@ -1307,9 +1333,53 @@ SMODS.Enhancement:take_ownership('m_stone', {
  
 --New Ranks
 
+--Hook for Card:get_id()
+
+local decimal_rank_map = { ['unstb_0.5'] = 17, unstb_r2 = 2, unstb_e = 3, unstb_Pi = 4}
+
+local ref_getid = Card.get_id
+function Card:get_id()
+
+	local engineer_joker = next(SMODS.find_card('j_unstb_engineer'))
+	
+	--If 'Engineer' Joker exists, returns rounded up rank instead
+	if engineer_joker and SMODS.Ranks[self.base.value].is_decimal then
+		return decimal_rank_map[self.base.value]
+	end
+
+	return ref_getid(self)
+end
+
+--Function wrapper to check if a card has decimal rank
+
+local function is_decimal(card)
+	return SMODS.Ranks[card.base.value].is_decimal
+end
+
+--Hook for Poker Hand name
+
+local ref_get_poker_hand_info = G.FUNCS.get_poker_hand_info
+
+G.FUNCS.get_poker_hand_info = function(_cards)
+    local text, loc_disp_text, poker_hands, scoring_hand, disp_text = ref_get_poker_hand_info(_cards)
+    --print(disp_text)
+	
+    if string.find(disp_text, 'Straight') then
+        for i=1, #scoring_hand do
+			if is_decimal(scoring_hand[i]) then
+				loc_disp_text = string.gsub(loc_disp_text, 'Straight', 'Gay')
+				break
+			end
+		end
+    end
+
+    return text, loc_disp_text, poker_hands, scoring_hand, disp_text
+end
+
+
 --Pool flag wrapper function to help assist managing ranks enable / disable
 function setPoolRankFlagEnable(rank, isEnable)
-	if not G.GAME then return end
+	if not G.GAME or G.GAME.pool_flags[rank] == isEnable then return end
 	
 	G.GAME.pool_flags[rank] = isEnable
 end
@@ -1331,17 +1401,22 @@ SMODS.Rank {
 	hc_atlas = 'rank_ex_hc',
     lc_atlas = 'rank_ex',
 	
-	loc_txt = loc.ranks['Half'],
+	loc_txt = loc.ranks['0'],
 	hidden = true,
 
-    key = '0.5',
-    card_key = '0.5',
-    pos = { x = 2 },
-    nominal = 0.5,
-    next = { 'unstb_1' },
-    shorthand = '0.5',
+    key = '0',
+    card_key = '0',
+    pos = { x = 6 },
+    nominal = 0,
+	strength_effect = {
+            fixed = 2,
+            random = false,
+            ignore = false
+        },
+    next = { 'unstb_0.5', 'unstb_1', 'unstb_r2' },
+    shorthand = '0',
 	
-	is_decimal = true,
+	straight_edge = true,
 	
 	in_pool = unstb_rankCheck,
 }
@@ -1350,17 +1425,18 @@ SMODS.Rank {
 	hc_atlas = 'rank_ex_hc',
     lc_atlas = 'rank_ex',
 	
-	loc_txt = loc.ranks['0'],
+	loc_txt = loc.ranks['Half'],
 	hidden = true,
 
-    key = '0',
-    card_key = '0',
-    pos = { x = 6 },
-    nominal = 0,
-    next = { 'unstb_1' },
-    shorthand = '0',
+    key = '0.5',
+    card_key = '0.5',
+    pos = { x = 2 },
+    nominal = 0.5,
+    next = {'unstb_1', 'unstb_r2', '2', 'unstb_e' },
+    shorthand = '0.5',
 	
-	straight_edge = true,
+	is_decimal = true,
+	rank_act = {'0', '0.5', '1'},
 	
 	in_pool = unstb_rankCheck,
 }
@@ -1376,8 +1452,33 @@ SMODS.Rank {
     card_key = '1',
     pos = { x = 5 },
     nominal = 1,
-    next = { '2' },
+	strength_effect = {
+            fixed = 2,
+            random = false,
+            ignore = false
+        },
+    next = {'unstb_r2', '2', 'unstb_e' },
     shorthand = '1',
+	
+	in_pool = unstb_rankCheck,
+}
+
+SMODS.Rank {
+	hc_atlas = 'rank_ex_hc',
+    lc_atlas = 'rank_ex',
+	
+	loc_txt = loc.ranks['Root'],
+	hidden = true,
+
+    key = 'r2',
+    card_key = 'R',
+    pos = { x = 7 },
+    nominal = 1.41,
+    next = {'2', 'unstb_e', '3', 'unstb_Pi' },
+    shorthand = '/2',
+	
+	is_decimal = true,
+	rank_act = {'1', '1.41', '2'},
 	
 	in_pool = unstb_rankCheck,
 }
@@ -1393,10 +1494,11 @@ SMODS.Rank {
     card_key = 'E',
     pos = { x = 3 },
     nominal = 2.72,
-    next = { '3' },
+    next = { '3', 'unstb_Pi', '4' },
     shorthand = 'e',
 	
 	is_decimal = true,
+	rank_act = {'2', '2.72', '3'},
 	
 	in_pool = unstb_rankCheck,
 }
@@ -1412,10 +1514,11 @@ SMODS.Rank {
     card_key = 'P',
     pos = { x = 4 },
     nominal = 3.14,
-    next = { '4' },
+    next = { '4', '5' },
     shorthand = 'Pi',
 	
 	is_decimal = true,
+	rank_act = {'3', '3.14', '4'},
 	
 	in_pool = unstb_rankCheck,
 }
@@ -1454,12 +1557,31 @@ SMODS.Rank {
 	in_pool = unstb_rankCheck,
 }
 
+SMODS.Ranks['2'].strength_effect = {
+            fixed = 2,
+            random = false,
+            ignore = false
+        }
+SMODS.Ranks['2'].next = {'unstb_e', '3', 'unstb_Pi'}
+
+SMODS.Ranks['3'].strength_effect = {
+            fixed = 2,
+            random = false,
+            ignore = false
+        }
+SMODS.Ranks['3'].next = {'unstb_Pi', '4'}
+
 --Change straight edge off from Ace, so it start to look at rank 0 instead
-SMODS.Rank:take_ownership('Ace', {
-	straight_edge = false
-}, true)
+--SMODS.Ranks['Ace'].straight_edge = false
+SMODS.Ranks['Ace'].strength_effect = {
+            fixed = 2,
+            random = false,
+            ignore = false
+        }
+SMODS.Ranks['Ace'].next = {'unstb_r2', '2', 'unstb_e'}
 
 -- Poker Hand Rewrite to support new ranks probably?
+-- Currently unused: Straights use SMODS Implementation perfectly fine
 
 local function get_keys(t)
   local keys={}
@@ -1473,7 +1595,8 @@ local isAllowDecimal = true
 
 local decimalHands = {['unstb_0.5'] = {0, 1}, ['unstb_e'] = {2, 3}, ['unstb_Pi'] = {3, 4}}
 
-function ustb_get_straight(hand)
+--Unused, redirect the entire straight calculation to ustb_get_straight instead due to straight_edge shenanigans
+function ustb_get_straight_wrapper(hand)
 
 	local ret = {}
 	if #hand < (5 - (four_fingers and 1 or 0)) then return ret end
@@ -1486,20 +1609,20 @@ function ustb_get_straight(hand)
 		end
 	end
 	
-	if hasDecimal then
+	return ustb_straight_calculation(hand) 
+	
+	--[[if hasDecimal then
 		--print('Has decimal')
 		return ustb_straight_decimal(hand) 
 	else
 		--print('do not has decimal')
 		return get_straight(hand) 
-	end
+	end]]
 end
 
-function ustb_straight_decimal(hand) 
-
-	--TODO: Figure this out what to do later
-
-	--Basically SMOD's implementation of straight, but w/ extra implementations to support decimal ranks
+function ustb_get_straight(hand) 
+	--Basically SMOD's implementation of straight_edge
+	--But with a slightly different fix to make extra ranks work
 
 	local ret = {}
 	local four_fingers = next(SMODS.find_card('j_four_fingers'))
@@ -1538,6 +1661,16 @@ function ustb_straight_decimal(hand)
 	local end_iter = false
 	local i = 0
 	
+	--print(inspect(vals))
+	
+	--Manually swapping vals because it would not work properly if it starts at Ace
+	--However, Ace has to be kept otherwise it allows the loop back
+	
+	--TODO: Honestly could figure out the proper logic so it can be converted to lovely patch instead
+	
+	vals[1] = 'unstb_0'
+	vals[2] = 'Ace'
+	
 	while 1 do
 		end_iter = false
 		if straight_length >= (5 - (four_fingers and 1 or 0)) then
@@ -1547,6 +1680,8 @@ function ustb_straight_decimal(hand)
 		if br or (i > #SMODS.Rank.obj_buffer + 1) then break end
 		if not next(vals) then break end
 		for _, val in ipairs(vals) do
+			--print(val)
+			--print('===')
 			if init_vals[val] and not initial then br = true end
 			if RANKS[val] then
 				straight_length = straight_length + 1
@@ -1556,6 +1691,9 @@ function ustb_straight_decimal(hand)
 				end
 				
 				vals = SMODS.Ranks[val].next
+				
+				--print(inspect(vals))
+				--print('---')
 				
 				initial = false
 				end_iter = true
@@ -2037,13 +2175,6 @@ SMODS.Consumable{
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.count}}
 	end,
-	
-	add_to_deck = function(self, card, from_debuff)
-		--Enable rank 1 card in pools
-		if not from_debuff then
-			setPoolRankFlagEnable('unstb_1', true);
-		end
-    end,
 
 	can_use = function(self, card)
 		if G.hand and (#G.hand.highlighted >= 1) and (#G.hand.highlighted <= card.ability.extra.count) then
@@ -2053,8 +2184,10 @@ SMODS.Consumable{
 	end,
 
 	use = function(self, card)
+		--Enable Rank Flag
+		setPoolRankFlagEnable('unstb_1', true);
+	
 		--Animation code mostly ported from basegame tarot
-		
 		event({trigger = 'after', delay = 0.4, func = function()
             play_sound('tarot1')
 			card:juice_up(0.3, 0.5)
@@ -2095,13 +2228,6 @@ SMODS.Consumable{
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.count}}
 	end,
-	
-	add_to_deck = function(self, card, from_debuff)
-		--Enable rank 21 card in pools
-		if not from_debuff then
-			setPoolRankFlagEnable('unstb_21', true);
-		end
-    end,
 
 	can_use = function(self, card)
 		if G.hand and (#G.hand.highlighted >= 1) and (#G.hand.highlighted <= card.ability.extra.count) and blackJack_evalrank(G.hand.highlighted, 21)>=21 then
@@ -2111,6 +2237,9 @@ SMODS.Consumable{
 	end,
 
 	use = function(self, card)
+		--Enable Rank Flag
+		setPoolRankFlagEnable('unstb_21', true);
+	
 		event({trigger = 'after', delay = 0.4, func = function()
             play_sound('tarot1')
 			card:juice_up(0.3, 0.5)
@@ -2427,7 +2556,7 @@ end
 
 --The Time
 SMODS.Consumable{
-	set = 'Tarot', atlas = 'consumable',
+	set = 'Tarot', atlas = 'tarot',
 	key = 'trt_time', loc_txt = loc['trt_time'],
 	set_card_type_badge = function(self, card, badges)
         badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
@@ -2463,7 +2592,7 @@ SMODS.Consumable{
 
 --The Acorn
 SMODS.Consumable{
-	set = 'Tarot', atlas = 'consumable',
+	set = 'Tarot', atlas = 'tarot',
 	key = 'trt_acorn', loc_txt = loc['trt_acorn'],
 	set_card_type_badge = function(self, card, badges)
         badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
@@ -2499,7 +2628,7 @@ SMODS.Consumable{
 
 --The Greed
 SMODS.Consumable{
-	set = 'Tarot', atlas = 'consumable',
+	set = 'Tarot', atlas = 'tarot',
 	key = 'trt_greed', loc_txt = loc['trt_greed'],
 	set_card_type_badge = function(self, card, badges)
         badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
@@ -2533,11 +2662,191 @@ SMODS.Consumable{
 	pos = get_coordinates(2),
 }
 
---Spectral
+--New Rank-based Tarot
+
+local tarot_half_blacklist = {}
+
+local tarot_half_rankList = {'unstb_0', 'unstb_1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Ace'}
+
+--Blacklisted all modded ranks that are not in the rankList
+for k, v in ipairs(SMODS.Rank:obj_list()) do
+	local is_blackListed = true
+	
+	for i=1, #tarot_half_rankList do
+		if v.key==tarot_half_rankList[i] then
+			is_blackListed = false
+			break
+		end
+	end
+	
+	if is_blackListed then
+		tarot_half_blacklist[v.key] = true
+	end
+end
+
+SMODS.Consumable{
+	set = 'Tarot', atlas = 'tarot',
+	key = 'trt_half', loc_txt = loc['trt_half'],
+	set_card_type_badge = function(self, card, badges)
+        badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
+    end,
+
+	config = {extra = {count = 2}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted == 1) and not G.hand.highlighted[1].config.center.replace_base_card and not tarot_half_blacklist[G.hand.highlighted[1].base.value] then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+			event({trigger = 'after', delay = 0.4, func = function()
+				play_sound('tarot1')
+				card:juice_up(0.3, 0.5)
+            return true end })
+			
+			local target_card = G.hand.highlighted[1]
+			
+			--Create two copies of the card, with half rank
+			--Create one additional rank 0.5 card if applicable, copy the enhancement only, no other bonus property
+			
+			local new_rank = tarot_half_rankList[math.floor(target_card.base.nominal*0.5)+1]
+			
+			local extra_card = 0
+			
+			if target_card.base.nominal%2 ==1 then
+				extra_card = 1
+				
+				--Enable Rank Flag
+				setPoolRankFlagEnable('unstb_0.5', true);
+			end
+			
+			event({
+                trigger = 'after',
+                delay = 0.7,
+                func = function() 
+						local _first_dissolve = nil
+						local new_cards = {}
+						for i = 1, card.ability.extra.count + extra_card do
+							G.playing_card = (G.playing_card and G.playing_card + 1) or 1
+							local _card = copy_card(target_card, nil, nil, G.playing_card)
+							
+							if extra_card>0 and i==card.ability.extra.count + extra_card then
+								--Remove special ability
+								--_card.set_ability(G.P_CENTERS.c_base)
+								_card:set_edition(nil, true, true)
+								_card:set_seal(nil, true, true)
+								_card.ability.perma_bonus = 0
+								
+								SMODS.change_base(_card, nil, 'unstb_0.5')
+							else
+								SMODS.change_base(_card, nil, new_rank)
+							end
+							
+							_card:add_to_deck()
+							G.deck.config.card_limit = G.deck.config.card_limit + 1
+							table.insert(G.playing_cards, _card)
+							G.hand:emplace(_card)
+							_card:start_materialize(nil, _first_dissolve)
+							_first_dissolve = true
+							new_cards[#new_cards+1] = _card
+						end
+						playing_card_joker_effects(new_cards)
+                    return true end })
+			
+			
+			--Destroy the original card
+			local destroyed_cards = {target_card}
+			event({
+                trigger = 'after',
+                delay = 0.1,
+                func = function() 
+                    for i=#destroyed_cards, 1, -1 do
+                        local c = destroyed_cards[i]
+                        if c.ability.name == 'Glass Card' then 
+                            c:shatter()
+                        else
+                            c:start_dissolve(nil, i == #destroyed_cards)
+                        end
+                    end
+                    return true end })
+			--Calling Jokers to process the card destroying
+			delay(0.3)
+			for i = 1, #G.jokers.cards do
+				G.jokers.cards[i]:calculate_joker({remove_playing_cards = true, removed = destroyed_cards})
+			end
+			
+	end,
+
+	pos = get_coordinates(3),
+}
+
+SMODS.Consumable{
+	set = 'Tarot', atlas = 'tarot',
+	key = 'trt_knowledge', loc_txt = loc['trt_knowledge'],
+	set_card_type_badge = function(self, card, badges)
+        badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
+    end,
+
+	config = {extra = {count = 1}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted == 1) and not G.hand.highlighted[1].config.center.replace_base_card then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		local targetCard = G.hand.highlighted[1]
+		
+		event({
+                trigger = 'after',
+                delay = 0.7,
+                func = function() 
+                    local cards = {}
+                    for i=1, card.ability.extra.count do
+                        cards[i] = true
+						local created_rank = pseudorandom_element({'unstb_0.5', 'unstb_r2', 'unstb_e', 'unstb_Pi'}, pseudoseed('trt_knowledge'))
+						setPoolRankFlagEnable(created_rank, true)
+						
+                        local _rank = SMODS.Ranks[created_rank]
+                        local _suit = SMODS.Suits[targetCard.base.suit]
+						
+                        create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = G.P_CENTERS.c_base}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
+                    end
+                    playing_card_joker_effects(cards)
+                    return true end })
+		event({trigger = 'after', delay = 0.2,func = function() G.hand:unhighlight_all(); return true end })
+			
+	end,
+
+	pos = get_coordinates(3),
+}
+
+--"Rebundant" Spectral (Same ability set as some Auxiliary exclusives, but worse)
 
 --Elixir of Life
 SMODS.Consumable{
-	set = 'Spectral', atlas = 'consumable',
+	set = 'Spectral', atlas = 'spectral',
 	key = 'spc_elixir', loc_txt = loc['spc_elixir'],
 
 	config = {extra = {}},
@@ -2599,7 +2908,7 @@ SMODS.Consumable{
         end
 	end,
 
-	pos = get_coordinates(3),
+	pos = get_coordinates(0),
 	
 	--Can spawn only when more than 1/3 of deck is Disenhanced
 	in_pool = function(self, args)
@@ -2616,7 +2925,749 @@ SMODS.Consumable{
     end,
 }
 
+--Vessel
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'spectral',
+	key = 'spc_vessel', loc_txt = loc['spc_vessel'],
+
+	config = {extra = {count = 1}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and (#G.hand.highlighted == 2) then
+		
+			local targetCard = G.hand.highlighted[1]
+			
+			if G.hand.highlighted[2].T.x < G.hand.highlighted[1].T.x then
+				targetCard = G.hand.highlighted[2]
+			end
+		
+			return not targetCard.config.center.no_suit and (unstb_global.SUIT_SEAL[targetCard.base.suit] or {}).seal_key
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		--Figure out what is left card, what is right card
+		local targetCard = G.hand.highlighted[1]
+		local recieveCard = G.hand.highlighted[2]
+		
+		if G.hand.highlighted[2].T.x < G.hand.highlighted[1].T.x then
+			targetCard = G.hand.highlighted[2]
+			recieveCard = G.hand.highlighted[1]
+		end
+		
+		--Adds Suit Seal to the right card (or none, if there's no matching suit)
+		local suit_seal = (unstb_global.SUIT_SEAL[targetCard.base.suit] or {}).seal_key
+		
+		recieveCard:set_seal(suit_seal, nil, true)
+		
+		--Destroy the left card
+		local destroyed_cards = {targetCard}
+		
+		event({
+			trigger = 'after',
+			delay = 0.1,
+			func = function() 
+				for i=#destroyed_cards, 1, -1 do
+					local c = destroyed_cards[i]
+					if c.ability.name == 'Glass Card' then 
+						c:shatter()
+					else
+						c:start_dissolve(nil, i == #destroyed_cards)
+					end
+				end
+				return true end })
+		--Calling Jokers to process the card destroying
+		delay(0.3)
+		for i = 1, #G.jokers.cards do
+			G.jokers.cards[i]:calculate_joker({remove_playing_cards = true, removed = destroyed_cards})
+		end
+	end,
+
+	pos = get_coordinates(0),
+}
+
+--Conferment
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'spectral',
+	key = 'spc_conferment', loc_txt = loc['spc_conferment'],
+
+	config = {extra = {count = 2, cost = 8}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {card and card.ability.extra.count or self.config.extra.count, card and card.ability.extra.cost or self.config.extra.cost}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand then
+		
+			--Check if the hand contains at least one non-face card
+			for i = 1, #G.hand.cards do
+				if not G.hand.cards[i]:is_face() then
+					return true
+				end
+			end
+			
+			return false
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+
+		for i = 1, card.ability.extra.count do
+		
+			event({
+			trigger = 'after',
+			delay = 0.2,
+			func = function() 
+			local hand_card = {}
+		
+			--Pool All eligible cards in hand, this has to be done each repetition
+			--Maybe there could be a prettier way for this?
+			for i = 1, #G.hand.cards do
+				if not G.hand.cards[i]:is_face() then
+					hand_card[#hand_card+1] = G.hand.cards[i]
+				end
+			end
+			
+			local target_card = pseudorandom_element(hand_card, pseudoseed('conferment'))
+			
+			if target_card then
+				target_card:set_seal('unstb_face', nil, true)
+			end
+			return true end
+			})
+			
+		end
+		
+		--Always decrease regardless of the current money
+		ease_dollars(-card.ability.extra.cost, true)
+		
+	end,
+
+	pos = get_coordinates(0),
+}
+
+--Amnesia
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'spectral',
+	key = 'spc_amnesia', loc_txt = loc['spc_amnesia'],
+
+	config = {extra = {count = 3}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {card and card.ability.extra.count or self.config.extra.count}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand then
+		
+			--Check if the hand contains at least one non-face card
+			for i = 1, #G.hand.cards do
+				if not G.hand.cards[i]:is_face() then
+					return true
+				end
+			end
+			
+			return false
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		--Enable Rank Flag
+		setPoolRankFlagEnable('unstb_0', true);
+	
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		--Based on Basegame's Immolate
+		local converted_card = {}
+		
+		local temp_hand = {}
+		for k, v in ipairs(G.hand.cards) do temp_hand[#temp_hand+1] = v end
+		table.sort(temp_hand, function (a, b) return not a.playing_card or not b.playing_card or a.playing_card < b.playing_card end)
+		pseudoshuffle(temp_hand, pseudoseed('amnesia'))
+
+		for i = 1, card.ability.extra.count do converted_card[#converted_card+1] = temp_hand[i] end
+		
+		if #converted_card > 0 then
+			--Animation from Basegame Tarot
+			for i=1, #converted_card do
+				local percent = 1.15 - (i-0.999)/(#converted_card-0.998)*0.3
+				event({trigger = 'after',delay = 0.15,func = function() converted_card[i]:flip();play_sound('card1', percent);converted_card[i]:juice_up(0.3, 0.3);return true end })
+			end
+			delay(0.2)
+			
+			--Handle the conversion
+			for i=1, #converted_card do
+			event({trigger = 'after',delay = 0.1,func = function()
+						SMODS.change_base(converted_card[i], nil, 'unstb_0')
+						return true end })
+			end
+			
+			for i=1, #converted_card do
+				local percent = 0.85 + (i-0.999)/(#converted_card-0.998)*0.3
+				event({trigger = 'after',delay = 0.15,func = function() converted_card[i]:flip();play_sound('tarot2', percent, 0.6);converted_card[i]:juice_up(0.3, 0.3);return true end })
+			end
+			delay(0.5)
+		end
+	end,
+
+	pos = get_coordinates(0),
+}
+
+--Altar
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'spectral',
+	key = 'spc_altar', loc_txt = loc['spc_altar'],
+
+	config = {extra = {destroy_count = 3, create_count = 2}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {card and card.ability.extra.destroy_count or self.config.extra.destroy_count, card and card.ability.extra.create_count or self.config.extra.create_count}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		--Enable Rank Flag
+		setPoolRankFlagEnable('unstb_21', true);
+	
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		--Based on Basegame's Immolate
+		local destroyed_cards = {}
+		
+		local temp_hand = {}
+		for k, v in ipairs(G.hand.cards) do temp_hand[#temp_hand+1] = v end
+		table.sort(temp_hand, function (a, b) return not a.playing_card or not b.playing_card or a.playing_card < b.playing_card end)
+		pseudoshuffle(temp_hand, pseudoseed('altar'))
+
+		for i = 1, card.ability.extra.destroy_count do destroyed_cards[#destroyed_cards+1] = temp_hand[i] end
+		
+		--Destroy Cards
+		event({
+			trigger = 'after',
+			delay = 0.1,
+			func = function() 
+				for i=#destroyed_cards, 1, -1 do
+					local c = destroyed_cards[i]
+					print(c)
+					
+					if c.ability.name == 'Glass Card' then 
+						c:shatter()
+					else
+						c:start_dissolve(nil, i == #destroyed_cards)
+					end
+				end
+				return true end })
+		--Calling Jokers to process the card destroying
+		delay(0.3)
+		print('joker')
+		for i = 1, #G.jokers.cards do
+			G.jokers.cards[i]:calculate_joker({remove_playing_cards = true, removed = destroyed_cards})
+		end
+		
+		--Adding New Cards
+		event({
+                trigger = 'after',
+                delay = 0.7,
+                func = function() 
+                    local cards = {}
+                    for i=1, card.ability.extra.create_count do
+                        cards[i] = true
+                        local _rank = SMODS.Ranks['unstb_21']
+                        local _suit = pseudorandom_element(SMODS.Suits, pseudoseed('altar')) or SMODS.Suits['Spades']
+						
+						--Pooling Enhancements
+						local cen_pool = {}
+                        for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+                            if not v.replace_base_card and not v.disenhancement then 
+                                cen_pool[#cen_pool+1] = v
+                            end
+                        end
+						
+                        create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = pseudorandom_element(cen_pool, pseudoseed('altar'))}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
+                    end
+                    playing_card_joker_effects(cards)
+                    return true end })
+		
+	end,
+
+	pos = get_coordinates(0),
+}
+
+--Devil's Contract
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'spectral',
+	key = 'spc_contract', loc_txt = loc['spc_contract'],
+
+	config = {extra = {upgrade_count = 1, disenc_count = 3}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {card and card.ability.extra.upgrade_count or self.config.extra.upgrade_count, card and card.ability.extra.disenc_count or self.config.extra.disenc_count}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand then
+			return true
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		--Based on Basegame's Immolate
+		local upgrade_card = {}
+		local disenc_card = {}
+		
+		local temp_hand = {}
+		for k, v in ipairs(G.hand.cards) do temp_hand[#temp_hand+1] = v end
+		table.sort(temp_hand, function (a, b) return not a.playing_card or not b.playing_card or a.playing_card < b.playing_card end)
+		pseudoshuffle(temp_hand, pseudoseed('dvcontract'))
+
+		for i = 1, card.ability.extra.upgrade_count do upgrade_card[#upgrade_card+1] = temp_hand[i] end
+		for i = card.ability.extra.upgrade_count+1, card.ability.extra.upgrade_count+card.ability.extra.disenc_count  do disenc_card[#disenc_card+1] = temp_hand[i] end
+		
+		--Upgrade the card
+		for i=1, #upgrade_card do
+		event({trigger = 'after',delay = 0.1,func = function()
+                    edition_upgrade(upgrade_card[i])
+                    return true end })
+		end
+		
+		--Disenhanced the Remaining Cards
+		if #disenc_card > 0 then
+			--Animation from Basegame Tarot
+			for i=1, #disenc_card do
+				local percent = 1.15 - (i-0.999)/(#disenc_card-0.998)*0.3
+				event({trigger = 'after',delay = 0.15,func = function() disenc_card[i]:flip();play_sound('card1', percent);disenc_card[i]:juice_up(0.3, 0.3);return true end })
+			end
+			delay(0.2)
+			
+			--Handle the conversion
+			for i=1, #disenc_card do
+			event({trigger = 'after',delay = 0.1,func = function()		
+						disenc_card[i]:set_ability(G.P_CENTERS[pseudorandom_element({'m_unstb_radioactive', 'm_unstb_biohazard', 'm_unstb_poison'}, pseudoseed('dvcontract'))])
+						return true end })
+			end
+			
+			for i=1, #disenc_card do
+				local percent = 0.85 + (i-0.999)/(#disenc_card-0.998)*0.3
+				event({trigger = 'after',delay = 0.15,func = function() disenc_card[i]:flip();play_sound('tarot2', percent, 0.6);disenc_card[i]:juice_up(0.3, 0.3);return true end })
+			end
+			delay(0.5)
+		end
+	end,
+
+	pos = get_coordinates(0),
+}
+
+--Other Spectrals
+
+--Poltergeist
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'spectral',
+	key = 'spc_poltergeist', loc_txt = loc['spc_poltergeist'],
+
+	config = {extra = {}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and #G.jokers.cards > 1 then
+		
+			--Check if there is at least one joker with edition
+			for i = 1, #G.jokers.cards do
+				if G.jokers.cards[i].edition then
+					return true
+				end
+			end
+			
+			return false
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		local joker_list = G.jokers.cards
+		
+		local temp_edition = {}
+		for k, v in ipairs(joker_list) do temp_edition[#temp_edition+1] = v.edition or 'none' end
+		pseudoshuffle(temp_edition, pseudoseed('poltergeist'))
+
+		--Give all joker new editions
+		--Animation from Basegame Tarot
+		for i=1, #joker_list do
+			local percent = 1.15 - (i-0.999)/(#joker_list-0.998)*0.3
+			event({trigger = 'after',delay = 0.15,func = function() joker_list[i]:flip();play_sound('card1', percent);joker_list[i]:juice_up(0.3, 0.3);return true end })
+		end
+		delay(0.2)
+		
+		--Set the new edition
+		for i=1, #joker_list do
+		event({trigger = 'after',delay = 0.1,func = function()	
+
+					local edition = temp_edition[i]
+					
+					if edition == 'none' then
+						edition =  nil
+					end
+		
+					joker_list[i]:set_edition(edition, true, true)
+					return true end })
+		end
+		
+		for i=1, #joker_list do
+			local percent = 0.85 + (i-0.999)/(#joker_list-0.998)*0.3
+			event({trigger = 'after',delay = 0.15,func = function() joker_list[i]:flip();play_sound('tarot2', percent, 0.6);joker_list[i]:juice_up(0.3, 0.3);return true end })
+		end
+		delay(0.5)
+	end,
+
+	pos = get_coordinates(0),
+}
+
+--Projection
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'spectral',
+	key = 'spc_projection', loc_txt = loc['spc_projection'],
+
+	config = {extra = {odds_break = 4}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card and card.ability.extra.odds_break or self.config.extra.odds_break}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and #G.jokers.cards > 1 and G.jokers.highlighted[1] then
+		
+			--Check if there is at least one of the selected jokers have edition and is not the same
+			local joker = G.jokers.highlighted[1]
+			local position = nil
+			
+			for i = 1, #G.jokers.cards do
+                if G.jokers.cards[i] == joker then position = i; break end
+            end
+			
+			--Selected Joker is at the rightmost
+			if position==#G.jokers.cards then
+				return false
+			end
+			
+			local nextjoker = G.jokers.cards[position+1]
+			
+			--If both has edition, see if it's the same
+			if joker.edition and nextjoker.edition then
+				return joker.edition.key ~= nextjoker.edition.key
+			end
+			
+			--Return true if at least one of them has edition
+			return joker.edition or nextjoker.edition 
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		local joker = G.jokers.highlighted[1]
+		local position = nil
+			
+		for i = 1, #G.jokers.cards do
+            if G.jokers.cards[i] == joker then position = i; break end
+        end
+		
+		local nextjoker = G.jokers.cards[position+1]
+		
+		local firstEdition = joker.edition
+		local nextEdition = nextjoker.edition
+		
+		local joker_list = {joker, nextjoker}
+		
+		--Animation from Basegame Tarot
+		for i=1, #joker_list do
+			local percent = 1.15 - (i-0.999)/(#joker_list-0.998)*0.3
+			event({trigger = 'after',delay = 0.15,func = function() joker_list[i]:flip();play_sound('card1', percent);joker_list[i]:juice_up(0.3, 0.3);return true end })
+		end
+		delay(0.2)
+		
+		--Set the new edition
+		for i=1, #joker_list do
+		event({trigger = 'after',delay = 0.1,func = function()	
+					joker:set_edition(nextEdition, true, true)
+					nextjoker:set_edition(firstEdition, true, true)
+					return true end })
+		end
+		
+		for i=1, #joker_list do
+			local percent = 0.85 + (i-0.999)/(#joker_list-0.998)*0.3
+			event({trigger = 'after',delay = 0.15,func = function() joker_list[i]:flip();play_sound('tarot2', percent, 0.6);joker_list[i]:juice_up(0.3, 0.3);return true end })
+		end
+		delay(0.5)
+		
+		--Destroy one of the joker
+		if pseudorandom('projection'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_break then
+			local target = pseudorandom_element(joker_list, pseudoseed('projection'))
+			event({func = function()
+                        target:start_dissolve({HEX("57ecab")}, nil, 1.6)
+                    return true end })
+			forced_message("Failed...", target, G.C.BLACK, true)
+		end
+		
+		
+	end,
+
+	pos = get_coordinates(0),
+}
+
+--Siphon
+SMODS.Consumable{
+	set = 'Spectral', atlas = 'spectral',
+	key = 'spc_siphon', loc_txt = loc['spc_siphon'],
+
+	config = {extra = {count = 4}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+
+		return {vars = {card and card.ability.extra.count or self.config.extra.count}}
+	end,
+
+	can_use = function(self, card)
+		if G.hand and #G.jokers.cards > 1 and G.jokers.highlighted[1] then
+			return G.jokers.highlighted[1].edition and G.jokers.highlighted[1].edition.key ~= 'e_negative'
+		end
+		return false
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+		
+		local edition_card = {}
+		local temp_hand = {}
+		
+		for k, v in ipairs(G.hand.cards) do temp_hand[#temp_hand+1] = v end
+		table.sort(temp_hand, function (a, b) return not a.playing_card or not b.playing_card or a.playing_card < b.playing_card end)
+		pseudoshuffle(temp_hand, pseudoseed('siphon'))
+
+		for i = 1, card.ability.extra.count do edition_card[#edition_card+1] = temp_hand[i] end
+		
+		local joker = G.jokers.highlighted[1]
+		local edition = joker.edition
+		
+		--Destroy the joker
+		
+		event({func = function()
+					joker:start_dissolve({HEX("57ecab")}, nil, 1.6)
+				return true end })
+		delay(0.5)
+		
+		--Upgrade the card
+		
+		event({trigger = 'after',delay = 0.1,func = function()
+					for i=1, #edition_card do
+						edition_card[i]:set_edition(edition, true, i==1)
+					end
+                    return true end })
+		
+		
+	end,
+
+	pos = get_coordinates(0),
+}
+
+
 -------- Joker Code Starts Here ------
+
+--Basic Jokers
+
+--Suit Seal Support Jokers
+
+--Vainglorious Joker
+create_joker({
+    name = 'Vainglorious Joker', id = 1, no_art = true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {mult = 2} },
+	
+    calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card.seal and SMODS.Seals[context.other_card.seal] and SMODS.Seals[context.other_card.seal].suit_seal then
+				--big_juice(context.blueprint_card or card)
+				return {
+				  mult = card.ability.extra.mult,
+				  card = card
+				}
+			end
+		end
+	end,
+  
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one card with suit seal
+		for _, v in pairs(G.playing_cards) do
+			if v.seal and SMODS.Seals[v.seal] and SMODS.Seals[v.seal].suit_seal then return true end
+		end
+		return false
+		
+    end
+})
+
+--Acedia Joker
+create_joker({
+    name = 'Acedia Joker', id = 1, no_art = true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {mult = 6} },
+	
+    calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card.seal and SMODS.Seals[context.other_card.seal] and SMODS.Seals[context.other_card.seal].suit_seal then
+				local is_activate = false
+				
+				--If same suit, returns true immediately. This should also handle Wild Card cases and other Joker-related calculation probably?
+				--I hope so, if there's a case that slips by I'll be crying
+				if context.other_card:is_suit(SMODS.Seals[context.other_card.seal].suit_seal, nil, nil, true) then
+					is_activate = true
+					
+				--Otherwise, checks suit group
+				elseif get_suit_group(context.other_card.base.suit) == get_suit_group(SMODS.Seals[context.other_card.seal].suit_seal) then
+					is_activate = true
+				end
+				
+				if is_activate then
+					return {
+					  mult = card.ability.extra.mult,
+					  card = card
+					}
+				end
+			end
+		end
+	end,
+  
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one card with suit seal
+		for _, v in pairs(G.playing_cards) do
+			if v.seal and SMODS.Seals[v.seal] and SMODS.Seals[v.seal].suit_seal then return true end
+		end
+		return false
+		
+    end
+})
+
+--Cinnabar
+create_joker({
+    name = 'Cinnabar', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {odds = 6} },
+	
+	custom_vars = function(self, info_queue, card)
+        return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
+    end,
+	
+    calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card.seal and SMODS.Seals[context.other_card.seal] and SMODS.Seals[context.other_card.seal].suit_seal then
+				local isActivated = pseudorandom('cinnabar'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds
+				
+				if isActivated then
+					if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+						
+						G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+						event({func = function()
+							local created_card = create_card('Auxiliary', G.consumeables, nil, nil, nil, nil, unstb_global.SUIT_SEAL[SMODS.Seals[context.other_card.seal].suit_seal].aux_key, nil)
+							created_card:add_to_deck()
+							G.consumeables:emplace(created_card)
+							G.GAME.consumeable_buffer = 0
+							return true end
+						})
+						
+						forced_message("Auxiliary", context.blueprint_card or card, G.C.GREEN, true)
+					end
+				end
+			end
+		end
+	end,
+  
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one card with suit seal
+		for _, v in pairs(G.playing_cards) do
+			if v.seal and SMODS.Seals[v.seal] and SMODS.Seals[v.seal].suit_seal then return true end
+		end
+		return false
+		
+    end
+})
 
 --BlackJack + Question Mark Line Jokers
 
@@ -2704,17 +3755,24 @@ create_joker({
 				return {
 				  chips = card.ability.extra.chips,
 				  mult = card.ability.extra.mult,
-				  card = context.other_card
+				  card = card
 				}
+			end
 		end
+	end,
+  
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one rank ??? card
+		for _, v in pairs(G.playing_cards) do
+			if v.base.value == 'unstb_???' then return true end
+		end
+		return false
+		
     end
-  end
 })
---Decimal-line Jokers
 
-local function is_decimal(card)
-	return SMODS.Ranks[card.base.value].is_decimal
-end
+--Decimal-line Jokers
 
 create_joker({
     name = 'Floating Point Error', id = 1, no_art = true,
@@ -2743,7 +3801,174 @@ create_joker({
                 }
 			end
 		end
-	end
+	end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one decimal card
+		for _, v in pairs(G.playing_cards) do
+			if is_decimal(v) then return true end
+		end
+		return false
+		
+    end
+})
+
+--Research Paper
+create_joker({
+    name = 'Research Paper', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {times_max = 1}},
+	
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.times_current, card.ability.extra.times_max}}
+    end,
+	
+	add_to_deck = function(self, card, from_debuff)
+		--Enable all decimal ranks card in pools
+		if not from_debuff then
+			setPoolRankFlagEnable('unstb_0.5', true);
+			setPoolRankFlagEnable('unstb_r2', true);
+			setPoolRankFlagEnable('unstb_e', true);
+			setPoolRankFlagEnable('unstb_Pi', true);
+		end
+    end,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+		--Initialize variables
+		card.ability.extra.times_current = 0
+    end,
+	
+    calculate = function(self, card, context)	
+		if context.before and not context.blueprint then
+			local is_active = true
+			
+			if card.ability.extra.times_current < card.ability.extra.times_max then
+				for i=1, #context.scoring_hand do
+					if context.scoring_hand[i]:is_face() then
+						is_active = false
+						break
+					end
+				end
+				
+				if is_active then
+					card.ability.extra.times_current = (card.ability.extra.times_current or 0) + 1
+				end
+			else
+				is_active = false
+			end
+			
+			card.ability.extra.is_active = is_active
+		end
+		
+		if context.after then
+			--Create Card if it activates
+			if card.ability.extra.is_active then
+				--Adds a card
+				event({trigger = 'after', func = function()
+							local rank = SMODS.Ranks[pseudorandom_element({'unstb_0.5', 'unstb_r2', 'unstb_e', 'unstb_Pi'}, pseudoseed('researchpaper')..G.SEED)].card_key
+							local suit = pseudorandom_element(SMODS.Suits, pseudoseed('researchpaper')..G.SEED).card_key
+							
+							--Pooling Enhancements
+							local cen_pool = {}
+							for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+								if not v.replace_base_card and not v.disenhancement then 
+									cen_pool[#cen_pool+1] = v
+								end
+							end
+							
+							local _card = Card(G.play.T.x + G.play.T.w/2, G.play.T.y, G.CARD_W, G.CARD_H, G.P_CARDS[suit..'_'..rank], pseudorandom_element(cen_pool, pseudoseed('researchpaper')..G.SEED), {playing_card = G.playing_card})
+							
+							_card:start_materialize({G.C.SECONDARY_SET.Enhanced})
+							G.play:emplace(_card)
+							table.insert(G.playing_cards, _card)
+							
+							big_juice(context.blueprint_card or card)
+							
+							return true end
+						})
+				delay(1.5)
+
+				event({trigger = 'after', func = function()
+					G.deck.config.card_limit = G.deck.config.card_limit + 1
+					draw_card(G.play,G.deck, 90,'up', nil)  
+					return true end
+					})
+					
+				playing_card_joker_effects({true})
+			end
+		end
+		
+		--End of round check, make sure it's checked absolutely once per round
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			if card.ability.extra.times_current > 0 then
+				card.ability.extra.times_current = 0
+				return {
+					  message = 'Reset!'
+				}
+			end
+		end
+	end,
+})
+
+--Engineer
+create_joker({
+    name = 'Engineer', id = 1, no_art = true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	--vars = { {times = 1}},
+	
+	--Engineer's actual ability is in Card:get_id hook above
+    --[[calculate = function(self, card, context)
+		
+	end,]]
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one decimal card
+		for _, v in pairs(G.playing_cards) do
+			if is_decimal(v) then return true end
+		end
+		return false
+		
+    end
+})
+
+--Thesis Proposal
+create_joker({
+    name = 'Thesis Proposal', id = 1, no_art = true,
+    rarity = 'Rare', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = {{ repetitions = 1 }},
+	
+    calculate = function(self, card, context)
+		if context.cardarea == G.play and context.repetition and not context.repetition_only then
+		  if is_decimal(context.other_card) then
+				return {
+				  message = 'Again!',
+				  repetitions = card.ability.extra.repetitions,
+				  card = context.blueprint_card or card
+				}
+		  end
+		end
+	end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one decimal card
+		for _, v in pairs(G.playing_cards) do
+			if is_decimal(v) then return true end
+		end
+		return false
+		
+    end
 })
 
 --Binary-line Jokers
@@ -2823,7 +4048,7 @@ create_joker({
 					
 					--Unflipping Animation
 					event({trigger = 'after', delay = 0.1, func = function() currentCard:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); currentCard:juice_up(0.3, 0.3); return true end })
-					forced_message("Zero!", currentCard, G.C.GRAY, true)
+					forced_message("Zero!", currentCard, G.C.GREY, true)
 				end
 			end
 		end
@@ -3264,8 +4489,7 @@ create_joker({
 			return {
 			  message = 'Again!',
 			  repetitions = card.ability.extra.repetitions,
-			  -- The card the repetitions are applying to is context.other_card
-			  card = context.other_card
+			  card =  context.blueprint_card or card
 			}
 		  end
 		end
@@ -4005,7 +5229,7 @@ create_joker({
 			return {
 			  message = 'Again!',
 			  repetitions = card.ability.extra.retrigger_times,
-			  card = context.other_card
+			  card = context.blueprint_card or card
 			}
 		  end
 		end
