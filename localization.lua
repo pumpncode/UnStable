@@ -582,6 +582,41 @@ return {
 	
 	--Jokers
 	
+	vainglorious_joker = {
+        ['en-us'] = {
+            ['name'] = 'Vainglorious Joker',
+            ['text'] = {
+                [1] = 'Played cards with',
+				[2] = '{C:attention}Suit Seal{} gives',
+				[3] = "{C:attention}+#1#{} Mult when scored",
+            }
+        }
+    },
+	
+	acedia_joker = {
+        ['en-us'] = {
+            ['name'] = 'Acedia Joker',
+            ['text'] = {
+                [1] = 'Played cards with',
+				[2] = '{C:attention}Suit Seal{} in the same',
+				[3] = "{C:purple}suit category{} of the card's suit gives",
+				[4] = "{C:attention}+#1#{} Mult when scored",
+            }
+        }
+    },
+	
+	cinnabar = {
+        ['en-us'] = {
+            ['name'] = 'Cinnabar',
+            ['text'] = {
+                [1] = 'Played cards with',
+				[2] = '{C:attention}Suit Seal{} has',
+				[3] = "{C:green}#1# in #2#{} chance to create respective",
+				[4] = "{C:attention}Seal Auxiliary Card{} when scored",
+            }
+        }
+    },
+	
 	black_jack = {
         ['en-us'] = {
             ['name'] = 'Black Jack',

@@ -36,12 +36,12 @@ register_suit_group("suit_red", "Diamonds")
 --register_suit_group("no_smear", "Inks_Color")
 
 local card_issuit_ref = Card.is_suit
-function Card:is_suit(suit, bypass_debuff, flush_calc)
+function Card:is_suit(suit, bypass_debuff, flush_calc, bypass_seal) --Adds one more argument: bypass_seal. true if the calculation bypass the seal on the card
 	--Modified from SMODS-patched version of is_suit, completely re-implemented to supports the new smear system
 	if flush_calc then
 	
 		--Has seal, is modded seal, and has suit_seal property
-		if self.seal and SMODS.Seals[self.seal] and SMODS.Seals[self.seal].suit_seal and not self.debuff then
+		if not bypass_seal and self.seal and SMODS.Seals[self.seal] and SMODS.Seals[self.seal].suit_seal and not self.debuff then
 			--returns true immediately if the suit is equal
 			if SMODS.Seals[self.seal].suit_seal == suit then
 				return true
@@ -63,7 +63,7 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 		--If smeared joker exists, and is not in no_smear group
         if next(SMODS.find_card('j_smeared')) and not suit_group.no_smear[suit] then	
 			--Has seal, is modded seal, and has suit_seal property
-			if self.seal and SMODS.Seals[self.seal] and SMODS.Seals[self.seal].suit_seal and not self.debuff then
+			if not bypass_seal and self.seal and SMODS.Seals[self.seal] and SMODS.Seals[self.seal].suit_seal and not self.debuff then
 				local targetGroup = get_suit_group(SMODS.Seals[self.seal].suit_seal)
 
 				--returns true immediately if the suit is in the same suit group
@@ -87,7 +87,7 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
         if self.debuff and not bypass_debuff then return end
 		
 		--Has seal, is modded seal, and has suit_seal property
-		if self.seal and SMODS.Seals[self.seal] and SMODS.Seals[self.seal].suit_seal then
+		if not bypass_seal and self.seal and SMODS.Seals[self.seal] and SMODS.Seals[self.seal].suit_seal then
 			--returns true immediately if the suit is equal
 			if SMODS.Seals[self.seal].suit_seal == suit then
 				return true
@@ -109,7 +109,7 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 		--If smeared joker exists, and is not in no_smear group
         if next(SMODS.find_card('j_smeared')) and not suit_group.no_smear[suit] then
             --Has seal, is modded seal, and has suit_seal property
-			if self.seal and SMODS.Seals[self.seal] and SMODS.Seals[self.seal].suit_seal then
+			if not bypass_seal and self.seal and SMODS.Seals[self.seal] and SMODS.Seals[self.seal].suit_seal then
 				local targetGroup = get_suit_group(SMODS.Seals[self.seal].suit_seal)
 				--returns true immediately if the suit is in the same suit group
 				if suit_group[targetGroup][suit] then

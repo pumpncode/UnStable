@@ -519,7 +519,11 @@ unstb_global.SUIT_SEAL = {}
 
 for i = 1, #suit_seal_list do
 	SuitSeal.initSeal(suit_seal_list[i], "suit_seal", i-1 )
-	unstb_global.SUIT_SEAL[suit_seal_list[i]] = 'unstb_'..string.lower(suit_seal_list[i])
+	
+	unstb_global.SUIT_SEAL[suit_seal_list[i]] = {}
+	
+	unstb_global.SUIT_SEAL[suit_seal_list[i]].seal_key = 'unstb_'..string.lower(suit_seal_list[i])
+	unstb_global.SUIT_SEAL[suit_seal_list[i]].aux_key = 'c_unstb_aux_'..string.lower(suit_seal_list[i])
 end
 
 --Heal Seal
@@ -2943,7 +2947,7 @@ SMODS.Consumable{
 				targetCard = G.hand.highlighted[2]
 			end
 		
-			return not targetCard.config.center.no_suit and unstb_global.SUIT_SEAL[targetCard.base.suit]
+			return not targetCard.config.center.no_suit and (unstb_global.SUIT_SEAL[targetCard.base.suit] or {}).seal_key
 		end
 		return false
 	end,
@@ -2964,7 +2968,7 @@ SMODS.Consumable{
 		end
 		
 		--Adds Suit Seal to the right card (or none, if there's no matching suit)
-		local suit_seal = unstb_global.SUIT_SEAL[targetCard.base.suit]
+		local suit_seal = (unstb_global.SUIT_SEAL[targetCard.base.suit] or {}).seal_key
 		
 		recieveCard:set_seal(suit_seal, nil, true)
 		
@@ -3536,6 +3540,135 @@ SMODS.Consumable{
 
 -------- Joker Code Starts Here ------
 
+--Basic Jokers
+
+--Suit Seal Support Jokers
+
+--Vainglorious Joker
+create_joker({
+    name = 'Vainglorious Joker', id = 1, no_art = true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {mult = 2} },
+	
+    calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card.seal and SMODS.Seals[context.other_card.seal] and SMODS.Seals[context.other_card.seal].suit_seal then
+				--big_juice(context.blueprint_card or card)
+				return {
+				  mult = card.ability.extra.mult,
+				  card = card
+				}
+			end
+		end
+	end,
+  
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one card with suit seal
+		for _, v in pairs(G.playing_cards) do
+			if v.seal and SMODS.Seals[v.seal] and SMODS.Seals[v.seal].suit_seal then return true end
+		end
+		return false
+		
+    end
+})
+
+--Acedia Joker
+create_joker({
+    name = 'Acedia Joker', id = 1, no_art = true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {mult = 6} },
+	
+    calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card.seal and SMODS.Seals[context.other_card.seal] and SMODS.Seals[context.other_card.seal].suit_seal then
+				local is_activate = false
+				
+				--If same suit, returns true immediately. This should also handle Wild Card cases and other Joker-related calculation probably?
+				--I hope so, if there's a case that slips by I'll be crying
+				if context.other_card:is_suit(SMODS.Seals[context.other_card.seal].suit_seal, nil, nil, true) then
+					is_activate = true
+					
+				--Otherwise, checks suit group
+				elseif get_suit_group(context.other_card.base.suit) == get_suit_group(SMODS.Seals[context.other_card.seal].suit_seal) then
+					is_activate = true
+				end
+				
+				if is_activate then
+					return {
+					  mult = card.ability.extra.mult,
+					  card = card
+					}
+				end
+			end
+		end
+	end,
+  
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one card with suit seal
+		for _, v in pairs(G.playing_cards) do
+			if v.seal and SMODS.Seals[v.seal] and SMODS.Seals[v.seal].suit_seal then return true end
+		end
+		return false
+		
+    end
+})
+
+--Cinnabar
+create_joker({
+    name = 'Cinnabar', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {odds = 6} },
+	
+	custom_vars = function(self, info_queue, card)
+        return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
+    end,
+	
+    calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card.seal and SMODS.Seals[context.other_card.seal] and SMODS.Seals[context.other_card.seal].suit_seal then
+				local isActivated = pseudorandom('cinnabar'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds
+				
+				if isActivated then
+					if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+						
+						G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+						event({func = function()
+							local created_card = create_card('Auxiliary', G.consumeables, nil, nil, nil, nil, unstb_global.SUIT_SEAL[SMODS.Seals[context.other_card.seal].suit_seal].aux_key, nil)
+							created_card:add_to_deck()
+							G.consumeables:emplace(created_card)
+							G.GAME.consumeable_buffer = 0
+							return true end
+						})
+						
+						forced_message("Auxiliary", context.blueprint_card or card, G.C.GREEN, true)
+					end
+				end
+			end
+		end
+	end,
+  
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one card with suit seal
+		for _, v in pairs(G.playing_cards) do
+			if v.seal and SMODS.Seals[v.seal] and SMODS.Seals[v.seal].suit_seal then return true end
+		end
+		return false
+		
+    end
+})
+
 --BlackJack + Question Mark Line Jokers
 
 --Black Jack
@@ -3622,7 +3755,7 @@ create_joker({
 				return {
 				  chips = card.ability.extra.chips,
 				  mult = card.ability.extra.mult,
-				  card = context.other_card
+				  card = card
 				}
 			end
 		end
