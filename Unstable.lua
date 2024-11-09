@@ -376,6 +376,29 @@ local function create_joker(joker)
         }
 end
 
+--New global function to get a random eligible suit and rank from the deck without rank-overrides enhancements getting in the way
+--Code based on Castle from base game
+function get_valid_card_from_deck(seed)
+    
+	local res_suit = 'Spades'
+	local res_rank = '2'
+	
+    local valid_cards = {}
+    for k, v in ipairs(G.playing_cards) do
+        if not v.config.center.replace_base_card  then --Excludes all cards with replace_base_card enhancements
+            valid_cards[#valid_cards+1] = v
+        end
+    end
+    if valid_cards[1] then 
+        local target_card = pseudorandom_element(valid_cards, pseudoseed(seed or 'validcard'..G.GAME.round_resets.ante))
+		
+        res_suit = target_card.base.suit
+		res_rank = target_card.base.value
+    end
+	
+	return {suit = res_suit, rank = res_rank}
+end
+
 --Black Jack Rank Calculation
 local function blackJack_evalrank(hand, bustAmount)
 	--Black Jack-style total rank evaluation
@@ -3542,6 +3565,98 @@ SMODS.Consumable{
 
 --Basic Jokers
 
+--Lunar Calendar
+create_joker({
+    name = 'Lunar Calendar', id = 1, no_art = true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {odds_spawn = 8} },
+	
+	custom_vars = function(self, info_queue, card)
+		local suit  = card and card.ability.extra and card.ability.extra.suit or 'Spades'
+	
+		local suit_name = localize(suit, 'suits_singular')
+		local suit_color = G.C.SUITS[suit]
+	
+        return {vars = {suit_name, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_spawn, colours = {suit_color}}}
+    end,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+		--Initialize variables
+		card.ability.extra.suit = pseudorandom_element(SMODS.Suits, pseudoseed('lunarcalendar')).key --All suits, not just strictly in the deck
+    end,
+	
+    calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			--Main Context
+			if context.other_card:is_suit(card.ability.extra.suit) then
+				local isActivated = pseudorandom('lunarcalendar'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_spawn
+				
+				if isActivated then
+					if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+						
+						G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+						event({func = function()
+							local created_card = create_card('Planet', G.consumeables, nil, nil, nil, nil, nil, nil)
+							created_card:add_to_deck()
+							G.consumeables:emplace(created_card)
+							G.GAME.consumeable_buffer = 0
+							return true end
+						})
+						
+						forced_message("Planet", context.blueprint_card or card, G.C.SECONDARY_SET.Planet, true)
+					end
+				end
+				
+			end
+		end
+		
+		--End-of-round Randomize
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			card.ability.extra.suit = pseudorandom_element(SMODS.Suits, pseudoseed('lunarcalendar')).key
+			return{
+				message = localize(card.ability.extra.suit, 'suits_singular'),
+			}
+		end
+	end,
+})
+
+--Dragon Hoard
+create_joker({
+    name = 'Dragon Hoard', id = 1, no_art = true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = {{mult_rate = 5}, {held_amount = 2}, {mult_current = 0}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		local mult_current = card.ability.extra.mult_rate * math.floor(#G.consumeables.cards/card.ability.extra.held_amount)
+		
+		return { vars = {card.ability.extra.mult_rate, card.ability.extra.held_amount, mult_current}}
+    end,
+	
+	
+    calculate = function(self, card, context)
+		--Main context
+		if context.joker_main then
+			
+			card.ability.extra.mult_current = card.ability.extra.mult_rate * math.floor(#G.consumeables.cards/card.ability.extra.held_amount)
+		
+			if card.ability.extra.mult_current > 0 then
+				return {
+					mult_mod = card.ability.extra.mult_current,
+					message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult_current } }
+				}
+			end
+		end
+		
+    end,
+})
+
 --Suit Seal Support Jokers
 
 --Vainglorious Joker
@@ -4550,29 +4665,6 @@ create_joker({
 })
 
 --New Enhancements Support Stuff
-
---New global function to get a random eligible suit and rank from the deck without rank-overrides enhancements getting in the way
---Code based on Castle from base game
-function get_valid_card_from_deck(seed)
-    
-	local res_suit = 'Spades'
-	local res_rank = '2'
-	
-    local valid_cards = {}
-    for k, v in ipairs(G.playing_cards) do
-        if not v.config.center.replace_base_card  then --Excludes all cards with replace_base_card enhancements
-            valid_cards[#valid_cards+1] = v
-        end
-    end
-    if valid_cards[1] then 
-        local target_card = pseudorandom_element(valid_cards, pseudoseed(seed or 'validcard'..G.GAME.round_resets.ante))
-		
-        res_suit = target_card.base.suit
-		res_rank = target_card.base.value
-    end
-	
-	return {suit = res_suit, rank = res_rank}
-end
 
 --Vintage Joker
 create_joker({

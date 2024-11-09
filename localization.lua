@@ -582,6 +582,31 @@ return {
 	
 	--Jokers
 	
+	lunar_calendar = {
+        ['en-us'] = {
+            ['name'] = 'Lunar Calendar',
+            ['text'] = {
+                [1] = 'Played cards with',
+				[2] = '{V:1}#1#{} suit has',
+				[3] = '{C:green}#2# in #3#{} chance to create',
+				[4] = "random {C:planet}Planet{} card when scored",
+				[5] = '{C:inactive}(Must have room)',
+            }
+        }
+    },
+	
+	dragon_hoard = {
+        ['en-us'] = {
+            ['name'] = 'Dragon Hoard',
+            ['text'] = {
+                [1] = 'Gives {C:mult}+#1#{} Mult for',
+				[2] = 'every {C:attention}#2#{} consumables',
+				[3] = 'held in hand',
+				[4] = "{C:inactive}(Currently {C:mult}+#3#{C:inactive} Mult)",
+            }
+        }
+    },
+	
 	vainglorious_joker = {
         ['en-us'] = {
             ['name'] = 'Vainglorious Joker',
@@ -613,6 +638,7 @@ return {
 				[2] = '{C:attention}Suit Seal{} has',
 				[3] = "{C:green}#1# in #2#{} chance to create respective",
 				[4] = "{C:attention}Seal Auxiliary Card{} when scored",
+				[5] = '{C:inactive}(Must have room)',
             }
         }
     },
