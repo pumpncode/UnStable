@@ -950,6 +950,19 @@ return {
         }
     },
 	
+	crosseyed_joker = {
+        ['en-us'] = {
+            ['name'] = 'Cross-eyed Joker',
+            ['text'] = {
+                [1] = 'Copies ability of',
+				[2] = '{C:attention}Joker{} to the',
+				[3] = 'left or right at random',
+				[4] = '{s:0.8}Direction changes each hands played',
+				[5] = '{C:inactive}(Currently: {C:red}#1#{C:inactive})',
+            }
+        }
+    },
+	
 	jackhammer = {
         ['en-us'] = {
             ['name'] = 'Jackhammer',
@@ -978,7 +991,7 @@ return {
             ['text'] = {
                 [1] = '{X:mult,C:white}x#1#{} Mult if the played hand is {C:attention}#3#{}',
 				[2] = '{X:mult,C:white}x#2#{} Mult otherwise',
-				[3] = '{C:inactive}(Hand changes at the end of round){}',
+				[3] = '{s:0.8}Hand changes at the end of round',
             }
         }
     },

@@ -3634,7 +3634,9 @@ create_joker({
 	
 	custom_vars = function(self, info_queue, card)
         
-		local mult_current = card.ability.extra.mult_rate * math.floor(#G.consumeables.cards/card.ability.extra.held_amount)
+		local held_amount = G.consumeables and #G.consumeables.cards or 0
+		
+		local mult_current = card.ability.extra.mult_rate * math.floor(held_amount/card.ability.extra.held_amount)
 		
 		return { vars = {card.ability.extra.mult_rate, card.ability.extra.held_amount, mult_current}}
     end,
@@ -5279,6 +5281,78 @@ create_joker({
 			end
 		end
 		
+    end
+})
+
+--Cross-eyed Joker
+create_joker({
+    name = 'Crosseyed Joker', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 10,
+	
+	vars = {{dir = 0}},
+	
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.dir==0 and 'Left' or 'Right'}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+		--Random direction
+		card.ability.extra.dir = 0
+		if pseudorandom('crosseyed'..G.SEED) > 0.5 then
+			card.ability.extra.dir = 1
+		end
+    end,
+	
+    calculate = function(self, card, context)
+		--Code based on Familiar's Crimsonotype
+		
+		--Code runs after hand played, cannot copyable by other blueprint
+		if context.after and not context.blueprint and not context.repetition and not context.repetition_only then
+			card.ability.extra.dir = 0
+			
+			if pseudorandom('crosseyed'..G.SEED) > 0.5 then
+				card.ability.extra.dir = 1
+			end
+			
+			forced_message(card.ability.extra.dir==0 and 'Left' or 'Right', card, G.C.ORANGE, true)
+		end
+		
+		local other_joker = nil
+		for i = 1, #G.jokers.cards do
+			if G.jokers.cards[i] == card then
+				if card.ability.extra.dir==0 then
+					other_joker = G.jokers.cards[i - 1]
+				else
+					other_joker = G.jokers.cards[i + 1]
+				end
+			end
+		end
+		if other_joker and other_joker ~= self then
+			context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
+			context.blueprint_card = context.blueprint_card or card
+
+			if context.blueprint > #G.jokers.cards + 1 then
+				return
+			end
+
+			local other_joker_ret, trig = other_joker:calculate_joker(context)
+			
+			if other_joker_ret or trig then
+				if not other_joker_ret then
+					other_joker_ret = {}
+				end
+				
+				other_joker_ret.card = context.blueprint_card or card
+				other_joker_ret.colour = G.C.GREEN
+				other_joker_ret.no_callback = true
+				
+				--IDK why these are not applied to the return value, it even worked fine when I commented return line out when it shouldn't
+				
+				return other_joker_ret
+			end
+		end
     end
 })
 
