@@ -3659,6 +3659,157 @@ create_joker({
     end,
 })
 
+--Card Dealer
+create_joker({
+    name = 'Card Dealer', id = 1, no_art = true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {chip_rate = 10}, {chips = 0} },
+	
+	custom_vars = function(self, info_queue, card)
+        
+		return { vars = {card.ability.extra.chip_rate, card.ability.extra.chips}}
+    end,
+	
+    calculate = function(self, card, context)
+	
+		if context.joker_main then
+			return {
+				chip_mod = card.ability.extra.chips,
+				message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.chips } }
+			}
+		end
+	
+		if context.before and context.full_hand and not context.blueprint then
+			card.ability.extra.chips = card.ability.extra.chips + #context.full_hand * card.ability.extra.chip_rate
+			
+			return {
+				message = 'Upgraded!',
+				colour = G.C.CHIPS,
+				card = card
+			 }
+		end
+		
+		--End-of-round Resets
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			card.ability.extra.chips = 0
+			return{
+				message = localize('k_reset'),
+				colour = G.C.RED
+			}
+		end
+		
+	end,
+})
+
+create_joker({
+    name = 'Furry Joker', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {odds_poly = 12} },
+	
+	custom_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_CENTERS['m_wild']
+		info_queue[#info_queue+1] = G.P_CENTERS['e_polychrome']
+		
+		return { vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_poly}}
+    end,
+	
+    calculate = function(self, card, context)	
+		if context.after and context.scoring_hand then
+			local polyAmount = 0
+			for i=1, #context.scoring_hand do
+				local current_card = context.scoring_hand[i]
+				if current_card.config.center == G.P_CENTERS.m_wild and (current_card.edition or {}).key ~= 'e_polychrome' and not current_card.becoming_poly then
+					local isActivated = pseudorandom('furry'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_poly
+					if isActivated then
+						current_card.becoming_poly = true
+						event({trigger = 'after', delay = 0.4, func = function()
+									big_juice(context.blueprint_card or card)
+									current_card:set_edition("e_polychrome", true, false)
+									current_card.becoming_poly = nil
+							return true end
+						})
+						polyAmount = polyAmount+1
+					end
+				end
+			end
+			if polyAmount>0 then
+				delay(2.5)
+			end
+		end
+	end,
+  
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one wild card in the deck
+		for _, v in pairs(G.playing_cards) do
+			if v.config.center == G.P_CENTERS.m_wild then return true end
+		end
+		return false
+		
+    end
+})
+
+--Hook set_cost to allow messing with prices
+local ref_set_cost = Card.set_cost
+function Card.set_cost(self)
+	ref_set_cost(self)
+	for k,v in ipairs(SMODS.find_card("j_unstb_expensive_handbag")) do
+		self.cost = self.cost + v.ability.extra.inflation
+	end
+	
+end
+
+create_joker({
+    name = 'Expensive Handbag', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = false, eternal = true,
+	
+	vars = { {add_slot = 2}, {inflation = 2} },
+	
+	custom_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.add_slot, card.ability.extra.inflation}}
+    end,
+	
+	add_to_deck = function(self, card, from_debuff)
+	
+		G.consumeables:change_size(card.ability.extra.add_slot)
+	
+		--Recalculate all prices in the shop
+		event({func = function()
+            for k, v in pairs(G.I.CARD) do
+                if v.set_cost then v:set_cost() end
+            end
+            return true end 
+		})
+		
+	end,
+	
+	remove_from_deck = function(self, card, from_debuff)
+		G.consumeables:change_size(-card.ability.extra.add_slot)
+		
+		--Recalculate all prices in the shop
+		event({func = function()
+            for k, v in pairs(G.I.CARD) do
+                if v.set_cost then v:set_cost() end
+            end
+            return true end 
+		})
+	end,
+	
+	--Actual functionality is in  Card.set_cost hook mostly
+	--[[
+    calculate = function(self, card, context)	
+		
+	end,]]
+})
+
 --Suit Seal Support Jokers
 
 --Vainglorious Joker

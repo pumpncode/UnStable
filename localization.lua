@@ -591,6 +591,7 @@ return {
 				[3] = '{C:green}#2# in #3#{} chance to create',
 				[4] = "random {C:planet}Planet{} card when scored",
 				[5] = '{C:inactive}(Must have room)',
+				[6] = '{s:0.8}Suit changes at the end of the round',
             }
         }
     },
@@ -603,6 +604,41 @@ return {
 				[2] = 'every {C:attention}#2#{} consumables',
 				[3] = 'held in hand',
 				[4] = "{C:inactive}(Currently {C:mult}+#3#{C:inactive} Mult)",
+            }
+        }
+    },
+	
+	card_dealer = {
+        ['en-us'] = {
+            ['name'] = 'Card Dealer',
+            ['text'] = {
+                [1] = '{C:chips}+#1#{} Chips per {C:attention}played{}',
+				[2] = 'cards this round',
+				[3] = '{C:attention}Resets{} at the end',
+				[4] = 'of the round',
+				[5] = "{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
+            }
+        }
+    },
+	
+	furry_joker = {
+        ['en-us'] = {
+            ['name'] = 'Furry Joker',
+            ['text'] = {
+                [1] = 'Played {C:attention}Wild Card{} has',
+				[2] = "{C:green}#1# in #2#{} chance to",
+				[3] = "turns {C:dark_edition}Polychrome{} when scored",
+            }
+        }
+    },
+	
+	expensive_handbag = {
+        ['en-us'] = {
+            ['name'] = 'Expensive Handbag',
+            ['text'] = {
+                [1] = '{C:attention}+#1#{} Consumable Slot',
+				[2] = "{C:red}Raises price{} of everything in",
+				[3] = "shop (except reroll) by {C:gold}$#2#{}",
             }
         }
     },
