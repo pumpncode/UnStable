@@ -5732,7 +5732,17 @@ create_joker({
 	
 	vars = {{side = 0}},
 	custom_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.retrigger_times}}
+	
+		local rank1 = localize(card.ability.extra.source_rank, 'ranks')
+		local suit1 = localize(card.ability.extra.source_suit, 'suits_plural')
+		
+		local rank2 = localize(card.ability.extra.target_rank, 'ranks')
+		local suit2 = localize(card.ability.extra.target_suit, 'suits_plural')
+	
+		local colour1 = G.C.SUITS[card.ability.extra.source_suit]
+		local colour2 = G.C.SUITS[card.ability.extra.target_suit]
+	
+		return {vars = {rank1..' of '..suit1, rank2..' of '..suit2, colours = {colour1, colour2}}}
     end,
 	
     blueprint = true, eternal = true,

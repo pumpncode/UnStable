@@ -1046,6 +1046,17 @@ return {
         }
     },
 	
+	magic_trick_card = {
+        ['en-us'] = {
+            ['name'] = 'Magic Trick Card',
+            ['text'] = {
+                [1] = 'Scored {V:1}#1#',
+				[2] = 'turns into {V:2}#2#',
+				[3] = '{s:0.8}On discard, flips over the Joker',
+            }
+        }
+    },
+	
 	spectre = {
         ['en-us'] = {
             ['name'] = 'Spectre',
