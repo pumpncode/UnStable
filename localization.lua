@@ -643,6 +643,17 @@ return {
         }
     },
 	
+	portal = {
+        ['en-us'] = {
+            ['name'] = 'Portal',
+            ['text'] = {
+                [1] = '{C:attention}Aces{} can be used in a',
+				[2] = "middle of a {C:purple}Straight{} hand",
+				[3] = "{C:inactive}(Ex: 3, 2, Ace, King, Queen)",
+            }
+        }
+    },
+	
 	vainglorious_joker = {
         ['en-us'] = {
             ['name'] = 'Vainglorious Joker',
@@ -743,6 +754,18 @@ return {
             ['text'] = {
                 [1] = 'Retrigger all played cards',
                 [2] = 'with {C:attention}decimal ranks{}',
+            }
+        }
+    },
+	
+	rainbow_flag = {
+        ['en-us'] = {
+            ['name'] = 'Rainbow Flag',
+            ['text'] = {
+                [1] = 'If a hand containing {C:purple}Straight{} has',
+				[2] = 'at least 1 {C:attention}decimal rank{} cards',
+				[3] = "{C:green}#1# in #2#{} chance to turns",
+				[4] = "one of the card {C:dark_edition}Polychrome{}",
             }
         }
     },
@@ -995,6 +1018,19 @@ return {
 				[3] = 'left or right at random',
 				[4] = '{s:0.8}Direction changes each hands played',
 				[5] = '{C:inactive}(Currently: {C:red}#1#{C:inactive})',
+            }
+        }
+    },
+	
+	joker_throwing_card = {
+        ['en-us'] = {
+            ['name'] = 'Joker Throwing Card',
+            ['text'] = {
+                [1] = 'Decrease blind size by {C:attention}#1#%{}',
+				[2] = '{C:green}#2# in #3#{} chance to destroy',
+				[3] = 'one of the scored card',
+				[4] = 'Increases percentage by {C:attention}#4#%{}',
+				[5] = 'if a card is destroyed this way',
             }
         }
     },

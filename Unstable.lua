@@ -1651,6 +1651,8 @@ function ustb_get_straight(hand)
 	local four_fingers = next(SMODS.find_card('j_four_fingers'))
 	local can_skip = next(SMODS.find_card('j_shortcut'))
 	
+	local can_loop = next(SMODS.find_card('j_unstb_portal'))
+	
 	if #hand < (5 - (four_fingers and 1 or 0)) then return ret end
 	
 	local t = {}
@@ -1692,7 +1694,11 @@ function ustb_get_straight(hand)
 	--TODO: Honestly could figure out the proper logic so it can be converted to lovely patch instead
 	
 	vals[1] = 'unstb_0'
-	vals[2] = 'Ace'
+	--vals[2] = 'Ace'
+	
+	if not can_loop then
+		vals[2] = 'Ace'
+	end
 	
 	while 1 do
 		end_iter = false
@@ -1705,7 +1711,7 @@ function ustb_get_straight(hand)
 		for _, val in ipairs(vals) do
 			--print(val)
 			--print('===')
-			if init_vals[val] and not initial then br = true end
+			if init_vals[val] and not initial and not can_loop then br = true end
 			if RANKS[val] then
 				straight_length = straight_length + 1
 				skipped_rank = false
@@ -3810,6 +3816,31 @@ create_joker({
 	end,]]
 })
 
+--Portal
+create_joker({
+    name = 'Portal', id = 1, no_art = true,
+    rarity = 'Rare', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	--vars = { {times = 1}},
+	
+	--Actual ability is in ustb_get_straight
+    --[[calculate = function(self, card, context)
+		
+	end,]]
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one decimal card
+		for _, v in pairs(G.playing_cards) do
+			if is_decimal(v) then return true end
+		end
+		return false
+		
+    end
+})
+
 --Suit Seal Support Jokers
 
 --Vainglorious Joker
@@ -4228,6 +4259,71 @@ create_joker({
 		end
 	end,
 	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one decimal card
+		for _, v in pairs(G.playing_cards) do
+			if is_decimal(v) then return true end
+		end
+		return false
+		
+    end
+})
+
+--Rainbow Flag
+create_joker({
+    name = 'Rainbow Flag', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {odds_poly = 8} },
+	
+	custom_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS['e_polychrome']
+		
+		return { vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_poly}}
+    end,
+	
+    calculate = function(self, card, context)	
+		if context.after and next(context.poker_hands['Straight']) and context.scoring_hand then
+			
+			--Check if the Joker should be activated or not
+			local is_activate = false
+			for i=1, #context.scoring_hand do
+				if is_decimal(context.scoring_hand[i]) then
+					is_activate = true
+					break
+				end
+			end
+			
+			if is_activate then
+				local eligible_card = {}
+				
+				--Populate the list of eligible card
+				for i=1, #context.scoring_hand do
+					if (context.scoring_hand[i].edition or {}).key ~= 'e_polychrome' and not context.scoring_hand[i].becoming_poly then
+						eligible_card[#eligible_card+1] = context.scoring_hand[i]
+					end
+				end
+				
+				--If there is eligible card, and the random chance hits
+				if #eligible_card > 0 and pseudorandom('rainbowflag'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_poly then
+					local targetCard = pseudorandom_element(eligible_card, pseudoseed('rainbowflag')..G.SEED)
+					
+					targetCard.becoming_poly = true
+					event({trigger = 'after', delay = 0.4, func = function()
+								big_juice(context.blueprint_card or card)
+								targetCard:set_edition("e_polychrome", true, false)
+								targetCard.becoming_poly = nil
+						return true end
+					})
+					delay(2.5)
+				end
+			end
+		end
+	end,
+  
 	custom_in_pool = function(self, args)
 	
 		--Spawns if there is at least one decimal card
@@ -5438,7 +5534,7 @@ create_joker({
 --Cross-eyed Joker
 create_joker({
     name = 'Crosseyed Joker', id = 1, no_art = true,
-    rarity = 'Uncommon', cost = 10,
+    rarity = 'Rare', cost = 10,
 	
 	vars = {{dir = 0}},
 	
@@ -5503,6 +5599,55 @@ create_joker({
 				
 				return other_joker_ret
 			end
+		end
+    end
+})
+
+--Joker Throwing Card
+create_joker({
+    name = 'Joker Throwing Card', id = 1, no_art = true,
+    rarity = 'Rare', cost = 8,
+	
+	vars = {{rate = 2}, {reduce = 10}, {odds_destroy = 4}},
+	
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.reduce, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_destroy, card.ability.extra.rate}}
+    end,
+	
+    blueprint = false, eternal = true,
+	
+    calculate = function(self, card, context)
+		--Reduce Blind Size
+		if context.setting_blind and not context.blueprint then
+            local decrease = math.min(card.ability.extra.reduce, 70) --Failsafe, just in case other value-altering joker did the funnies
+			
+            G.GAME.blind.chips = G.GAME.blind.chips * (1 - decrease * 0.01)
+            G.GAME.blind.chip_text = number_format(G.GAME.blind.chips)
+        end
+		
+		--Check before hand is played
+		if context.before and context.scoring_hand and not context.blueprint then
+		
+			local isActivated = pseudorandom('throwingcard'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_destroy
+			
+			if isActivated and card.ability.extra.reduce < 70 then --Won't activate if the reduction reach the hardcoded limit (to prevent other value-altering joker)
+				local target_card = pseudorandom_element(context.scoring_hand, pseudoseed('throwingcard'..G.SEED))
+				target_card.is_destroying = true
+			end
+		end
+		
+		--Handle Card Destroy
+		if context.destroying_card and not context.blueprint then
+				if context.destroying_card.is_destroying then
+					if card.ability.extra.reduce < 70 then
+						card.ability.extra.reduce = card.ability.extra.reduce + card.ability.extra.rate
+						card.ability.extra.reduce = math.min(card.ability.extra.reduce, 70)
+						
+						forced_message("Upgraded!", card, G.C.PURPLE, true)
+					end
+					
+					return true --Destroy the card
+				end
 		end
     end
 })
