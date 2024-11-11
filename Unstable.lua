@@ -58,6 +58,18 @@ SMODS.Atlas {
   py = 95
 }
 
+--Atlas for special Jokers (multi-face, dynamic graphic, etc)
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "unstb_jokers_ex",
+  -- The name of the file, for the code to pull the atlas from
+  path = "jokers_ex.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
 SMODS.Atlas {
   -- Key for code to find it with
   key = "unstb_jokers_wip",
@@ -287,6 +299,11 @@ local function create_joker(joker)
     if joker.rarity == 'Legendary' then
         joker.atlas = 'unstb_jokers_legend'
     end
+	
+	--If the joker has ex property, used extra sheet
+	if joker.ex_art then
+		joker.atlas = 'unstb_jokers_ex'
+	end
 	
 	--If the joker has no art, fallback to WIP sheet
 	if joker.no_art then
@@ -5558,6 +5575,98 @@ create_joker({
 					card.ability.extra.target_jack = nil
 					return true --Destroy the card
 				end
+		end
+		
+    end
+})
+
+--Magic Trick Card
+create_joker({
+    name = 'Magic Trick Card', id = 0, ex_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+	vars = {{side = 0}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.retrigger_times}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+		if card.ability.extra.side == 0 then
+			card.ability.extra.source_suit = 'Hearts'
+			card.ability.extra.source_rank = 'Queen'
+			
+			card.ability.extra.target_suit = 'Clubs'
+			card.ability.extra.target_rank = '7'
+		else
+			card.ability.extra.source_suit = 'Clubs'
+			card.ability.extra.source_rank = '7'
+			
+			card.ability.extra.target_suit = 'Hearts'
+			card.ability.extra.target_rank = 'Queen'
+		end
+		card.children.center:set_sprite_pos({x = card.ability.extra.side, y = 0})
+    end,
+	
+    calculate = function(self, card, context)
+	
+		if context.pre_discard then
+            event({trigger = 'after', delay = 0.3, blockable = false,
+				func = function()
+				
+					card:juice_up(1, 1)
+					
+					if card.ability.extra.side == 0 then
+						card.ability.extra.side = 1
+						
+						card.ability.extra.source_suit = 'Clubs'
+						card.ability.extra.source_rank = '7'
+						
+						card.ability.extra.target_suit = 'Hearts'
+						card.ability.extra.target_rank = 'Queen'
+					else
+						card.ability.extra.side = 0
+						
+						card.ability.extra.source_suit = 'Hearts'
+						card.ability.extra.source_rank = 'Queen'
+						
+						card.ability.extra.target_suit = 'Clubs'
+						card.ability.extra.target_rank = '7'
+					end
+					card.children.center:set_sprite_pos({x = card.ability.extra.side, y = 0})
+	
+				return true end})
+				
+				card_eval_status_text(
+            card,
+            'extra',
+            nil, nil, nil,
+            {message = 'Flipped!', colour = G.C.ORANGE, instant = true}
+        )
+		end
+		
+		if context.after and not context.blueprint then
+			for i = 1, #context.scoring_hand do
+				local currentCard = context.scoring_hand[i]
+				
+				local is_activate = currentCard:is_suit(card.ability.extra.source_suit) and currentCard.base.value == card.ability.extra.source_rank
+				
+				if is_activate then
+					--Flipping Animation
+					event({trigger = 'after', delay = 0.1, func = function() big_juice(card); currentCard:flip(); play_sound('card1', 1); currentCard:juice_up(0.3, 0.3); return true end })
+					
+					--Changing Card Property
+					
+					event({trigger = 'after', delay = 0.05,  func = function()
+						 SMODS.change_base(currentCard, card.ability.extra.target_suit, card.ability.extra.target_rank)
+						return true end })
+					
+					--Unflipping Animation
+					event({trigger = 'after', delay = 0.1, func = function() currentCard:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); currentCard:juice_up(0.3, 0.3); return true end })
+					forced_message("Changed!", currentCard, G.C.ORANGE, true)
+				end
+			end
 		end
 		
     end
