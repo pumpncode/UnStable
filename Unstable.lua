@@ -3537,8 +3537,8 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and #G.jokers.cards > 1 and G.jokers.highlighted[1] then
-			return G.jokers.highlighted[1].edition and G.jokers.highlighted[1].edition.key ~= 'e_negative'
+		if G.hand and #G.jokers.cards >= 1 and G.jokers.highlighted[1] then
+			return G.jokers.highlighted[1].edition --and G.jokers.highlighted[1].edition.key ~= 'e_negative'
 		end
 		return false
 	end,
@@ -5932,6 +5932,39 @@ create_joker({
             }
         end
     end
+})
+
+--Glass Cannon
+create_joker({
+    name = 'Glass Cannon', id = 1, no_art = true,
+    rarity = 'Rare', cost = 8,
+	
+    blueprint = true, eternal = true,
+	
+	vars = {{ repetitions = 1 }},
+	
+	custom_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.m_glass
+		return {vars = {card.ability.extra.repetitions}}
+    end,
+	
+    calculate = function(self, card, context)
+		if context.cardarea == G.play and context.repetition and not context.repetition_only then
+		  if context.other_card.config.center == G.P_CENTERS.m_glass  then
+			return {
+			  message = 'Again!',
+			  repetitions = card.ability.extra.repetitions,
+			  card =  context.blueprint_card or card
+			}
+		  end
+		end
+		
+		if context.destroying_card and not context.blueprint then
+				if context.destroying_card.config.center == G.P_CENTERS.m_glass then
+					return true --Destroy the card
+				end
+		end
+	end
 })
 
 --Salmon Run

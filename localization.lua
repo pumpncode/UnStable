@@ -575,7 +575,7 @@ return {
 				[2] = 'with {C:dark_edition}edition{}',
 				[3] = "Gives the {C:attention}Joker's {C:dark_edition}edition{} to",
 				[4] = '{C:attention}#1#{} random card in your hand',
-				[5] = '{C:inactive}({C:dark_edition}Negative{} excluded){}',
+				--[5] = '{C:inactive}({C:dark_edition}Negative{} excluded){}',
             }
         }
     },
@@ -1075,6 +1075,18 @@ return {
                 [1] = '{X:mult,C:white}x#1#{} Mult if the played hand is {C:attention}#3#{}',
 				[2] = '{X:mult,C:white}x#2#{} Mult otherwise',
 				[3] = '{s:0.8}Hand changes at the end of round',
+            }
+        }
+    },
+	
+	glass_cannon = {
+        ['en-us'] = {
+            ['name'] = 'Glass Cannon',
+            ['text'] = {
+                [1] = 'Retrigger each',
+                [2] = 'played {C:attention}Glass Card{}',
+				[3] = '{C:red}Glass Cards are guaranteed',
+				[4] = '{C:red}breaking after scored',
             }
         }
     },
