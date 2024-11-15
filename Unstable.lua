@@ -2615,7 +2615,7 @@ SMODS.Consumable{
 	
 		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_vintage']
 	
-		return {vars = {card.ability.extra.count}}
+		return {vars = {card and card.ability.extra.count or self.config.extra.count}}
 	end,
 
 	can_use = function(self, card)
@@ -2687,7 +2687,7 @@ SMODS.Consumable{
 	
 		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_promo']
 	
-		return {vars = {card.ability.extra.count}}
+		return {vars = {card and card.ability.extra.count or self.config.extra.count}}
 	end,
 
 	can_use = function(self, card)
@@ -2710,25 +2710,19 @@ SMODS.Consumable{
 
 --New Rank-based Tarot
 
-local tarot_half_blacklist = {}
-
-local tarot_half_rankList = {'unstb_0', 'unstb_1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Ace'}
-
---Blacklisted all modded ranks that are not in the rankList
-for k, v in ipairs(SMODS.Rank:obj_list()) do
-	local is_blackListed = true
-	
-	for i=1, #tarot_half_rankList do
-		if v.key==tarot_half_rankList[i] then
-			is_blackListed = false
-			break
-		end
-	end
-	
-	if is_blackListed then
-		tarot_half_blacklist[v.key] = true
-	end
-end
+local tarot_half_rankList = {['unstb_0'] = 'unstb_0',
+							['unstb_1'] = 'unstb_0',
+							['2'] = 'unstb_1',
+							['3'] = 'unstb_1',
+							['4'] = '2',
+							['5'] = '2',
+							['6'] = '3',
+							['7'] = '3',
+							['8'] = '4',
+							['9'] = '4',
+							['10'] = '5',
+							['Ace'] = '5',
+							['unstb_21'] = '10',}
 
 SMODS.Consumable{
 	set = 'Tarot', atlas = 'tarot',
@@ -2746,7 +2740,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted == 1) and not G.hand.highlighted[1].config.center.replace_base_card and not tarot_half_blacklist[G.hand.highlighted[1].base.value] then
+		if G.hand and (#G.hand.highlighted == 1) and not G.hand.highlighted[1].config.center.replace_base_card and tarot_half_rankList[G.hand.highlighted[1].base.value] then
 			return true
 		end
 		return false
@@ -2763,7 +2757,7 @@ SMODS.Consumable{
 			--Create two copies of the card, with half rank
 			--Create one additional rank 0.5 card if applicable, copy the enhancement only, no other bonus property
 			
-			local new_rank = tarot_half_rankList[math.floor(target_card.base.nominal*0.5)+1]
+			local new_rank = tarot_half_rankList[target_card.base.value]
 			
 			local extra_card = 0
 			
@@ -2885,7 +2879,7 @@ SMODS.Consumable{
 			
 	end,
 
-	pos = get_coordinates(3),
+	pos = get_coordinates(4),
 }
 
 --"Rebundant" Spectral (Same ability set as some Auxiliary exclusives, but worse)
@@ -3041,7 +3035,7 @@ SMODS.Consumable{
 		end
 	end,
 
-	pos = get_coordinates(0),
+	pos = get_coordinates(1),
 }
 
 --Conferment
@@ -3110,7 +3104,7 @@ SMODS.Consumable{
 		
 	end,
 
-	pos = get_coordinates(0),
+	pos = get_coordinates(2),
 }
 
 --Amnesia
@@ -3183,7 +3177,7 @@ SMODS.Consumable{
 		end
 	end,
 
-	pos = get_coordinates(0),
+	pos = get_coordinates(3),
 }
 
 --Altar
@@ -3274,7 +3268,7 @@ SMODS.Consumable{
 		
 	end,
 
-	pos = get_coordinates(0),
+	pos = get_coordinates(4),
 }
 
 --Devil's Contract
@@ -3346,7 +3340,7 @@ SMODS.Consumable{
 		end
 	end,
 
-	pos = get_coordinates(0),
+	pos = get_coordinates(5),
 }
 
 --Other Spectrals
@@ -3421,7 +3415,21 @@ SMODS.Consumable{
 		delay(0.5)
 	end,
 
-	pos = get_coordinates(0),
+	pos = get_coordinates(6),
+	
+	--Can spawn only if there is more than one joker, and at least one with edition
+	in_pool = function(self, args)
+	
+		if #G.jokers.cards > 1 then
+			for i=1, #G.jokers.cards do
+				if G.jokers.cards[i].edition then
+					return true
+				end
+			end
+		end
+	
+        return false
+    end,
 }
 
 --Projection
@@ -3520,7 +3528,28 @@ SMODS.Consumable{
 		
 	end,
 
-	pos = get_coordinates(0),
+	pos = get_coordinates(7),
+	
+	--Can spawn only if there is at least more than 1 Joker with distinct edition
+	in_pool = function(self, args)
+	
+		local prev_edition = nil
+	
+		if #G.jokers.cards > 1 then
+			--Set the first one as a pivot check
+			prev_edition = G.jokers.cards[1].edition
+			
+			--Iterate through the rest
+			for i=2, #G.jokers.cards do
+				--If there is one Joker with different edition, breaks and return true
+				if prev_edition ~= G.jokers.cards[i].edition then
+					return true
+				end
+			end
+		end
+	
+        return false
+    end,
 }
 
 --Siphon
@@ -3580,7 +3609,21 @@ SMODS.Consumable{
 		
 	end,
 
-	pos = get_coordinates(0),
+	pos = get_coordinates(8),
+	
+	--Can spawn only if there is one joker or more with edition
+	in_pool = function(self, args)
+	
+		if #G.jokers.cards >= 1 then
+			for i=1, #G.jokers.cards do
+				if G.jokers.cards[i].edition then
+					return true
+				end
+			end
+		end
+	
+        return false
+    end,
 }
 
 
