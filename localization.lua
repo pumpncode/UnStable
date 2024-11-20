@@ -724,9 +724,9 @@ return {
         }
     },
 	
-	research_paper = {
+	academic_journal = {
         ['en-us'] = {
-            ['name'] = 'Research Paper',
+            ['name'] = 'Academic Journal',
             ['text'] = {
                 [1] = 'Adds one random {C:attention}Enhanced Card{}',
 				[2] = 'with {C:attention}decimal rank{} to deck if',
@@ -867,6 +867,43 @@ return {
     },
 	
 	--New Enhancement Supports
+	
+	--Slop
+	joker_diffusion = {
+        ['en-us'] = {
+            ['name'] = 'Joker Diffusion',
+            ['text'] = {
+                [1] = 'Converts {C:attention}#1#{} random {C:attention}non-enhanced{} card',
+				[2] = 'in hand to {C:attention}Slop Card{} every time',
+				[3] = 'a hand is played with {C:attention}unscored card{}',
+            }
+        }
+    },
+	
+	nonfungible_joker = {
+        ['en-us'] = {
+            ['name'] = 'Non-Fungible Joker',
+            ['text'] = {
+                [1] = 'If the discarded hand contains',
+				[2] = 'only {C:attention}#1#{} Slop Card, destroy it and ',
+				[3] = 'earn random amount up to {C:gold}$#2#',
+				[4] = '{s:0.8,C:red}Maximum Payout and Sell Value drops at the end of the round',
+            }
+        }
+    },
+	
+	prompt = {
+        ['en-us'] = {
+            ['name'] = 'Prompt',
+            ['text'] = {
+                [1] = 'Scored {C:attention}Slop Card{} takes {C:attention}rank{} and {C:attention}suit',
+				[2] = 'from other scored {C:attention}non-Slop Card{}',
+				[3] = 'instead of random if possible',
+            }
+        }
+    },
+	
+	--Other Enhancement
 	
 	joker_island = {
         ['en-us'] = {
@@ -1075,6 +1112,17 @@ return {
                 [1] = '{X:mult,C:white}x#1#{} Mult if the played hand is {C:attention}#3#{}',
 				[2] = '{X:mult,C:white}x#2#{} Mult otherwise',
 				[3] = '{s:0.8}Hand changes at the end of round',
+            }
+        }
+    },
+	
+	get_out_of_jail_free_card = {
+        ['en-us'] = {
+            ['name'] = 'Get Out of Jail Free Card',
+            ['text'] = {
+                [1] = 'Sell this Joker to',
+				[2] = "win the blind instantly",
+				[3] = '{C:inactive}Status: {V:1}#1#{}',
             }
         }
     },

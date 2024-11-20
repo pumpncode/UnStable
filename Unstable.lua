@@ -861,16 +861,16 @@ SMODS.Enhancement {
 	
 	loc_vars = function(self, info_queue, card)
 	
-		local suit_text = 'undefined'
-		local suit_text_color = {}
+		local suit_text = '(Suit)'
+		local suit_text_color = G.C.ORANGE
 		
-		if card.ability then
+		if card and card.ability then
 			suit_text = localize(card.ability.extra.suit, 'suits_plural');
 			suit_text_color = G.C.SUITS[card.ability.extra.suit]
 		end
 	
         return {
-            vars = { card.ability.extra.chips or 0, suit_text, localize(card.ability.extra.rank or '2', 'ranks')  ,
+            vars = { card and card.ability.extra.chips or 2, suit_text, localize(card and card.ability.extra.rank or '2', 'ranks')  ,
 			colours = {suit_text_color} }
         }
     end,
@@ -940,6 +940,9 @@ SMODS.Enhancement {
         if context.cardarea == G.play and not context.repetition then
 			local scoredAmount = card.ability.extra.chips + card.ability.perma_bonus
 			SMODS.eval_this(card, {chip_mod = scoredAmount, message = localize{type='variable',key='a_chips',vars={scoredAmount}}} )
+			
+			--Store the current scoring hand, for after_play
+			card.ability.extra.prevhand = context.scoring_hand
         end
     end,
 	
@@ -950,6 +953,30 @@ SMODS.Enhancement {
 		event({trigger = 'after', delay = 0.05,  func = function()
 			card.ability.extra.suit = pseudorandom_element(SMODS.Suits, pseudoseed('slop_card')..G.SEED).key
 			card.ability.extra.rank = pseudorandom_element(SMODS.Ranks, pseudoseed('slop_card')..G.SEED).key
+			
+			local prompt_joker = SMODS.find_card('j_unstb_prompt')
+			
+			if next(prompt_joker) then
+				local eligible_hand = {}
+				
+				for i=1, #card.ability.extra.prevhand do
+					if not card.ability.extra.prevhand[i].config.center.replace_base_card then
+						eligible_hand[#eligible_hand+1] = card.ability.extra.prevhand[i]
+					end
+				end
+				
+				if #eligible_hand>0 then
+					card.ability.extra.suit = pseudorandom_element(eligible_hand, pseudoseed('slop_card')..G.SEED).base.suit
+					card.ability.extra.rank = pseudorandom_element(eligible_hand, pseudoseed('slop_card')..G.SEED).base.value
+					
+					--Bounce the Joker a lil bit for the feedback effect
+					big_juice(prompt_joker[1])
+				end
+				
+			end
+			
+			--Clear the variable, unsure why this caused the game to crash when hovering on the deck if left uncleared
+			card.ability.extra.prevhand = nil
 			
 			card.ability.extra.chips = SMODS.Ranks[card.base.value].nominal
 			
@@ -1393,7 +1420,7 @@ end
 --Function wrapper to check if a card has decimal rank
 
 local function is_decimal(card)
-	return SMODS.Ranks[card.base.value].is_decimal
+	return SMODS.Ranks[card.base.value].is_decimal and not card.config.center.no_rank
 end
 
 --Hook for Poker Hand name
@@ -4173,9 +4200,9 @@ create_joker({
     end
 })
 
---Research Paper
+--Academic Journal
 create_joker({
-    name = 'Research Paper', id = 1, no_art = true,
+    name = 'Academic Journal', id = 1, no_art = true,
     rarity = 'Uncommon', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -4974,6 +5001,174 @@ create_joker({
 })
 
 --New Enhancements Support Stuff
+
+--Slop Card Lines
+
+--Joker Diffusion
+create_joker({
+    name = 'Joker Diffusion', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = {{count = '1'}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_slop']
+		
+		return { vars = {card.ability.extra.count}}
+    end,
+	
+	
+    calculate = function(self, card, context)
+		if context.after then
+			local is_activate = #context.scoring_hand ~= #context.full_hand
+			
+			--Terminate if the condition does not met
+			if not is_activate then return end
+			
+			--Populate Candidate Card
+			local eligible_card = {}
+			local converted_card = {}
+			
+			for i=1, #G.hand.cards do
+				if G.hand.cards[i].config.center == G.P_CENTERS.c_base and not G.hand.cards[i].to_convert then eligible_card[#eligible_card+1] = G.hand.cards[i] end
+			end
+			
+			table.sort(eligible_card, function (a, b) return not a.playing_card or not b.playing_card or a.playing_card < b.playing_card end)
+			pseudoshuffle(eligible_card, pseudoseed('jokerdiffusion'..G.SEED))
+
+			
+			for i = 1, card.ability.extra.count do converted_card[#converted_card+1] = eligible_card[i] end
+			
+			if #converted_card > 0 then
+				--Animation from Basegame Tarot
+				for i=1, #converted_card do
+					converted_card[i].to_convert = true
+				
+					local percent = 1.15 - (i-0.999)/(#converted_card-0.998)*0.3
+					event({trigger = 'after',delay = 0.15,func = function() big_juice(context.blueprint_card or card); converted_card[i]:flip();play_sound('card1', percent);converted_card[i]:juice_up(0.3, 0.3);return true end })
+				end
+				delay(0.2)
+				
+				--Handle the conversion
+				for i=1, #converted_card do
+				event({trigger = 'after',delay = 0.1,func = function()
+							converted_card[i]:set_ability(G.P_CENTERS.m_unstb_slop)
+							return true end })
+				end
+				
+				for i=1, #converted_card do
+					local percent = 0.85 + (i-0.999)/(#converted_card-0.998)*0.3
+					event({trigger = 'after',delay = 0.15,func = function() converted_card[i]:flip();play_sound('tarot2', percent, 0.6);converted_card[i]:juice_up(0.3, 0.3); converted_card[i].to_convert = nil; return true end })
+				end
+				delay(0.5)
+			end
+		end
+		
+    end,
+})
+
+--Non-Fungible Joker
+create_joker({
+    name = 'NonFungible Joker', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 6,
+	
+    blueprint = false, eternal = true,
+	
+	vars = {{count = '1'}, {max_payout = 10}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_slop']
+		
+		return { vars = {card.ability.extra.count, card.ability.extra.max_payout}}
+    end,
+	
+	
+    calculate = function(self, card, context)
+		if context.pre_discard and not context.blueprint then
+			local slop_count = 0
+			for i=1, #context.full_hand do
+				if context.full_hand[i].config.center == G.P_CENTERS.m_unstb_slop then slop_count = slop_count + 1 end
+			end
+			
+			card.ability.extra.is_activate = slop_count==1
+		end
+	
+		if context.discard and not context.other_card.debuff and not context.blueprint then
+			if card.ability.extra.is_activate and context.other_card.config.center == G.P_CENTERS.m_unstb_slop then
+				ease_dollars(math.random(card.ability.extra.max_payout), true)
+				
+				return {
+					--play_sound('whoosh1', math.random()*0.1 + 0.6,0.3),
+					message = 'Sold!',
+					colour = G.C.GOLD,
+					remove = true,
+					card = card
+				}
+			end
+		end
+		
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			if card.ability.extra.max_payout > 0 or card.sell_cost > 0 then
+				if card.ability.extra.max_payout>0 then
+					card.ability.extra.max_payout = card.ability.extra.max_payout - 1
+				end
+				
+				--Reduce its own selling price too, for the funny
+				
+				if card.sell_cost > 0 then
+					card.ability.extra_value = (card.ability.extra_value or 0) - 1
+					card:set_cost()
+				end
+				
+				return{
+					message = "Price Dropped",
+					colour = G.C.RED,
+				}
+			end
+		end
+		
+    end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one slop card
+		for _, v in pairs(G.playing_cards) do
+			if v.config.center == G.P_CENTERS.m_unstb_slop then return true end
+		end
+		return false
+		
+    end
+})
+
+--Prompt
+create_joker({
+    name = 'Prompt', id = 1, no_art = true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	--vars = { {times = 1}},
+	
+	--Prompt's actual ability is in Slop Card's after_play function
+    --[[calculate = function(self, card, context)
+		
+	end,]]
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one slop card
+		for _, v in pairs(G.playing_cards) do
+			if v.config.center == G.P_CENTERS.m_unstb_slop then return true end
+		end
+		return false
+		
+    end
+})
+
 
 --Vintage Joker
 create_joker({
@@ -5975,6 +6170,43 @@ create_joker({
             }
         end
     end
+})
+
+--Get Out of Jail Free Card
+create_joker({
+    name = 'Get Out of Jail Free Card', id = 1, no_art = true,
+    rarity = 'Rare', cost = 10,
+	
+    blueprint = false, eternal = true,
+	
+	--vars = { {times = 1}},
+	
+	custom_vars = function(self, info_queue, card)
+	
+		local activate_text = 'Inactive'
+		local activate_color = G.C.RED
+		if G.STATE == G.STATES.SELECTING_HAND then
+			activate_text = 'Active'
+			activate_color = G.C.GREEN
+		end
+	
+		return {vars = {activate_text,
+				colours = {activate_color} }}
+    end,
+	
+    calculate = function(self, card, context)
+		--Referenced from DebugPlus's "Win Blind" function
+		if context.selling_self and not context.blueprint then
+			if G.STATE ~= G.STATES.SELECTING_HAND then
+				return
+			end
+			G.GAME.chips = G.GAME.blind.chips
+			G.STATE = G.STATES.HAND_PLAYED
+			G.STATE_COMPLETE = true
+			end_round()
+		end
+	end,
+	
 })
 
 --Glass Cannon
