@@ -903,6 +903,34 @@ return {
         }
     },
 	
+	uninterested_primate = {
+        ['en-us'] = {
+            ['name'] = 'Uninterested Primate',
+            ['text'] = {
+                [1] = 'Gains {C:chips}+#1#{} Chips every {C:attention}#2# {C:inactive}[#6#]',
+				[2] = 'Slop Cards scored.',
+				[3] = '{C:green}#3# in #4#{} chance to destroy',
+				[4] = 'itself at the end of the round',
+				[5] = '{C:inactive}(Currently: {C:chips}+#5# {C:inactive}Chips)',
+				
+            }
+        }
+    },
+	
+	lethargic_lion = {
+        ['en-us'] = {
+            ['name'] = 'Lethargic Lion',
+            ['text'] = {
+                [1] = 'Gains {X:mult,C:white}x#1#{} Mult every {C:attention}#2# {C:inactive}[#6#]',
+				[2] = 'Slop Cards scored.',
+				[3] = '{C:green}#3# in #4#{} chance to destroy',
+				[4] = 'itself at the end of the round',
+				[5] = '{C:inactive}(Currently: {X:mult,C:white}x#5#{C:inactive} Mult)',
+				
+            }
+        }
+    },
+	
 	--Other Enhancement
 	
 	joker_island = {

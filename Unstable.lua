@@ -5169,6 +5169,170 @@ create_joker({
     end
 })
 
+--Uninterested Primate
+create_joker({
+    name = 'Uninterested Primate', id = 1, no_art = true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {chips = 50}, {chips_rate = 10}, {slop_scored = 0}, {slop_cycle = 5}, {chance_destroy = 8}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		return { vars = {card.ability.extra.chips_rate, card.ability.extra.slop_cycle, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.chance_destroy, card.ability.extra.chips, card.ability.extra.slop_cycle - card.ability.extra.slop_scored}}
+    end,
+	
+	calculate = function(self, card, context)
+		--Main Context
+		if context.joker_main then
+			return {
+				chip_mod = card.ability.extra.chips,
+				message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.chips } }
+			}
+		end
+		
+		--Scaling, cannot copy via blueprint
+		if context.individual and context.cardarea == G.play and not context.blueprint then
+			if context.other_card.config.center == G.P_CENTERS.m_unstb_slop then
+				card.ability.extra.slop_scored = card.ability.extra.slop_scored + 1
+				
+				if card.ability.extra.slop_scored >= card.ability.extra.slop_cycle then
+					card.ability.extra.slop_scored = 0
+					
+					card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chips_rate
+					
+					forced_message("+"..card.ability.extra.chips_rate, card, G.C.CHIPS, true)
+				end
+				
+			end
+		end
+	
+		--End of round check, make sure it's checked absolutely once per round
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			if pseudorandom('primate'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.chance_destroy then
+				event({func = function()
+							
+						play_sound('tarot1')
+						card.T.r = -0.2
+						card:juice_up(0.3, 0.4)
+						card.states.drag.is = true
+						card.children.center.pinch.x = true
+						
+						--Destroy Card
+						event({trigger = 'after', delay = 0.3,  func = function()
+							
+							G.jokers:remove_card(card)
+							card:remove()
+							card = nil
+							return true end })
+						
+						return true end })
+						
+				G.GAME.pool_flags.primate_gone = true
+				return {
+				  message = 'My Primates Gone'
+				}
+			else
+				return {
+				  message = 'Safe!'
+				}
+			end
+		end
+	end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one slop card + primate is not gone yet
+		for _, v in pairs(G.playing_cards) do
+			if v.config.center == G.P_CENTERS.m_unstb_slop then return not G.GAME.pool_flags.primate_gone end
+		end
+		return false
+		
+    end
+})
+
+--Lethargic Lion
+create_joker({
+    name = 'Lethargic Lion', id = 1, no_art = true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {xmult = 2}, {xmult_rate = 0.02}, {slop_scored = 0}, {slop_cycle = 5}, {chance_destroy = 8}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		return { vars = {card.ability.extra.xmult_rate, card.ability.extra.slop_cycle, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.chance_destroy, card.ability.extra.xmult, card.ability.extra.slop_cycle - card.ability.extra.slop_scored}}
+    end,
+	
+	calculate = function(self, card, context)
+		--Main Context
+		if context.joker_main then
+			return {
+				Xmult_mod = card.ability.extra.xmult,
+				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.xmult } }
+			}
+		end
+		
+		--Scaling, cannot copy via blueprint
+		if context.individual and context.cardarea == G.play and not context.blueprint then
+			if context.other_card.config.center == G.P_CENTERS.m_unstb_slop then
+				card.ability.extra.slop_scored = card.ability.extra.slop_scored + 1
+				
+				if card.ability.extra.slop_scored >= card.ability.extra.slop_cycle then
+					card.ability.extra.slop_scored = 0
+					
+					card.ability.extra.xmult = card.ability.extra.xmult + card.ability.extra.xmult_rate
+					
+					forced_message("+"..card.ability.extra.xmult_rate, card, G.C.MULT, true)
+				end
+				
+			end
+		end
+	
+		--End of round check, make sure it's checked absolutely once per round
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			if pseudorandom('primate'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.chance_destroy then
+				event({func = function()
+							
+						play_sound('tarot1')
+						card.T.r = -0.2
+						card:juice_up(0.3, 0.4)
+						card.states.drag.is = true
+						card.children.center.pinch.x = true
+						
+						--Destroy Card
+						event({trigger = 'after', delay = 0.3,  func = function()
+							
+							G.jokers:remove_card(card)
+							card:remove()
+							card = nil
+							return true end })
+						
+						return true end })
+				return {
+				  message = 'My Lions Gone'
+				}
+			else
+				return {
+				  message = 'Safe!'
+				}
+			end
+		end
+	end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one slop card + primate is gone
+		for _, v in pairs(G.playing_cards) do
+			if v.config.center == G.P_CENTERS.m_unstb_slop then return G.GAME.pool_flags.primate_gone end
+		end
+		return false
+		
+    end
+})
+
 
 --Vintage Joker
 create_joker({
@@ -5661,7 +5825,7 @@ create_joker({
 			card.ability.extra.xmult = 1+count*card.ability.extra.xmult_rate
 		
 			return {
-				xmult_mod = card.ability.extra.xmult,
+				Xmult_mod = card.ability.extra.xmult,
 				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.xmult } }
 			}
 		end
