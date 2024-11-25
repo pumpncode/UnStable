@@ -6469,7 +6469,7 @@ function ease_dollars(mod, instant)
 					G.GAME.virtual_dollars = G.GAME.virtual_dollars + spendamount
 					
 					if not instant then
-						forced_message("-$"..math.abs(spendamount), iccard_list[i], G.C.red, true)
+						forced_message("-$"..math.abs(spendamount), iccard_list[i], G.C.red, 0.5)
 					end
 					
 					if mod >= 0 then
