@@ -6449,6 +6449,122 @@ create_joker({
     end
 })
 
+--ease_dollars hook, for IC Card
+local ref_ease_dollars = ease_dollars
+function ease_dollars(mod, instant)
+
+	if mod < 0 then
+	
+		local iccard_list = SMODS.find_card('j_unstb_ic_card')
+	
+		if next(iccard_list) then
+			for i=1, #iccard_list do
+				 if iccard_list[i].ability.extra.balance > 0 then 
+				 
+					--Note: Spend amount is negative
+					local spendamount = math.max(mod, -iccard_list[i].ability.extra.balance)
+					
+					mod = mod - spendamount
+					iccard_list[i].ability.extra.balance = iccard_list[i].ability.extra.balance + spendamount
+					G.GAME.virtual_dollars = G.GAME.virtual_dollars + spendamount
+					
+					if not instant then
+						forced_message("-$"..math.abs(spendamount), iccard_list[i], G.C.red, true)
+					end
+					
+					if mod >= 0 then
+						return
+					end
+				 end
+			end
+		end
+	end
+	
+	ref_ease_dollars(mod, instant)
+end
+
+--IC Card
+create_joker({
+    name = 'IC Card', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 6,
+	
+	vars = {{money_rate = 3},{balance = 0}, {round_max = 9}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.money_rate, card.ability.extra.round_max, card.ability.extra.balance, card.ability.extra.round_left}}
+    end,
+	
+    blueprint = false, eternal = false,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+		card.ability.extra.round_left = card.ability.extra.round_max
+		
+		if G.STATE ~= G.STATES.SHOP then --Joker obtained not during the shop
+			card.ability.extra.start_counting = true
+		end
+    end,
+	
+	add_to_deck = function(self, card, from_debuff)
+		G.GAME.virtual_dollars = (G.GAME.virtual_dollars or 0) + card.ability.extra.balance
+	end,
+	
+	remove_from_deck = function(self, card, from_debuff)
+		G.GAME.virtual_dollars = (G.GAME.virtual_dollars or 0) - card.ability.extra.balance
+	end,
+	
+    calculate = function(self, card, context)
+		
+		--When entering the round, start counting the round remaining
+		--(If the Joker is bought in the shop, the first shop leave will not be counted down)
+		if context.first_hand_drawn then
+			card.ability.extra.start_counting = true
+		end
+		
+		if context.before and context.scoring_hand and not context.blueprint then
+			card.ability.extra.balance = card.ability.extra.balance + card.ability.extra.money_rate
+			
+			--Update the game's global virtual money at the same time
+			G.GAME.virtual_dollars = (G.GAME.virtual_dollars or 0) + card.ability.extra.money_rate
+			
+			forced_message("$"..card.ability.extra.money_rate, card, G.C.GOLD, true)
+		end
+		
+		if context.ending_shop and not context.blueprint then
+		
+			if card.ability.extra.start_counting then
+				card.ability.extra.round_left = card.ability.extra.round_left - 1
+				
+				if card.ability.extra.round_left <= 0 then
+					event({func = function()
+							
+						play_sound('tarot1')
+						card.T.r = -0.2
+						card:juice_up(0.3, 0.4)
+						card.states.drag.is = true
+						card.children.center.pinch.x = true
+						
+						--Destroy Card
+						event({trigger = 'after', delay = 0.3,  func = function()
+							
+							G.jokers:remove_card(card)
+							card:remove()
+							card = nil
+							return true end })
+						
+						return true end })
+					card_eval_status_text(card,'extra',nil, nil, nil,{message = 'Expired', colour = G.C.ORANGE, instant = true})
+				else
+					forced_message(card.ability.extra.round_left..' Round', card, G.C.ORANGE, true)
+				end
+				
+			end
+		
+			card.ability.extra.start_counting = false
+		end
+    end
+})
+
+
+
 local rank_2048 = { unstb_0 = true, unstb_1 = true, ['2'] = true, ['4'] = true, ['8'] = true}
 
 --2048

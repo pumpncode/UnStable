@@ -1177,6 +1177,20 @@ return {
         }
     },
 	
+	ic_card = {
+        ['en-us'] = {
+            ['name'] = 'IC Card',
+            ['text'] = {
+                [1] = 'Gain {C:gold}$#1#{} to store in this card',
+				[2] = 'every time a hand is played',
+				[3] = 'When spending money, the {C:attention}balances',
+				[4] = 'in this card are used first.',
+				[5] = '{C:red}Only usable for #2# rounds',
+				[6] = '{C:inactive}(Current: {C:gold}$#3#{C:inactive}, {C:red}#4# Rounds left{C:inactive}){}',
+            }
+        }
+    },
+	
 	j2048 = {
         ['en-us'] = {
             ['name'] = '2048',
