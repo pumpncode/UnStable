@@ -632,9 +632,9 @@ return {
         }
     },
 	
-	expensive_handbag = {
+	luxurious_handbag = {
         ['en-us'] = {
-            ['name'] = 'Expensive Handbag',
+            ['name'] = 'Luxurious Handbag',
             ['text'] = {
                 [1] = '{C:attention}+#1#{} Consumable Slot',
 				[2] = "{C:red}Raises price{} of everything in",
@@ -1074,9 +1074,9 @@ return {
         }
     },
 	
-	crosseyed_joker = {
+	plagiarism = {
         ['en-us'] = {
-            ['name'] = 'Cross-eyed Joker',
+            ['name'] = 'Plagiarism',
             ['text'] = {
                 [1] = 'Copies ability of',
 				[2] = '{C:attention}Joker{} to the',

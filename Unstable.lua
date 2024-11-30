@@ -3660,7 +3660,7 @@ SMODS.Consumable{
 
 --Lunar Calendar
 create_joker({
-    name = 'Lunar Calendar', id = 1, no_art = true,
+    name = 'Lunar Calendar', id = 40,
     rarity = 'Common', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -3718,7 +3718,7 @@ create_joker({
 
 --Dragon Hoard
 create_joker({
-    name = 'Dragon Hoard', id = 1, no_art = true,
+    name = 'Dragon Hoard', id = 42,
     rarity = 'Common', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -3754,7 +3754,7 @@ create_joker({
 
 --Card Dealer
 create_joker({
-    name = 'Card Dealer', id = 1, no_art = true,
+    name = 'Card Dealer', id = 41,
     rarity = 'Common', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -3798,7 +3798,7 @@ create_joker({
 })
 
 create_joker({
-    name = 'Furry Joker', id = 1, no_art = true,
+    name = 'Furry Joker', id = 44,
     rarity = 'Uncommon', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -3859,7 +3859,7 @@ function Card.set_cost(self)
 end
 
 create_joker({
-    name = 'Expensive Handbag', id = 1, no_art = true,
+    name = 'Luxurious Handbag', id = 43,
     rarity = 'Uncommon', cost = 4,
 	
     blueprint = false, eternal = true,
@@ -3905,7 +3905,7 @@ create_joker({
 
 --Portal
 create_joker({
-    name = 'Portal', id = 1, no_art = true,
+    name = 'Portal', id = 39,
     rarity = 'Rare', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -3932,7 +3932,7 @@ create_joker({
 
 --Vainglorious Joker
 create_joker({
-    name = 'Vainglorious Joker', id = 1, no_art = true,
+    name = 'Vainglorious Joker', id = 32,
     rarity = 'Common', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -3964,7 +3964,7 @@ create_joker({
 
 --Acedia Joker
 create_joker({
-    name = 'Acedia Joker', id = 1, no_art = true,
+    name = 'Acedia Joker', id = 31,
     rarity = 'Common', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -4009,7 +4009,7 @@ create_joker({
 
 --Cinnabar
 create_joker({
-    name = 'Cinnabar', id = 1, no_art = true,
+    name = 'Cinnabar', id = 33,
     rarity = 'Uncommon', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -4161,7 +4161,7 @@ create_joker({
 --Decimal-line Jokers
 
 create_joker({
-    name = 'Floating Point Error', id = 1, no_art = true,
+    name = 'Floating Point Error', id = 34,
     rarity = 'Uncommon', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -4202,7 +4202,7 @@ create_joker({
 
 --Academic Journal
 create_joker({
-    name = 'Academic Journal', id = 1, no_art = true,
+    name = 'Academic Journal', id = 35,
     rarity = 'Uncommon', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -4302,7 +4302,7 @@ create_joker({
 
 --Engineer
 create_joker({
-    name = 'Engineer', id = 1, no_art = true,
+    name = 'Engineer', id = 37,
     rarity = 'Common', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -4327,7 +4327,7 @@ create_joker({
 
 --Thesis Proposal
 create_joker({
-    name = 'Thesis Proposal', id = 1, no_art = true,
+    name = 'Thesis Proposal', id = 36,
     rarity = 'Rare', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -4359,7 +4359,7 @@ create_joker({
 
 --Rainbow Flag
 create_joker({
-    name = 'Rainbow Flag', id = 1, no_art = true,
+    name = 'Rainbow Flag', id = 38,
     rarity = 'Uncommon', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -4927,7 +4927,7 @@ create_joker({
 
 --Connoiseur
 create_joker({
-    name = 'Connoiseur', id = 1, no_art = true,
+    name = 'Connoiseur', id = 45,
     rarity = 'Rare', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -5006,7 +5006,7 @@ create_joker({
 
 --Joker Diffusion
 create_joker({
-    name = 'Joker Diffusion', id = 1, no_art = true,
+    name = 'Joker Diffusion', id = 26,
     rarity = 'Uncommon', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -5072,7 +5072,7 @@ create_joker({
 
 --Non-Fungible Joker
 create_joker({
-    name = 'NonFungible Joker', id = 1, no_art = true,
+    name = 'NonFungible Joker', id = 27,
     rarity = 'Uncommon', cost = 6,
 	
     blueprint = false, eternal = true,
@@ -5146,7 +5146,7 @@ create_joker({
 
 --Prompt
 create_joker({
-    name = 'Prompt', id = 1, no_art = true,
+    name = 'Prompt', id = 28,
     rarity = 'Common', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -5171,7 +5171,7 @@ create_joker({
 
 --Uninterested Primate
 create_joker({
-    name = 'Uninterested Primate', id = 1, no_art = true,
+    name = 'Uninterested Primate', id = 29,
     rarity = 'Common', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -5254,7 +5254,7 @@ create_joker({
 
 --Lethargic Lion
 create_joker({
-    name = 'Lethargic Lion', id = 1, no_art = true,
+    name = 'Lethargic Lion', id = 30,
     rarity = 'Common', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -5950,9 +5950,9 @@ create_joker({
     end
 })
 
---Cross-eyed Joker
+--Plagiarism
 create_joker({
-    name = 'Crosseyed Joker', id = 1, no_art = true,
+    name = 'Plagiarism', id = 46,
     rarity = 'Rare', cost = 10,
 	
 	vars = {{dir = 0}},
@@ -6024,7 +6024,7 @@ create_joker({
 
 --Joker Throwing Card
 create_joker({
-    name = 'Joker Throwing Card', id = 1, no_art = true,
+    name = 'Joker Throwing Card', id = 47,
     rarity = 'Rare', cost = 8,
 	
 	vars = {{rate = 2}, {reduce = 10}, {odds_destroy = 4}},
@@ -6338,7 +6338,7 @@ create_joker({
 
 --Get Out of Jail Free Card
 create_joker({
-    name = 'Get Out of Jail Free Card', id = 1, no_art = true,
+    name = 'Get Out of Jail Free Card', id = 48,
     rarity = 'Rare', cost = 10,
 	
     blueprint = false, eternal = true,
@@ -6485,7 +6485,7 @@ end
 
 --IC Card
 create_joker({
-    name = 'IC Card', id = 1, no_art = true,
+    name = 'IC Card', id = 49,
     rarity = 'Uncommon', cost = 6,
 	
 	vars = {{money_rate = 3},{balance = 0}, {round_max = 9}},
