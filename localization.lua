@@ -621,6 +621,17 @@ return {
         }
     },
 	
+	match_three = {
+        ['en-us'] = {
+            ['name'] = 'Match Three',
+            ['text'] = {
+                [1] = '{C:mult}+#1#{} Mult if the scoring hand has',
+				[2] = '{C:attention}#2#{} or more adjacent cards',
+				[3] = 'with the {C:attention}same base suit{}',
+            }
+        }
+    },
+	
 	furry_joker = {
         ['en-us'] = {
             ['name'] = 'Furry Joker',
@@ -1144,6 +1155,30 @@ return {
         }
     },
 	
+	imperial_bower = {
+        ['en-us'] = {
+            ['name'] = 'Imperial Bower',
+            ['text'] = {
+                [1] = '{X:mult,C:white}x#1#{} Mult if the played hand',
+				[2] = "contains a {C:attention}Straight{} and",
+				[3] = 'has at least one {C:attention}face card{}',
+            }
+        }
+    },
+	
+	the_jolly_joker = {
+        ['en-us'] = {
+            ['name'] = 'The "Jolly Joker"',
+            ['text'] = {
+                [1] = 'Gains {C:mult}+#1#{} Mult if',
+				[2] = 'played hand contains {C:attention}Pair{}',
+				[3] = "{C:red}Resets{} if played hand",
+				[4] = "does not contain {C:attention}Pair{}",
+				[5] = '{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)',
+            }
+        }
+    },
+	
 	get_out_of_jail_free_card = {
         ['en-us'] = {
             ['name'] = 'Get Out of Jail Free Card',
@@ -1167,12 +1202,34 @@ return {
         }
     },
 	
+	pity_rate_drop = {
+        ['en-us'] = {
+            ['name'] = 'Pity Rate Drop',
+            ['text'] = {
+                [1] = 'When {C:attention}Blind{} is selected,',
+                [2] = '{C:green}#1# in #2#{} chance to create {C:red}Rare {C:attention}Joker{}',
+				[3] = 'Chance increase by {C:green}#3#{} if no {C:attention}Joker{} created,',
+				[4] = 'resets to {C:green}1{} otherwise.',
+            }
+        }
+    },
+	
 	salmon_run = {
         ['en-us'] = {
             ['name'] = 'Salmon Run',
             ['text'] = {
                 [1] = '{C:green}#1# in #2#{} chance of',
 				[2] = 'duplicating any scored {C:attention}7{}',
+            }
+        }
+    },
+	
+	cool_s = {
+        ['en-us'] = {
+            ['name'] = 'Cool S',
+            ['text'] = {
+                [1] = 'Played {C:attention}8s{} became',
+				[2] = 'a random {C:attention}enhanced card{}',
             }
         }
     },

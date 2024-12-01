@@ -3797,6 +3797,66 @@ create_joker({
 	end,
 })
 
+--Match Three
+create_joker({
+    name = 'Match Three', id = 1, no_art =  true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {mult = 15}, {count = 3} },
+	
+	custom_vars = function(self, info_queue, card)
+        
+		return { vars = {card.ability.extra.mult, card.ability.extra.count}}
+    end,
+	
+    calculate = function(self, card, context)
+	
+		if context.joker_main then
+		
+			--Not enough card
+			if #context.scoring_hand < card.ability.extra.count then
+				return
+			end
+			
+			local card_count = 1
+			local max_card_count = 0
+			local current_suit = context.scoring_hand[1].base.suit
+			
+			for i=2, #context.scoring_hand do
+				if context.scoring_hand[i]:is_suit(current_suit) then
+					card_count = card_count + 1
+				else
+					--reset count
+					
+					if card_count > max_card_count then
+						max_card_count = card_count
+					end
+					
+					card_count = 1
+					current_suit = context.scoring_hand[i].base.suit
+				end
+			end
+			
+			if card_count > max_card_count then
+				max_card_count = card_count
+			end
+			
+			print(max_card_count)
+			print(card.ability.extra.count)
+			
+			if max_card_count >= card.ability.extra.count then
+				return {
+					mult_mod = card.ability.extra.mult,
+					message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } }
+				}
+			end
+		end
+		
+	end,
+})
+
 create_joker({
     name = 'Furry Joker', id = 44,
     rarity = 'Uncommon', cost = 4,
@@ -5966,7 +6026,7 @@ create_joker({
 	set_ability = function(self, card, initial, delay_sprites)
 		--Random direction
 		card.ability.extra.dir = 0
-		if pseudorandom('crosseyed'..G.SEED) > 0.5 then
+		if pseudorandom('plagiarism'..G.SEED) > 0.5 then
 			card.ability.extra.dir = 1
 		end
     end,
@@ -5974,15 +6034,17 @@ create_joker({
     calculate = function(self, card, context)
 		--Code based on Familiar's Crimsonotype
 		
-		--Code runs after hand played, cannot copyable by other blueprint
+		--This bit of code runs after hand played, cannot copyable by other blueprint
 		if context.after and not context.blueprint and not context.repetition and not context.repetition_only then
 			card.ability.extra.dir = 0
 			
-			if pseudorandom('crosseyed'..G.SEED) > 0.5 then
+			if pseudorandom('plagiarism'..G.SEED) > 0.5 then
 				card.ability.extra.dir = 1
 			end
 			
 			forced_message(card.ability.extra.dir==0 and 'Left' or 'Right', card, G.C.ORANGE, true)
+			
+			print(card.config.center.key)
 		end
 		
 		local other_joker = nil
@@ -6336,6 +6398,98 @@ create_joker({
     end
 })
 
+--Imperial Bower
+create_joker({
+    name = 'Imperial Bower', id = 1, no_art =  true,
+    rarity = 'Common', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {xmult = 3}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		return { vars = {card.ability.extra.xmult}}
+    end,
+	
+    calculate = function(self, card, context)
+	
+		if context.joker_main and next(context.poker_hands['Straight']) then
+			
+			local face_count = 0
+			
+			for i=1, #context.scoring_hand do
+				if context.scoring_hand[i]:is_face() then
+					face_count = face_count+1
+				end
+			end
+			
+			if face_count > 0 then
+				return {
+					Xmult_mod = card.ability.extra.xmult,
+					message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.xmult } }
+				}
+			end
+			
+		end
+		
+	end,
+})
+
+--The Jolly Joker
+create_joker({
+    name = 'The Jolly Joker', id = 1, no_art =  true,
+    rarity = 'Uncommon', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = { {mult_rate = 8}, {mult = 0}},
+	
+	custom_vars = function(self, info_queue, card)
+        
+		return { vars = {card.ability.extra.mult_rate, card.ability.extra.mult}}
+    end,
+	
+    calculate = function(self, card, context)
+	
+		if context.before and context.scoring_hand and not context.blueprint then
+			if next(context.poker_hands['Pair']) then
+			
+				card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_rate
+				
+				return {
+					message = 'Upgraded!',
+					colour = G.C.MULT,
+					card = card
+				}
+				
+			elseif card.ability.extra.mult > 0 then
+				card.ability.extra.mult = 0
+				
+				event({ trigger = 'after', delay = 0.2, func = function()
+                play_sound('tarot1')
+				return true end })
+				
+				return {
+					message = 'Reset',
+					card = card
+				}
+			end
+		end
+	
+		if context.joker_main then
+			if card.ability.extra.mult > 0 then
+				return {
+					mult_mod = card.ability.extra.mult,
+					message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } }
+				}
+			end
+			
+		end
+		
+	end,
+})
+
 --Get Out of Jail Free Card
 create_joker({
     name = 'Get Out of Jail Free Card', id = 48,
@@ -6406,6 +6560,39 @@ create_joker({
 	end
 })
 
+--Pity Rate Drop
+create_joker({
+    name = 'Pity Rate Drop', id = 1, no_art = true,
+    rarity = 'Rare', cost = 8,
+	
+    blueprint = true, eternal = true,
+	
+	vars = {{ odds = 12 }, {odds_rate = 1}},
+	
+	custom_vars = function(self, info_queue, card)
+		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds, card.ability.extra.odds_rate}}
+    end,
+	
+    calculate = function(self, card, context)
+		if context.setting_blind and #G.jokers.cards + G.GAME.joker_buffer < G.jokers.config.card_limit then
+			local jokers_to_create = math.min(1, G.jokers.config.card_limit - (#G.jokers.cards + G.GAME.joker_buffer))
+			G.GAME.joker_buffer = G.GAME.joker_buffer + jokers_to_create
+			event({
+				func = function() 
+					for i = 1, jokers_to_create do
+						local card = create_card('Joker', G.jokers, nil, 1, nil, nil, nil, 'pity_rate_drop')
+						card:add_to_deck()
+						G.jokers:emplace(card)
+						card:start_materialize()
+					end
+					G.GAME.joker_buffer = 0
+					return true
+				end})   
+				card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = 'Create!', colour = G.C.RED})
+		end
+	end
+})
+
 --Salmon Run
 create_joker({
     name = 'Salmon Run', id = 10,
@@ -6443,6 +6630,53 @@ create_joker({
 						})
 						
 					playing_card_joker_effects({true})
+				end
+			end
+		end
+    end
+})
+
+--Cool S
+create_joker({
+    name = 'Cool S', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+	vars = {},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {}}
+    end,
+	
+    blueprint = false, eternal = true,
+	
+    calculate = function(self, card, context)
+		if context.after and not context.blueprint then
+			for i = 1, #context.scoring_hand do
+				local currentCard = context.scoring_hand[i]
+				
+				if currentCard.base.value == '8' then
+					--Pooling Enhancements
+					local cen_pool = {}
+					for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+						if not v.replace_base_card and not v.disenhancement then 
+							cen_pool[#cen_pool+1] = v
+						end
+					end
+					
+					--Flipping Animation
+					event({trigger = 'after', delay = 0.1, func = function() currentCard:flip(); play_sound('card1', 1); currentCard:juice_up(0.3, 0.3); return true end })
+					
+					--Changing Card Property
+					
+					event({trigger = 'after', delay = 0.05,  func = function()
+					
+						currentCard:set_ability(pseudorandom_element(cen_pool, pseudoseed('cool_s'..G.SEED)))
+					
+						return true end })
+					
+					--Unflipping Animation
+					event({trigger = 'after', delay = 0.1, func = function() currentCard:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); currentCard:juice_up(0.3, 0.3); return true end })
+					
+					delay(0.1)
 				end
 			end
 		end

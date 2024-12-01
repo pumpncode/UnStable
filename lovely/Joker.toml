@@ -10,7 +10,7 @@ target = "card.lua"
 pattern = "elseif self.ability.name == 'Blueprint' then"
 position = "before"
 payload = '''
-elseif self.config.center.key == 'j_unstb_crosseyed_joker' then
+elseif self.config.center.key == 'j_unstb_plagiarism' then
     self.ability.blueprint_compat_ui = self.ability.blueprint_compat_ui or ''; self.ability.blueprint_compat_check = nil
     main_end = (self.area and self.area == G.jokers) and {
         {n=G.UIT.C, config={align = "bm", minh = 0.4}, nodes={
@@ -29,7 +29,7 @@ target = "card.lua"
 pattern = "if self.ability.name == 'Blueprint' or self.ability.name == 'Brainstorm' then"
 position = "before"
 payload = '''
-if self.config.center.key == 'j_unstb_crosseyed_joker' then
+if self.config.center.key == 'j_unstb_plagiarism' then
 	local other_joker = nil
     for i = 1, #G.jokers.cards do
             if G.jokers.cards[i] == self then
