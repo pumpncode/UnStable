@@ -6298,6 +6298,133 @@ create_joker({
     end
 })
 
+--Polychrome Red Seal Steel Joker
+create_joker({
+    name = 'prssj', id = 1, no_art = true,
+    rarity = 'Rare', cost = 10,
+	
+	vars = {{odds_upgrade = 8}, {odds_retrigger = 4}, {odds_hand = 2}, {hand_xmult = 2}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_upgrade, card.ability.extra.odds_retrigger, card.ability.extra.odds_hand,  card.ability.extra.hand_xmult}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+    calculate = function(self, card, context)
+	
+		--Upgrade Part
+		if context.before then
+		
+			local upgrade_count = 0
+			for i = 1, #context.scoring_hand do
+				local current_card = context.scoring_hand[i]
+				
+				if current_card.base.value == 'King' and pseudorandom('prssj1'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_upgrade then
+					upgrade_count = upgrade_count+1
+					edition_upgrade(current_card)
+				end
+				
+				if upgrade_count > 0 then
+					--forced_message("Upgrade!", context.blueprint_card or card, G.C.SECONDARY_SET.Enhanced, true)
+					return {
+						message = 'Upgrade!',
+						colour = G.C.SECONDARY_SET.Enhanced,
+						card = context.blueprint_card or card,
+					}
+				end
+				
+			end
+		
+		end
+		
+		if context.cardarea == G.play and context.other_card.base.value == 'King' and context.repetition and not context.repetition_only then
+			if pseudorandom('prssj2'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_retrigger then
+				return {
+				  message = 'Again!',
+				  repetitions = 1,
+				  card =  context.blueprint_card or card
+				}
+			end
+		end
+		
+		if context.individual and context.cardarea == G.hand and not context.end_of_round and context.other_card.base.value == 'King' then
+			if pseudorandom('prssj3'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_hand then
+				if context.other_card.debuff then
+					return {
+						message = localize('k_debuffed'),
+						colour = G.C.RED,
+						card = context.blueprint_card or card,
+					}
+				else
+					return {
+						x_mult = card.ability.extra.hand_xmult,
+						card = context.blueprint_card or card
+					}
+				end
+			end
+		end
+    end
+})
+
+--Master of One
+create_joker({
+    name = 'Master of One', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 7,
+	
+	--vars = {},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+	add_to_deck = function(self, card, from_debuff)
+		--Enable rank 1 card in pools
+		if not from_debuff then
+			setPoolRankFlagEnable('unstb_1', true);
+		end
+    end,
+	
+    calculate = function(self, card, context)
+	
+		if context.setting_blind then
+			--Adds a card
+			event({trigger = 'after', func = function()
+						local rank = 'unstb_1'
+						local suit = pseudorandom_element(SMODS.Suits, pseudoseed('masterofone')..G.SEED).card_key
+						
+						--Pooling Enhancements
+						local cen_pool = {}
+						for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+							if not v.replace_base_card and not v.disenhancement then 
+								cen_pool[#cen_pool+1] = v
+							end
+						end
+						
+						local _card = Card(G.play.T.x + G.play.T.w/2, G.play.T.y, G.CARD_W, G.CARD_H, G.P_CARDS[suit..'_'..rank], pseudorandom_element(cen_pool, pseudoseed('masterofone')..G.SEED), {playing_card = G.playing_card})
+						
+						_card:start_materialize({G.C.SECONDARY_SET.Enhanced})
+						G.play:emplace(_card)
+						table.insert(G.playing_cards, _card)
+						
+						big_juice(context.blueprint_card or card)
+						card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = 'One!', colour = G.C.SECONDARY_SET.Enhanced})
+						
+						return true end
+					})
+
+			event({trigger = 'after', func = function()
+				G.deck.config.card_limit = G.deck.config.card_limit + 1
+				draw_card(G.play,G.deck, 90,'up', nil)  
+				return true end
+				})
+				
+			playing_card_joker_effects({true})
+		end
+		
+    end
+})
+
 --Spectre
 create_joker({
     name = 'Spectre', id = 9,

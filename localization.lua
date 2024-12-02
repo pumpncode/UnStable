@@ -1133,6 +1133,27 @@ return {
         }
     },
 	
+	prssj = {
+        ['en-us'] = {
+            ['name'] = 'Polychrome Red Seal Steel Joker',
+            ['text'] = {
+                [1] = '{C:green}#1# in #2#{} chance for scored {C:attention}Kings{} to upgrade {C:dark_edition}edition',
+				[2] = '{C:green}#1# in #3#{} chance for scored {C:attention}Kings{} to {C:attention}retrigger',
+				[3] = '{C:green}#1# in #4#{} chance for {C:attention}Kings{} held in hand to give {X:mult,C:white}x#5#{} Mult',
+            }
+        }
+    },
+	
+	master_of_one = {
+        ['en-us'] = {
+            ['name'] = 'Master of One',
+            ['text'] = {
+                [1] = 'Adds one {C:attention}Enhanced Rank 1{} Card',
+				[2] = 'to the deck when {C:attention}Blind{} is selected',
+            }
+        }
+    },
+	
 	spectre = {
         ['en-us'] = {
             ['name'] = 'Spectre',
