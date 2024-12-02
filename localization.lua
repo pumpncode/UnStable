@@ -1190,6 +1190,19 @@ return {
         }
     },
 	
+	tanzaku = {
+        ['en-us'] = {
+            ['name'] = 'Tanzaku',
+            ['text'] = {
+                [1] = 'Retrigger played card',
+                [2] = 'with {C:attention}seal{} additional {C:attention}#1#{} times',
+				[3] = 'Amount increase by {C:attention}#2#{} for',
+				[4] = 'every discarded card with {C:attention}seal{}',
+				[5] = '{s:0.8}Reset after each round',
+            }
+        }
+    },
+	
 	glass_cannon = {
         ['en-us'] = {
             ['name'] = 'Glass Cannon',
@@ -1209,7 +1222,8 @@ return {
                 [1] = 'When {C:attention}Blind{} is selected,',
                 [2] = '{C:green}#1# in #2#{} chance to create {C:red}Rare {C:attention}Joker{}',
 				[3] = 'Chance increase by {C:green}#3#{} if no {C:attention}Joker{} created,',
-				[4] = 'resets to {C:green}1{} otherwise.',
+				[4] = 'resets to {C:green}#4#{} otherwise.',
+				[5] = '{C:inactive}(Must have room)',
             }
         }
     },

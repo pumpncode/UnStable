@@ -252,6 +252,13 @@ local function extra_juice(card)
     card:juice_up(0.6, 0.1)
 end
 
+local function play_nope_sound()
+	--Copied from Wheel of Fortune lol
+	event({trigger = 'after', delay = 0.06*G.SETTINGS.GAMESPEED, blockable = false, blocking = false, func = function()
+           play_sound('tarot2', 0.76, 0.4);return true end})
+    play_sound('tarot2', 1, 0.4)
+end
+
 local function forced_message(message, card, color, delay, juice)
     if delay == true then
         delay = 0.7 * 1.25
@@ -6527,6 +6534,59 @@ create_joker({
 	
 })
 
+--Tanzaku
+create_joker({
+    name = 'Tanzaku', id = 1, no_art = true,
+    rarity = 'Rare', cost = 4,
+	
+    blueprint = true, eternal = true,
+	
+	vars = {{ repetitions = 0 }, { repetition_rate = 1 } },
+	
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.repetitions, card.ability.extra.repetition_rate}}
+    end,
+	
+    calculate = function(self, card, context)
+		if context.cardarea == G.play and context.repetition and not context.repetition_only then
+		  if context.other_card.seal  then
+			return {
+			  message = 'Again!',
+			  repetitions = card.ability.extra.repetitions,
+			  card =  context.blueprint_card or card
+			}
+		  end
+		end
+		
+		--The scaling part is not copyable by Blueprint
+		if context.discard and not context.blueprint then
+			
+			local currentCard = context.other_card
+			
+			--Not debuffed, and has seal
+			if not currentCard.debuff and currentCard.seal then
+				card.ability.extra.repetitions = card.ability.extra.repetitions + card.ability.extra.repetition_rate
+				
+				--forced_message('+'..card.ability.extra.repetition_rate, card, G.C.ORANGE, true)
+				return {
+					message = '+'..card.ability.extra.repetition_rate
+				}
+			end
+			
+		end
+		
+		--End of round check, make sure it's checked absolutely once per round
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			if card.ability.extra.repetitions > 0 then
+				card.ability.extra.repetitions = 0
+				return {
+					  message = 'Reset!'
+				}
+			end
+		end
+	end
+})
+
 --Glass Cannon
 create_joker({
     name = 'Glass Cannon', id = 1, no_art = true,
@@ -6567,28 +6627,51 @@ create_joker({
 	
     blueprint = true, eternal = true,
 	
-	vars = {{ odds = 12 }, {odds_rate = 1}},
+	vars = {{ odds = 12 }, {odds_rate = 1}, {odds_current = 1}},
 	
 	custom_vars = function(self, info_queue, card)
-		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds, card.ability.extra.odds_rate}}
+		return {vars = {card.ability.extra.odds_current * (G.GAME and G.GAME.probabilities.normal  or 1), card.ability.extra.odds, card.ability.extra.odds_rate * (G.GAME and G.GAME.probabilities.normal or 1), G.GAME and G.GAME.probabilities.normal  or 1}}
     end,
 	
     calculate = function(self, card, context)
+	
 		if context.setting_blind and #G.jokers.cards + G.GAME.joker_buffer < G.jokers.config.card_limit then
-			local jokers_to_create = math.min(1, G.jokers.config.card_limit - (#G.jokers.cards + G.GAME.joker_buffer))
-			G.GAME.joker_buffer = G.GAME.joker_buffer + jokers_to_create
-			event({
-				func = function() 
-					for i = 1, jokers_to_create do
-						local card = create_card('Joker', G.jokers, nil, 1, nil, nil, nil, 'pity_rate_drop')
-						card:add_to_deck()
-						G.jokers:emplace(card)
-						card:start_materialize()
-					end
-					G.GAME.joker_buffer = 0
-					return true
-				end})   
+			if pseudorandom('pity_rate_drop'..G.SEED) < G.GAME.probabilities.normal * card.ability.extra.odds_current / card.ability.extra.odds then
+			
+				if context.blueprint then
+					card.ability.extra.blueprint_created = true
+				end
+				card.ability.extra.odds_current = 1
+				
+				local jokers_to_create = math.min(1, G.jokers.config.card_limit - (#G.jokers.cards + G.GAME.joker_buffer))
+				G.GAME.joker_buffer = G.GAME.joker_buffer + jokers_to_create
+				event({
+					func = function() 
+						for i = 1, jokers_to_create do
+							local card = create_card('Joker', G.jokers, nil, 1, nil, nil, nil, 'pity_rate_drop')
+							card:add_to_deck()
+							G.jokers:emplace(card)
+							card:start_materialize()
+						end
+						G.GAME.joker_buffer = 0
+						return true
+					end})   
 				card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = 'Create!', colour = G.C.RED})
+			else
+				--Odds increments part are not copyable by Blueprint
+				if not context.blueprint then
+					--Increase odds, only if a card has not been created by blueprint prior
+					
+					if not card.ability.extra.blueprint_created then
+						card.ability.extra.odds_current = card.ability.extra.odds_current + card.ability.extra.odds_rate
+					else
+						card.ability.extra.blueprint_created = nil
+					end
+					
+					play_nope_sound()
+					card_eval_status_text(card, 'extra', nil, nil, nil, {message = 'Nope', colour = G.C.RED})
+				end
+			end
 		end
 	end
 })
