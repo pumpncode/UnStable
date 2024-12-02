@@ -29,6 +29,7 @@ function unstb.process_loc_text()
 
     -- Other localization
 	SMODS.process_loc_text(G.localization.descriptions.Other, 'decimal_rank_ability', loc.dictionary.decimal_rank_ability)
+	SMODS.process_loc_text(G.localization.descriptions.Other, 'no_chip', loc.dictionary.no_chip)
 end
 
 -- Debug message
