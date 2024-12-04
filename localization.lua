@@ -23,6 +23,31 @@ return {
         },
     },
 	
+	-- Mechanics Infobox
+
+    upgrade_edition = {
+        ['en-us'] = {
+            ['name'] = 'Upgrade Edition',
+            ['text'] = {
+                [1] = "Change the card's {C:attention}edition{}",
+				[2] = "by {C:attention}1{} step from",
+                [3] = '{C:inactive}(None){} -> {C:dark_edition}Foil{} ->',
+				[4] = '{C:dark_edition}Hologram{} -> {C:dark_edition}Polychrome{}'
+            }
+        }
+    },
+	
+	disenhancement = {
+        ['en-us'] = {
+            ['name'] = 'DisEnhancement',
+            ['text'] = {
+                [1] = "Enhancement that have",
+				[2] = "negative effects",
+                [3] = '{C:attention}(Radioactive, Biohazard, Poison){}'
+            }
+        }
+    },
+	
 	-- Enhancement
 	
 	enh_acorn = {
@@ -205,34 +230,34 @@ return {
 	--Booster Pack 
 	auxpack = {
         ['en-us'] = {
-            ['group_name'] = 'Auxiliary Pack',
-            ['name'] = 'Auxiliary Pack',
+            ['group_name'] = 'Expansion Pack',
+            ['name'] = 'Expansion Pack',
             ['text'] = {
                 [1] = 'Choose {C:attention}#1#{} of up to',
-                [2] = '{C:attention}#2#{C:green} Auxiliary{} cards to',
-                [3] = 'be used immediately'
+                [2] = '{C:attention}#2#{C:auxiliary} Auxiliary{} cards to',
+                [3] = 'adds to your consumable area'
             }
         }
     },
     auxpack_jumbo = {
         ['en-us'] = {
-            ['group_name'] = 'Auxiliary Pack',
-            ['name'] = 'Jumbo Auxiliary Pack',
+            ['group_name'] = 'Expansion Pack',
+            ['name'] = 'Jumbo Expansion Pack',
             ['text'] = {
                 [1] = 'Choose {C:attention}#1#{} of up to',
-                [2] = '{C:attention}#2#{C:green} Auxiliary{} cards to',
-                [3] = 'be used immediately'
+                [2] = '{C:attention}#2#{C:auxiliary} Auxiliary{} cards to',
+                [3] = 'adds to your consumable area'
             }
         }
     },
     auxpack_mega = {
         ['en-us'] = {
-            ['group_name'] = 'Auxiliary Pack',
-            ['name'] = 'Mega Auxiliary Pack',
+            ['group_name'] = 'Expansion Pack',
+            ['name'] = 'Mega Expansion Pack',
             ['text'] = {
                 [1] = 'Choose {C:attention}#1#{} of up to',
-                [2] = '{C:attention}#2#{C:green} Auxiliary{} cards to',
-                [3] = 'be used immediately'
+                [2] = '{C:attention}#2#{C:auxiliary} Auxiliary{} cards to',
+                [3] = 'adds to your consumable area'
             }
         }
     },
@@ -538,7 +563,7 @@ return {
             ['name'] = "Devil's Contract",
             ['text'] = {
                 [1] = '{C:purple}Upgrades {C:attention}#1#{} random',
-				[2] = 'cards in your hand,',
+				[2] = 'card in your hand,',
 				[3] = 'converts {C:attention}#2#{} random',
 				[4] = 'cards in your hand into',
 				[5] = '{C:attention}random {C:red}DisEnhancement{}',
@@ -578,6 +603,28 @@ return {
 				[3] = "Gives the {C:attention}Joker's {C:dark_edition}edition{} to",
 				[4] = '{C:attention}#1#{} random card in your hand',
 				--[5] = '{C:inactive}({C:dark_edition}Negative{} excluded){}',
+            }
+        }
+    },
+	
+	--Voucher
+	v_aux1 = {
+        ['en-us'] = {
+            ['name'] = "Hardware Store",
+            ['text'] = {
+                [1] = '{C:auxiliary}Auxiliary{} cards can',
+				[2] = 'spawn in the shop',
+            }
+        }
+    },
+	
+	v_aux2 = {
+        ['en-us'] = {
+            ['name'] = "Heavy Duty Tools",
+            ['text'] = {
+                [1] = '{C:auxiliary}Auxiliary{} card in the',
+				[2] = '{C:attention}Expansion Pack{} can sometimes',
+				[3] = "has {C:dark_edition}negative{} edition.",
             }
         }
     },

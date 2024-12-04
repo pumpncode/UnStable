@@ -30,7 +30,19 @@ function unstb.process_loc_text()
     -- Other localization
 	SMODS.process_loc_text(G.localization.descriptions.Other, 'decimal_rank_ability', loc.dictionary.decimal_rank_ability)
 	SMODS.process_loc_text(G.localization.descriptions.Other, 'no_chip', loc.dictionary.no_chip)
+	
+	SMODS.process_loc_text(G.localization.descriptions.Other, 'upgrade_edition', loc.upgrade_edition)
+    G.P_CENTERS['upgrade_edition'] = {key = 'upgrade_edition', set = 'Other'}
+	
+	SMODS.process_loc_text(G.localization.descriptions.Other, 'disenhancement', loc.disenhancement)
+    G.P_CENTERS['disenhancement'] = {key = 'disenhancement', set = 'Other'}
 end
+
+--Initialize All Colors
+G.C.UNSTB_AUX = HEX('00a669')
+
+--Localization Colors
+G.ARGS.LOC_COLOURS['auxiliary'] = G.C.UNSTB_AUX 
 
 -- Debug message
 
@@ -185,6 +197,18 @@ SMODS.Atlas {
   key = "spectral",
   -- The name of the file, for the code to pull the atlas from
   path = "spectral.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
+--Atlas for Vouchers
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "voucher",
+  -- The name of the file, for the code to pull the atlas from
+  path = "voucher.png",
   -- Width of each sprite in 1x size
   px = 71,
   -- Height of each sprite in 1x size
@@ -1809,13 +1833,26 @@ SMODS.PokerHandPart:take_ownership('_straight', {
 	func = function(hand) return ustb_get_straight(hand) end
 })
 
+--set_consumeable_usage hook to keep track of UnStable's own consumable count
+local set_consumeable_usage_ref = set_consumeable_usage
+
+function set_consumeable_usage(card) 
+
+	if card.config.center_key and card.ability.consumeable then
+		if card.config.center.set == 'Auxiliary' then
+			G.GAME.consumeable_usage_total.auxiliary = (G.GAME.consumeable_usage_total.auxiliary or 0) + 1  
+		end
+	end
+
+	return set_consumeable_usage_ref(card)
+end
 
 --Auxiliary Card
 
 SMODS.ConsumableType{
     key = 'Auxiliary',
     primary_colour = HEX('424e54'),
-    secondary_colour = HEX('00a669'),
+    secondary_colour = G.C.UNSTB_AUX,
     loc_txt = loc.auxiliary,
     collection_rows = {5, 5}
 }
@@ -1827,6 +1864,9 @@ SMODS.UndiscoveredSprite{
 }
 
 --Booster Pack for Auxiliary Cards
+
+local aux_booster_rate = {0.5, 0.5, 0.3, 0.1}
+
 for i = 1, 4 do
     SMODS.Booster{
         key = 'aux_'..(i <= 2 and i or i == 3 and 'jumbo' or 'mega'), loc_txt = loc['auxpack'..(i <= 2 and '' or i == 3 and '_jumbo' or '_mega')],
@@ -1835,25 +1875,39 @@ for i = 1, 4 do
         draw_hand = false,
 
         create_card = function(self, card)
-            return create_card('Auxiliary', G.pack_cards, nil, nil, true, true, nil, 'aux')
+            local card = create_card('Auxiliary', G.pack_cards, nil, nil, true, true, nil, 'aux')
+			local neg_chance = pseudorandom('aux_rng')
+			
+			if neg_chance < 0.4 and G.GAME.used_vouchers.v_unstb_aux2 then
+				 card:set_edition({negative = true}, true)
+			end
+			
+			return card
             -- return {set = 'Polymino', area = G.pack_cards, skip_materialize = nil, soulable = nil, key_append = 'vir'}
         end,
 
         ease_background_colour = function(self)
-            --ease_colour(G.C.DYN_UI.MAIN, G.C.BUNCO_VIRTUAL)
-            ease_background_colour{new_colour = HEX('00a669'), special_colour = HEX('7e9999'), contrast = 2}
+            ease_colour(G.C.DYN_UI.MAIN, G.C.UNSTB_AUX)
+            ease_background_colour{new_colour = HEX('477978'), special_colour = HEX('00a669'), contrast = 4}
         end,
 
         pos = get_coordinates(i-1),
         atlas = 'booster',
+		
+		weight = aux_booster_rate[i],
 
-        in_pool = function() return (pseudorandom('aux'..G.SEED) < 0.5) end
+        --in_pool = function() return (pseudorandom('aux'..G.SEED) < aux_booster_rate[i]) end
     }
 end
 
---Original Reserve Card Button Code from MoreFluff (Credits to John Cryptid and Betmma)
+--Original Reserve Card Button Code from MoreFluff (which credits to John Cryptid and Betmma)
 G.FUNCS.can_take_card = function(e)
-	if #G.consumeables.cards < G.consumeables.config.card_limit then
+	local card = e.config.ref_table
+	
+	--If the edition is negative, adds one more buffer to check if you can take it or not
+	local neg_buffer = (card.edition or {}).key == 'e_negative' and 1 or 0
+	
+	if #G.consumeables.cards < G.consumeables.config.card_limit + neg_buffer then
 		  e.config.colour = G.C.GREEN
 		  e.config.button = "take_card"
 	else
@@ -1894,7 +1948,7 @@ end
 
 local G_UIDEF_use_and_sell_buttons_ref = G.UIDEF.use_and_sell_buttons
 function G.UIDEF.use_and_sell_buttons(card)
-	if (card.area == G.pack_cards and G.pack_cards) and card.ability.consumeable then --Add a use button
+	if (card.area == G.pack_cards and G.pack_cards) and card.ability.consumeable then --Add a take button for Auxiliary pack
 	  if card.ability.set == "Auxiliary" then
 		return {
 		  n = G.UIT.ROOT,
@@ -2377,6 +2431,7 @@ SMODS.Consumable{
 
 	loc_vars = function(self, info_queue, card)
 	
+		info_queue[#info_queue+1] = {set = 'Other', key = 'upgrade_edition'}
 		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_poison']
 	
 		return {vars = {}}
@@ -2928,6 +2983,8 @@ SMODS.Consumable{
 	discovered = true,
 
 	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {set = 'Other', key = 'disenhancement'}
+		
 		return {vars = {card.ability.extra.count}}
 	end,
 
@@ -3316,6 +3373,9 @@ SMODS.Consumable{
 
 	loc_vars = function(self, info_queue, card)
 
+		info_queue[#info_queue+1] = {set = 'Other', key = 'upgrade_edition'}
+		info_queue[#info_queue+1] = {set = 'Other', key = 'disenhancement'}
+
 		return {vars = {card and card.ability.extra.upgrade_count or self.config.extra.upgrade_count, card and card.ability.extra.disenc_count or self.config.extra.disenc_count}}
 	end,
 
@@ -3661,6 +3721,36 @@ SMODS.Consumable{
     end,
 }
 
+--Vouchers
+
+SMODS.Voucher({
+	object_type = "Voucher",
+	key = "aux1",
+	loc_txt = loc['v_aux1'],
+	atlas = "voucher",
+	pos = { x = 0, y = 0 },
+	unlocked = true,
+	discovered = true,
+	redeem = function(self)
+		event({
+			func = function()
+				G.GAME.auxiliary_rate = (G.GAME.auxiliary_rate or 0) + 2
+				return true
+			end,
+		})
+	end,
+})
+  
+SMODS.Voucher({
+	object_type = "Voucher",
+	key = "aux2",
+	loc_txt = loc['v_aux2'],
+	atlas = "voucher",
+	pos = { x = 0, y = 0 },
+	unlocked = true,
+	discovered = true,
+	requires = { "v_unstb_aux1" },
+})
 
 -------- Joker Code Starts Here ------
 
@@ -5023,6 +5113,8 @@ create_joker({
 	vars = {{odds = 4}},
 	
     custom_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {set = 'Other', key = 'upgrade_edition'}
+	
         local vars
         if G.GAME and G.GAME.probabilities.normal then
             vars = {G.GAME.probabilities.normal, card.ability.extra.odds}
@@ -6306,6 +6398,8 @@ create_joker({
 	
 	vars = {{odds_upgrade = 8}, {odds_retrigger = 4}, {odds_hand = 2}, {hand_xmult = 2}},
 	custom_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {set = 'Other', key = 'upgrade_edition'}
+	
 		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_upgrade, card.ability.extra.odds_retrigger, card.ability.extra.odds_hand,  card.ability.extra.hand_xmult}}
     end,
 	
