@@ -744,7 +744,7 @@ return {
                 [1] = 'Played cards with',
 				[2] = '{C:attention}Suit Seal{} has',
 				[3] = "{C:green}#1# in #2#{} chance to create respective",
-				[4] = "{C:attention}Seal Auxiliary Card{} when scored",
+				[4] = "{C:auxiliary}Seal Auxiliary{} Card when scored",
 				[5] = '{C:inactive}(Must have room)',
             }
         }
@@ -1105,6 +1105,52 @@ return {
 				[1] = 'If {C:attention}Promo Card{} is destroyed after scored',
                 [2] = "gains {C:gold}money{} equals to amount the card",
 				[3] = "gives before breaks",
+            }
+        }
+    },
+	
+	--Auxiliary Support
+	
+	free_trial = {
+        ['en-us'] = {
+            ['name'] = 'Free Trial',
+            ['text'] = {
+				[1] = '{C:green}#1# in #2#{} chance to create',
+                [2] = "a {C:dark_edition}negative{} random {C:auxiliary}Auxiliary{} Card",
+				[3] = "when an {C:auxiliary}Auxiliary{} Card is used",
+            }
+        }
+    },
+	
+	extended_warranty = {
+        ['en-us'] = {
+            ['name'] = 'Extended Warranty',
+            ['text'] = {
+				[1] = '{C:auxiliary}Auxiliary{} Cards held in hand',
+                [2] = "give {X:mult,C:white}X#1#{} Mult",
+            }
+        }
+    },
+	
+	tool_box = {
+        ['en-us'] = {
+            ['name'] = 'Tool Box',
+            ['text'] = {
+                [1] = '{C:chips}+#1#{} Chips per {C:auxiliary}Auxiliary{}',
+				[2] = 'card used this run',
+				[3] = '{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips){}',
+            }
+        }
+    },
+	
+	season_pass = {
+        ['en-us'] = {
+            ['name'] = 'Season Pass',
+            ['text'] = {
+                [1] = '{C:green}#1# in #2#{} chance to create',
+                [2] = "a random {C:auxiliary}Auxiliary{} Card",
+				[3] = 'when discard a {C:attention}face{} card',
+				[4] = '{C:inactive}(Must have room)',
             }
         }
     },

@@ -1840,6 +1840,9 @@ function set_consumeable_usage(card)
 
 	if card.config.center_key and card.ability.consumeable then
 		if card.config.center.set == 'Auxiliary' then
+			--Initialize it if not, basically what basegame does but have to put here bc it runs before basegame's
+			G.GAME.consumeable_usage_total = G.GAME.consumeable_usage_total or {tarot = 0, planet = 0, spectral = 0, tarot_planet = 0, all = 0}
+			
 			G.GAME.consumeable_usage_total.auxiliary = (G.GAME.consumeable_usage_total.auxiliary or 0) + 1  
 		end
 	end
@@ -1854,6 +1857,7 @@ SMODS.ConsumableType{
     primary_colour = HEX('424e54'),
     secondary_colour = G.C.UNSTB_AUX,
     loc_txt = loc.auxiliary,
+	default = 'c_unstb_aux_seal_move',
     collection_rows = {5, 5}
 }
 
@@ -4195,7 +4199,7 @@ create_joker({
 							return true end
 						})
 						
-						forced_message("Auxiliary", context.blueprint_card or card, G.C.GREEN, true)
+						forced_message("Auxiliary", context.blueprint_card or card, G.C.UNSTB_AUX, true)
 					end
 				end
 			end
@@ -6000,6 +6004,162 @@ create_joker({
 		end
 		return false
 		
+    end
+})
+
+--Auxiliary Support
+
+--Free Trial
+create_joker({
+    name = 'Free Trial', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+	vars = {{odds = 4}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+    calculate = function(self, card, context)
+		
+		if context.using_consumeable then
+			if context.consumeable.ability.set == "Auxiliary" then
+				if pseudorandom('freetrial'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds then
+					event({trigger = 'after', delay = 0.4, func = function()
+					if G.consumeables.config.card_limit >= #G.consumeables.cards then
+						play_sound('timpani')
+						local c = create_card('Auxiliary', G.consumeables, nil, nil, true, true, nil, 'freetrial')
+						c:set_edition({negative = true}, true)
+						c:add_to_deck()
+						G.consumeables:emplace(c)
+						
+						big_juice(context.blueprint_card or card)
+						card_eval_status_text(context.blueprint_card or card,'extra',nil, nil, nil,{message = "Free Trial", colour = G.C.UNSTB_AUX, instant = true})
+						
+						--forced_message("Free Trial!", context.blueprint_card or card, G.C.UNSTB_AUX, )
+					end
+					return true end })
+					
+				end
+			end
+		end
+    end
+})
+
+--Extended Warranty
+create_joker({
+    name = 'Extended Warranty', id = 1, no_art = true,
+    rarity = 'Rare', cost = 8,
+	
+	vars = {{xmult = 1.5}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.xmult}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+    calculate = function(self, card, context)
+		
+		if context.joker_main then
+			for i=1, #G.consumeables.cards do
+				if G.consumeables.cards[i].ability.set == "Auxiliary" then
+				
+					event({trigger = 'after', func = function()
+						(context.blueprint_card or card):juice_up(0.5, 0.5)
+					return true end
+					})
+					
+					SMODS.eval_this(G.consumeables.cards[i], {Xmult_mod = card.ability.extra.xmult, message = localize{type='variable',key='a_xmult',vars={card.ability.extra.xmult}}} )
+				end
+			end
+			
+		end
+		
+    end
+})
+
+--Tool Box
+create_joker({
+    name = 'Tool Box', id = 1, no_art = true,
+    rarity = 'Common', cost = 6,
+	
+	vars = {{chip_rate = 15}, {chips = 0}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.chip_rate, card.ability.extra.chips}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+		if G.GAME and G.GAME.consumeable_usage_total then
+			card.ability.extra.chips = G.GAME.consumeable_usage_total.auxiliary * card.ability.extra.chip_rate
+		else
+			card.ability.extra.chips = 0
+		end
+    end,
+	
+    calculate = function(self, card, context)
+		
+		--Upgrades
+		if context.using_consumeable and not context.blueprint then
+                if context.consumeable.ability.set == "Auxiliary" then
+				   card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_rate
+				   event({
+					func = function()
+							big_juice(card)
+							forced_message("Upgraded!", card, G.C.CHIPS, true)
+							--card_eval_status_text(card,'extra',nil, nil, nil,{message = "Upgraded", colour = G.C.MULT, instant = true})
+							return true end})
+				end
+		end
+		
+		--Main context
+		if context.joker_main then
+			if card.ability.extra.chips > 0 then
+				return {
+					chip_mod = card.ability.extra.chips,
+					message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.chips } }
+				}
+			end
+		end
+		
+    end
+})
+
+--Season Pass
+create_joker({
+    name = 'Season Pass', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 4,
+	
+	vars = {{odds = 6}},
+	
+    custom_vars = function(self, info_queue, card)
+	
+        return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+    calculate = function(self, card, context)
+		if context.discard then
+			if not context.other_card.debuff and context.other_card:is_face() and pseudorandom('season_pass'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds then
+				--Create consumable
+				if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+						
+						G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+						event({func = function()
+							local created_card = create_card('Auxiliary', G.consumeables, nil, nil, nil, true, nil, 'season_pass')
+							created_card:add_to_deck()
+							G.consumeables:emplace(created_card)
+							G.GAME.consumeable_buffer = 0
+							return true end
+						})
+						
+						forced_message("Auxiliary", context.blueprint_card or card, G.C.UNSTB_AUX, 0.5)
+					end
+			end
+		end
     end
 })
 
