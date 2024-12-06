@@ -440,6 +440,55 @@ return {
         }
     },
 	
+	aux_lottery = {
+        ['en-us'] = {
+            ['name'] = 'Lottery',
+            ['text'] = {
+                [1] = '{C:green}#1# in #2#{} chance',
+				[2] = 'to win {C:gold}$#3#{}',
+            }
+        }
+    },
+	
+	aux_blank = {
+        ['en-us'] = {
+            ['name'] = 'Blank Card',
+            ['text'] = {
+                [1] = 'Does nothing..?',
+            }
+        }
+    },
+	
+	aux_dark_matter = {
+        ['en-us'] = {
+            ['name'] = 'Dark Matter',
+            ['text'] = {
+                [1] = '{C:dark_edition}+#1#{} Joker Slot',
+				[2] = '{C:red}Cannot be Negative'
+            }
+        }
+    },
+	
+	aux_dark_matter_n = {
+        ['en-us'] = {
+            ['name'] = 'Dark Matter..?',
+            ['text'] = {
+                [1] = '{C:red}-#1#{} Joker Slot',
+            }
+        }
+    },
+	
+	aux_random = {
+        ['en-us'] = {
+            ['name'] = '???',
+            ['text'] = {
+                [1] = 'Create {C:attention}#1#{} random',
+				[2] = '{C:auxiliary}Auxiliary{} Card',
+				[3] = '{C:inactive}(Must have room)',
+            }
+        }
+    },
+	
 	-- Other Consumable Additions
 	
 	--Tarots

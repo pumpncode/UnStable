@@ -2664,6 +2664,191 @@ SMODS.Consumable{
     end,
 }
 
+--Lottery
+SMODS.Consumable{
+	set = 'Auxiliary', atlas = 'auxiliary',
+	key = 'aux_lottery', loc_txt = loc['aux_lottery'],
+
+	config = {extra = {odds_win = 4, prize = 20}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_win, card.ability.extra.prize }}
+	end,
+
+	can_use = function(self, card)
+		return true
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+			
+		event({trigger = 'after', func = function()
+						if pseudorandom('aux_lottery'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_win then
+							ease_dollars(20, true)
+						else
+							--Port from Wheel of Fortune
+							event({trigger = 'after', delay = 0.4, func = function()
+								attention_text({
+									text = localize('k_nope_ex'),
+									scale = 1.3, 
+									hold = 1.4,
+									major = card,
+									backdrop_colour = G.C.UNSTB_AUX,
+									align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK or G.STATE == G.STATES.SMODS_BOOSTER_OPENED) and 'tm' or 'cm',
+									offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK or G.STATE == G.STATES.SMODS_BOOSTER_OPENED) and -0.2 or 0},
+									silent = true
+									})
+									event({trigger = 'after', delay = 0.06*G.SETTINGS.GAMESPEED, blockable = false, blocking = false, func = function()
+										play_sound('tarot2', 0.76, 0.4);return true end})
+									play_sound('tarot2', 1, 0.4)
+									card:juice_up(0.3, 0.5)
+							return true end })
+						end
+						return true
+					end
+				})
+	end,
+
+	pos = get_coordinates(1),
+}
+
+--Blank
+SMODS.Consumable{
+	set = 'Auxiliary', atlas = 'auxiliary',
+	key = 'aux_blank', loc_txt = loc['aux_blank'],
+
+	config = {extra = {}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+		return {vars = {}}
+	end,
+
+	can_use = function(self, card)
+		return true
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+			
+		event({trigger = 'after', func = function()
+						G.GAME.aux_blank_count = (G.GAME.aux_blank_count or 0) + 1
+						return true
+					end
+				})
+	end,
+
+	pos = get_coordinates(1),
+	
+	in_pool = function(self, args)
+        return (G.GAME.aux_blank_count or 0) < 4
+    end,
+}
+
+--Dark Matter
+SMODS.Consumable{
+	set = 'Auxiliary', atlas = 'auxiliary',
+	key = 'aux_dark_matter', loc_txt = loc['aux_dark_matter'],
+
+	config = {extra = {slot = 1}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+	
+		local key = self.key
+		if (card.edition or {}).key == 'e_negative' then
+			key = self.key..'_n'
+		end
+	
+		return {key = key, vars = {card.ability.extra.slot}}
+	end,
+	
+	process_loc_text = function(self)
+        SMODS.Consumable.process_loc_text(self)
+        SMODS.process_loc_text(G.localization.descriptions.Auxiliary, self.key..'_n', loc.aux_dark_matter_ex)
+    end,
+
+	can_use = function(self, card)
+		return G.jokers.config.card_limit > 0
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+			
+		G.GAME.aux_blank_count = 0
+			
+		event({trigger = 'after', func = function()
+						if (card.edition or {}).key == 'e_negative' then
+							G.jokers.config.card_limit = G.jokers.config.card_limit - card.ability.extra.slot
+						else
+							G.jokers.config.card_limit = G.jokers.config.card_limit + card.ability.extra.slot
+						end
+						return true
+					end
+				})
+	end,
+
+	pos = get_coordinates(1),
+	
+	--Can spawn only when redeemed Blank Auxiliary Card enough time
+	in_pool = function(self, args)
+        return (G.GAME.aux_blank_count or 0) >= 4
+    end,
+}
+
+--Random
+SMODS.Consumable{
+	set = 'Auxiliary', atlas = 'auxiliary',
+	key = 'aux_random', loc_txt = loc['aux_random'],
+
+	config = {extra = {count = 2}},
+	discovered = true,
+
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.count}}
+	end,
+
+	can_use = function(self, card)
+		return true
+	end,
+
+	use = function(self, card)
+		
+		event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('tarot1')
+			card:juice_up(0.3, 0.5)
+            return true end })
+			
+		for i = 1, math.min(card.ability.extra.count, G.consumeables.config.card_limit - #G.consumeables.cards) do
+            event({trigger = 'after', delay = 0.4, func = function()
+                if G.consumeables.config.card_limit > #G.consumeables.cards then
+                    play_sound('timpani')
+                    local c = create_card('Auxiliary', G.consumeables, nil, nil, nil, nil, nil, 'aux_random')
+                    c:add_to_deck()
+                    G.consumeables:emplace(c)
+                    card:juice_up(0.3, 0.5)
+                end
+                return true end })
+        end
+        delay(0.6)
+	end,
+
+	pos = get_coordinates(1),
+}
+
 --Other Basegame Consumable Supports for new features
 
 --Tarots
@@ -6029,7 +6214,7 @@ create_joker({
 					event({trigger = 'after', delay = 0.4, func = function()
 					if G.consumeables.config.card_limit >= #G.consumeables.cards then
 						play_sound('timpani')
-						local c = create_card('Auxiliary', G.consumeables, nil, nil, true, true, nil, 'freetrial')
+						local c = create_card('Auxiliary', G.consumeables, nil, nil, nil, nil, nil, 'freetrial')
 						c:set_edition({negative = true}, true)
 						c:add_to_deck()
 						G.consumeables:emplace(c)
@@ -6149,7 +6334,7 @@ create_joker({
 						
 						G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
 						event({func = function()
-							local created_card = create_card('Auxiliary', G.consumeables, nil, nil, nil, true, nil, 'season_pass')
+							local created_card = create_card('Auxiliary', G.consumeables, nil, nil, nil, nil, nil, 'season_pass')
 							created_card:add_to_deck()
 							G.consumeables:emplace(created_card)
 							G.GAME.consumeable_buffer = 0
