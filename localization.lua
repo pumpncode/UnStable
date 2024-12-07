@@ -979,6 +979,19 @@ return {
         }
     },
 	
+	graphic_card = {
+        ['en-us'] = {
+            ['name'] = 'Graphic Card',
+            ['text'] = {
+                [1] = 'Create {C:attention}Double Tag{}',
+				[2] = 'at the end of the round',
+                [3] = 'if scored {C:attention}#1#{} or more cards',
+				[4] = 'with {C:dark_edition}editions{} this round',
+				[5] = '{C:inactive}(Current: {C:attention}#2#{C:inactive})',
+            }
+        }
+    },
+	
 	connoiseur = {
         ['en-us'] = {
             ['name'] = 'Connoiseur',
@@ -1435,6 +1448,31 @@ return {
             ['text'] = {
                 [1] = 'Played {C:attention}8s{} became',
 				[2] = 'a random {C:attention}enhanced card{}',
+            }
+        }
+    },
+	
+	cashback_card = {
+        ['en-us'] = {
+            ['name'] = 'Cashback Card',
+            ['text'] = {
+                [1] = 'At the end of {C:attention}Boss Blind{},',
+				[2] = 'earn {C:gold}money{} equals to amount',
+				[3] = 'of {C:attention}consumables{} used this Ante',
+				[4] = '{C:inactive}(Current: {C:gold}$#1#{C:inactive})',
+            }
+        }
+    },
+	
+	raffle = {
+        ['en-us'] = {
+            ['name'] = 'Raffle',
+            ['text'] = {
+                [1] = 'At the end of shop,',
+				[2] = '{C:green}#1# in #2#{} chance to win {C:gold}$#3#',
+				[3] = 'Chance increases by {C:green}#4#{}',
+				[4] = 'per each purchase in the shop',
+				[5] = '{s:0.8, C:red}Resets after rolling the prize',
             }
         }
     },
