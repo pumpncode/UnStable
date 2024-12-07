@@ -48,7 +48,20 @@ end
 G.C.UNSTB_AUX = HEX('00a669')
 
 --Localization Colors
-G.ARGS.LOC_COLOURS['auxiliary'] = G.C.UNSTB_AUX 
+--Properly hook into the function, so it does not error
+local ref_loc_colour = loc_colour
+
+function loc_colour(_c, default)
+    if not G.ARGS.LOC_COLOURS then
+        ref_loc_colour(_c, default)
+    elseif not G.ARGS.LOC_COLOURS.unstb_colour then --Init UNSTB's exclusive color
+		G.ARGS.LOC_COLOURS.unstb_colour = true
+		
+        G.ARGS.LOC_COLOURS['auxiliary'] = G.C.UNSTB_AUX 
+    end
+
+    return ref_loc_colour(_c, default)
+end
 
 -- Debug message
 
