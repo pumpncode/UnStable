@@ -48,6 +48,31 @@ return {
         }
     },
 	
+	suit_seal = {
+		['en-us'] = {
+			['label'] = 'Suit Seal',
+            ['name'] = 'Suit Seal',
+            ['text'] = {
+				[1] = 'Makes the card also',
+				[2] = 'counts as {C:attention}(Respective Suit){}',
+            }
+        }
+	},
+	
+	resource_tooltip = { --Actual resource card's tooltip breaks info queue
+		['en-us'] = {
+            ['name'] = 'Resource Card',
+            ['text'] = {
+                [1] = 'Has no rank, always scored.',
+				[2] = 'Give {X:mult,C:white}X5{} Mult',
+				[3] = 'if the played hand has at least',
+				[4] = 'one card with {C:attention}(Corresponding Suit){} suit',
+				[5] = '{C:red}Destroy itself after scored{}',
+				[6] = '{C:inactive}(Does not count another Resource Card){}',
+            }
+        }
+	},
+	
 	-- Enhancement
 	
 	enh_acorn = {
@@ -483,6 +508,7 @@ return {
             ['name'] = '???',
             ['text'] = {
                 [1] = 'Create {C:attention}#1#{} random',
+                [1] = 'Create {C:attention}#1#{} random',
 				[2] = '{C:auxiliary}Auxiliary{} Card',
 				[3] = '{C:inactive}(Must have room)',
             }
@@ -553,7 +579,7 @@ return {
         ['en-us'] = {
             ['name'] = 'Elixir of Life',
             ['text'] = {
-                [1] = 'Heal all {C:attention}Disenhanced Cards{} in the deck',
+                [1] = 'Heal all {C:red}Disenhanced Cards{} in the deck',
                 [2] = 'Reduce money by half {C:inactive}(rounded up){}'
             }
         }
@@ -994,7 +1020,7 @@ return {
             ['name'] = 'Non-Fungible Joker',
             ['text'] = {
                 [1] = 'If the discarded hand contains',
-				[2] = 'only {C:attention}#1#{} Slop Card, destroy it and ',
+				[2] = 'only {C:attention}#1# Slop Card{}, destroy it and ',
 				[3] = 'earn random amount up to {C:gold}$#2#',
 				[4] = '{s:0.8,C:red}Maximum Payout and Sell Value drops at the end of the round',
             }
@@ -1017,7 +1043,7 @@ return {
             ['name'] = 'Uninterested Primate',
             ['text'] = {
                 [1] = 'Gains {C:chips}+#1#{} Chips every {C:attention}#2# {C:inactive}[#6#]',
-				[2] = 'Slop Cards scored.',
+				[2] = '{C:attention}Slop Cards{} scored.',
 				[3] = '{C:green}#3# in #4#{} chance to destroy',
 				[4] = 'itself at the end of the round',
 				[5] = '{C:inactive}(Currently: {C:chips}+#5# {C:inactive}Chips)',
@@ -1031,7 +1057,7 @@ return {
             ['name'] = 'Lethargic Lion',
             ['text'] = {
                 [1] = 'Gains {X:mult,C:white}x#1#{} Mult every {C:attention}#2# {C:inactive}[#6#]',
-				[2] = 'Slop Cards scored.',
+				[2] = '{C:attention}Slop Cards{} scored.',
 				[3] = '{C:green}#3# in #4#{} chance to destroy',
 				[4] = 'itself at the end of the round',
 				[5] = '{C:inactive}(Currently: {X:mult,C:white}x#5#{C:inactive} Mult)',

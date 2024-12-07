@@ -36,6 +36,12 @@ function unstb.process_loc_text()
 	
 	SMODS.process_loc_text(G.localization.descriptions.Other, 'disenhancement', loc.disenhancement)
     G.P_CENTERS['disenhancement'] = {key = 'disenhancement', set = 'Other'}
+	
+	SMODS.process_loc_text(G.localization.descriptions.Other, 'suit_seal', loc.suit_seal)
+    G.P_CENTERS['suit_seal'] = {key = 'suit_seal', set = 'Other'}
+	
+	SMODS.process_loc_text(G.localization.descriptions.Other, 'resource_tooltip', loc.resource_tooltip)
+    G.P_CENTERS['resource_tooltip'] = {key = 'resource_tooltip', set = 'Other'}
 end
 
 --Initialize All Colors
@@ -622,6 +628,7 @@ SMODS.Seal({
     config = {extra = {}},
     loc_txt = loc["seal_heal"],
     loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {set = 'Other', key = 'disenhancement'}
         return {vars = {}}
     end,
     calculate = function(self, card, context)
@@ -2009,6 +2016,8 @@ for i = 1, #suit_seal_list do
 			local suit = localize(suit_seal_list[i], 'suits_singular') ..' Seal'
 			local suit_color = G.C.SUITS[suit_seal_list[i]]
 			
+			info_queue[#info_queue+1] = {set = 'Other', key = 'suit_seal'}
+			
 			return {vars = {card.ability.extra.count, suit, colours = {suit_color}}}
 		end,
 
@@ -2055,6 +2064,7 @@ SMODS.Consumable{
 	discovered = true,
 
 	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {set = 'Other', key = 'unstb_face_seal'}
 		return {vars = {card.ability.extra.count}}
 	end,
 
@@ -2597,6 +2607,8 @@ SMODS.Consumable{
 	discovered = true,
 
 	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {set = 'Other', key = 'disenhancement'}
+		
 		return {vars = {card.ability.extra.count}}
 	end,
 
@@ -3096,11 +3108,14 @@ SMODS.Consumable{
                         end
                     end
                     return true end })
+					
 			--Calling Jokers to process the card destroying
-			delay(0.3)
+			--Edit: Disable this part for now, technically it should not be counted as destroying card because the new card is considered a split
+			
+			--[[delay(0.3)
 			for i = 1, #G.jokers.cards do
 				G.jokers.cards[i]:calculate_joker({remove_playing_cards = true, removed = destroyed_cards})
-			end
+			end]]
 			
 	end,
 
@@ -3255,7 +3270,7 @@ SMODS.Consumable{
 	discovered = true,
 
 	loc_vars = function(self, info_queue, card)
-
+		info_queue[#info_queue+1] = {set = 'Other', key = 'suit_seal'}
 		return {vars = {}}
 	end,
 
@@ -3328,7 +3343,7 @@ SMODS.Consumable{
 	discovered = true,
 
 	loc_vars = function(self, info_queue, card)
-
+		info_queue[#info_queue+1] = {set = 'Other', key = 'unstb_face_seal'}
 		return {vars = {card and card.ability.extra.count or self.config.extra.count, card and card.ability.extra.cost or self.config.extra.cost}}
 	end,
 
@@ -4286,6 +4301,11 @@ create_joker({
 	
 	vars = { {mult = 2} },
 	
+	custom_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {set = 'Other', key = 'suit_seal'}
+        return {vars = {card.ability.extra.mult}}
+    end,
+	
     calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
 			if context.other_card.seal and SMODS.Seals[context.other_card.seal] and SMODS.Seals[context.other_card.seal].suit_seal then
@@ -4317,6 +4337,11 @@ create_joker({
     blueprint = true, eternal = true,
 	
 	vars = { {mult = 6} },
+	
+	custom_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {set = 'Other', key = 'suit_seal'}
+        return {vars = {card.ability.extra.mult}}
+    end,
 	
     calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
@@ -4364,6 +4389,7 @@ create_joker({
 	vars = { {odds = 6} },
 	
 	custom_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {set = 'Other', key = 'suit_seal'}
         return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
     end,
 	
@@ -5502,6 +5528,13 @@ create_joker({
 	
 	--vars = { {times = 1}},
 	
+	custom_vars = function(self, info_queue, card)
+        
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_slop']
+		
+		return { vars = {}}
+    end,
+	
 	--Prompt's actual ability is in Slop Card's after_play function
     --[[calculate = function(self, card, context)
 		
@@ -5529,6 +5562,8 @@ create_joker({
 	
 	custom_vars = function(self, info_queue, card)
         
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_slop']
+		
 		return { vars = {card.ability.extra.chips_rate, card.ability.extra.slop_cycle, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.chance_destroy, card.ability.extra.chips, card.ability.extra.slop_cycle - card.ability.extra.slop_scored}}
     end,
 	
@@ -5612,6 +5647,8 @@ create_joker({
 	
 	custom_vars = function(self, info_queue, card)
         
+		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_slop']
+		
 		return { vars = {card.ability.extra.xmult_rate, card.ability.extra.slop_cycle, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.chance_destroy, card.ability.extra.xmult, card.ability.extra.slop_cycle - card.ability.extra.slop_scored}}
     end,
 	
@@ -5822,6 +5859,7 @@ create_joker({
 	vars = {{target_rank = 2}, {odds_ticket = 6}},
 	
     custom_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {set = 'Other', key = 'resource_tooltip'}
         return {vars = {localize(card.ability.extra.target_rank, 'ranks'), G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_ticket}}
     end,
 	
