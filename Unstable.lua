@@ -4529,7 +4529,7 @@ create_joker({
 	
 	set_ability = function(self, card, initial, delay_sprites)
 		if G.GAME and G.GAME.consumeable_usage_total then
-			card.ability.extra.chips = G.GAME.consumeable_usage_total.auxiliary * card.ability.extra.chip_rate
+			card.ability.extra.chips = (G.GAME.consumeable_usage_total.auxiliary or 0) * card.ability.extra.chip_rate
 		else
 			card.ability.extra.chips = 0
 		end
@@ -7806,6 +7806,122 @@ create_joker({
 		
     end
 })
+
+--Decks
+
+SMODS.Back{ -- Utility Deck
+	key = "utility", loc_txt = loc.deck_util,
+	pos = {x = 0, y = 0},
+	
+	unlocked = true,
+
+    config = {vouchers = {'v_unstb_aux1'}, aux_amount = 1, aux_chance = 2},
+    loc_vars = function(self)
+        return {vars = {}}
+    end,
+
+    apply = function(self)
+		G.GAME.auxiliary_rate = self.config.aux_chance
+         event({
+				func = function()
+					for i = 1, self.config.aux_amount do
+						local card = create_card('Auxiliary', G.consumeables, nil, nil, nil, nil, 'c_unstb_aux_random', 'utildeck')
+						card:add_to_deck()
+						G.consumeables:emplace(card)
+					end
+					return true
+				end
+                })
+    end,
+
+    atlas = 'unstb_jokers'
+}
+
+SMODS.Back{ -- Lowkey Deck
+	key = "lowkey", loc_txt = loc.deck_lowkey,
+	pos = {x = 1, y = 0},
+	
+	unlocked = true,
+
+    config = {},
+    loc_vars = function(self)
+        return {vars = {}}
+    end,
+
+    apply = function(self)
+		
+		--Enable all the pool flags
+		setPoolRankFlagEnable('unstb_0', true);
+		setPoolRankFlagEnable('unstb_0.5', true);
+		setPoolRankFlagEnable('unstb_1', true);
+		setPoolRankFlagEnable('unstb_r2', true);
+		setPoolRankFlagEnable('unstb_e', true);
+		setPoolRankFlagEnable('unstb_Pi', true);
+	
+		--Notice: used card_key version and not standard key
+		local added_rank = {'unstb_0', 'unstb_0.5', 'unstb_1', 'unstb_R', 'unstb_E', 'unstb_P'}
+				
+		local all_suit = {}
+		
+		for k, v in pairs(SMODS.Suits) do
+			--If has in_pool, check in_pool
+			if type(v) == 'table' and type(v.in_pool) == 'function' and v.in_pool then
+				if v:in_pool({initial_deck = true}) then
+					all_suit[#all_suit+1] = v.card_key
+				end
+			else --Otherwise, added by default
+				all_suit[#all_suit+1] = v.card_key
+			end
+			
+		end
+		
+		--print(inspect(all_suit))
+		
+		local extra_cards = {}
+		
+		for i=1, #all_suit do
+			for j=1, #added_rank do
+				extra_cards[#extra_cards+1] = {s = all_suit[i], r = added_rank[j]}
+			end
+		end
+		
+		G.GAME.starting_params.extra_cards = extra_cards
+		
+		--Based on Royal Deck from Ortalab. Has a bit of visual glitch at the start, though.
+		event({
+            func = function()
+                local keep_rank = {'2', '3', '4', '5', 'unstb_0', 'unstb_0.5', 'unstb_1', 'unstb_r2', 'unstb_e', 'unstb_Pi'}
+				
+				local rank_status = {}
+				
+				for i=1, #keep_rank do
+					rank_status[ keep_rank[i] ] = true
+				end
+				
+                for k, v in pairs(G.playing_cards) do
+                    if not rank_status[v.base.value] then 
+                        v.to_remove = true
+                    end
+                end
+				
+                local i = 1
+                while i <= #G.playing_cards do
+                    if G.playing_cards[i].to_remove then
+                        G.playing_cards[i]:remove()
+                    else
+                        i = i + 1
+                    end
+                end
+				
+                G.GAME.starting_deck_size = #G.playing_cards
+                return true
+            end
+        })
+    end,
+
+    atlas = 'unstb_jokers'
+}
+
 
 --Compatibility / Tweaks / Rework Stuff
 

@@ -505,9 +505,8 @@ return {
 	
 	aux_random = {
         ['en-us'] = {
-            ['name'] = '???',
+            ['name'] = 'The Question',
             ['text'] = {
-                [1] = 'Create {C:attention}#1#{} random',
                 [1] = 'Create {C:attention}#1#{} random',
 				[2] = '{C:auxiliary}Auxiliary{} Card',
 				[3] = '{C:inactive}(Must have room)',
@@ -1525,6 +1524,33 @@ return {
 				[4] = '{C:green}#1# in #3#{} chance to copy {C:attention}Edition{}',
 				[5] = '{C:green}#1# in #4#{} chance to copy {C:attention}Seal{}',
             }
+        }
+    },
+	
+	--Decks
+	
+	deck_util = {
+        ['en-us'] = {
+            ['name'] = 'Utility Deck',
+            ['text'] = {
+                [1] = 'Start run with the',
+				[2] = '{C:auxiliary}Hardware Store{} voucher',
+                [3] = 'and one copy of {C:auxiliary}The Question.',
+                [4] = '{C:auxiliary}Auxiliary Card{} can appear',
+				[5] = 'in the shop more often.',
+            },
+        }
+    },
+	
+	deck_lowkey = {
+        ['en-us'] = {
+            ['name'] = 'Lowkey Deck',
+            ['text'] = {
+                [1] = 'Start run with only',
+				[2] = '{C:attention}rank 0-5{} cards',
+                [3] = 'and all {C:attention}decimal',
+				[4] = '{C:attention}ranks{} inbetween',
+            },
         }
     },
 	
