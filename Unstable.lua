@@ -5513,7 +5513,17 @@ create_joker({
 			end
 			card.ability.extra.current_count = 0
 		end
-	end
+	end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one card with edition
+		for _, v in pairs(G.playing_cards) do
+			if v.edition then return true end
+		end
+		return false
+		
+    end
 })
 
 --Connoiseur
@@ -5535,7 +5545,17 @@ create_joker({
 			}
 		  end
 		end
-	end
+	end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if there is at least one card with edition
+		for _, v in pairs(G.playing_cards) do
+			if v.edition then return true end
+		end
+		return false
+		
+    end
 })
 
 --Jeweler
@@ -7433,6 +7453,96 @@ create_joker({
     end
 })
 
+--Memoriam Photo
+create_joker({
+    name = 'Memoriam Photo', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 6,
+	
+	vars = {{chips = 0}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.chips}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+    calculate = function(self, card, context)
+		--Upgrades
+		if context.remove_playing_cards and not context.blueprint then
+			local added_total = 0
+			for i=1, #context.removed do
+				if not context.removed[i].config.center.no_rank then
+					added_total = added_total + context.removed[i].base.nominal
+				end
+			end
+			
+			if added_total>0 then
+				card.ability.extra.chips = card.ability.extra.chips + (2 * added_total)
+				event({
+					func = function()
+						big_juice(card)
+						forced_message("Upgraded!", card, G.C.CHIPS, true)
+						--card_eval_status_text(card,'extra',nil, nil, nil,{message = "Upgraded", colour = G.C.MULT, instant = true})
+						return true end
+					})
+			end
+		end
+		
+		--Main context
+		if context.joker_main then
+			if card.ability.extra.chips > 0 then
+				return {
+					chip_mod = card.ability.extra.chips,
+					message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.chips } }
+				}
+			end
+		end
+    end,
+})
+
+--Schrodinger Cat
+create_joker({
+    name = 'Schrodinger Cat', id = 1, no_art = true,
+    rarity = 'Rare', cost = 8,
+	
+	vars = {{odds = 3}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+    calculate = function(self, card, context)
+		--Upgrades
+		if context.remove_playing_cards then
+			for i=1, #context.removed do
+				local isActivated = pseudorandom('schrodingercat'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds
+				
+				if isActivated then
+					event({func = function()
+									--Copy Card
+									G.playing_card = (G.playing_card and G.playing_card + 1) or 1
+									local _card = copy_card(context.removed[i], nil, nil, G.playing_card)
+									_card:start_materialize({G.C.SECONDARY_SET.Enhanced})
+									_card:add_to_deck()
+									G.deck:emplace(_card)
+									table.insert(G.playing_cards, _card)
+									return true end
+							})
+							
+					event({func = function()
+									G.deck.config.card_limit = G.deck.config.card_limit + 1
+									return true end
+							})
+						
+					playing_card_joker_effects({true})
+					
+					forced_message(localize('k_copied_ex'), context.blueprint_card or card, G.C.ORANGE, 0.25)
+				end
+			end
+		end
+    end,
+})
+
 --Cashback Card
 create_joker({
     name = 'Cashback Card', id = 1, no_art = true,
@@ -7834,7 +7944,7 @@ SMODS.Back{ -- Utility Deck
                 })
     end,
 
-    atlas = 'unstb_jokers'
+    atlas = 'unstb_jokers_wip'
 }
 
 SMODS.Back{ -- Lowkey Deck
@@ -7919,7 +8029,7 @@ SMODS.Back{ -- Lowkey Deck
         })
     end,
 
-    atlas = 'unstb_jokers'
+    atlas = 'unstb_jokers_wip'
 }
 
 

@@ -1451,6 +1451,29 @@ return {
         }
     },
 	
+	memoriam_photo = {
+        ['en-us'] = {
+            ['name'] = 'Memoriam Photo',
+            ['text'] = {
+                [1] = 'When a playing card is {C:attention}destroyed{},',
+				[2] = 'gains {C:chips}Chips{} equal to {C:attention}double{}',
+				[3] = 'the rank of the {C:attention}destroyed card{}',
+				[4] = '{C:inactive}(Current: {C:chips}#1#{C:inactive} Chips)',
+            }
+        }
+    },
+	
+	schrodinger_cat = {
+        ['en-us'] = {
+            ['name'] = "Schrödinger's Cat",
+            ['text'] = {
+                [1] = 'When a playing card is {C:attention}destroyed{},',
+				[2] = '{C:green}#1# in #2#{} chance to add',
+				[3] = 'a copy of the card to your deck',
+            }
+        }
+    },
+	
 	cashback_card = {
         ['en-us'] = {
             ['name'] = 'Cashback Card',
