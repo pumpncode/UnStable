@@ -1347,6 +1347,30 @@ return {
         }
     },
 	
+	library_card = {
+        ['en-us'] = {
+            ['name'] = 'Library Card',
+            ['text'] = {
+                [1] = "For each scoring card's {C:attention}singular",
+				[2] = '{C:attention}suit name{} in English. Give:',
+				[3] = '{C:chips}+#1#{} Chips per {C:attention}Consonant',
+				[4] = '{C:mult}+#2#{} Mult per {C:attention}Vowel',
+				[5] = '{C:inactive}(Example: Spade = {C:chips}+15{C:inactive} Chips, {C:mult}+4{C:inactive} Mult)'
+            }
+        }
+    },
+	
+	collector_album = {
+        ['en-us'] = {
+            ['name'] = "Collector's Album",
+            ['text'] = {
+                [1] = 'Jokers with {C:attention}"Card"{} in ',
+				[2] = 'the name each gives',
+				[3] = '{C:chips}+#1#{} Chips',
+            }
+        }
+    },
+	
 	throwing_hands = {
         ['en-us'] = {
             ['name'] = 'Throwing Hands',

@@ -7031,6 +7031,82 @@ create_joker({
     end
 })
 
+--Library Card
+create_joker({
+    name = 'Library Card', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 8,
+	
+	vars = {{chips_rate = 5}, {mult_rate = 2}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.chips_rate, card.ability.extra.mult_rate}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+	
+    calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if not context.other_card.config.center.no_suit then
+				local suit_name = string.lower(localize(context.other_card.base.suit, 'suits_singular'))
+				
+				local vowel = suit_name:gsub("[^aeiou]","")
+				local consonant = suit_name:gsub("[^bcdfghjklmnpqrstvwxyz]","") --To be safe, list alphabet only, no symbol, space, or numbers
+				
+				local totalChips = card.ability.extra.chips_rate * (string.len(consonant))
+				local totalMult = card.ability.extra.mult_rate * (string.len(vowel))
+				
+				print(vowel)
+				print(consonant)
+				
+				print(totalChips)
+				print(totalMult)
+				
+				return {
+				  chips = totalChips,
+				  mult = totalMult,
+				  card = card
+				}
+			end
+		end
+    end
+})
+
+--Collector's Album
+create_joker({
+    name = 'Collector Album', id = 1, no_art = true,
+    rarity = 'Uncommon', cost = 8,
+	
+	vars = {{chips_rate = 120}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.chips_rate, card.ability.extra.mult_rate}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+	
+    calculate = function(self, card, context)
+	
+		if context.other_joker then
+			--get name
+			local jokerName = string.lower(localize{type = 'name_text', key = context.other_joker.config.center.key, set = 'Joker'})
+			
+			--trigger on only joker with "Card" in the name
+			if string.match(jokerName, "card") then
+				event({
+                    func = function()
+                        context.other_joker:juice_up(0.5, 0.5)
+                        return true
+                    end
+                })
+                return {
+                    message = localize{type='variable',key='a_chips',vars={card.ability.extra.chips_rate}},
+                    chip_mod = card.ability.extra.chips_rate
+                }
+			end
+		end
+    end
+})
+
 local function get_random_hand(current_hand, seed)
 	local _poker_hands = {}
 	
