@@ -1304,6 +1304,17 @@ return {
         }
     },
 	
+	jack_of_all_trades = {
+        ['en-us'] = {
+            ['name'] = 'Jack of All Trades',
+            ['text'] = {
+                [1] = 'Played {C:attention}Jack{} gives',
+				[2] = '{C:chips}+#1#{} Chips, {C:mult}+#2#{} Mult, ',
+				[3] = '{X:mult,C:white}X#3#{} XMult, and {C:gold}$#4#',
+            }
+        }
+    },
+	
 	magic_trick_card = {
         ['en-us'] = {
             ['name'] = 'Magic Trick Card',
@@ -1315,6 +1326,18 @@ return {
         }
     },
 	
+	queensland = {
+        ['en-us'] = {
+            ['name'] = 'Queensland',
+            ['text'] = {
+                [1] = 'Played {C:attention}Queen{} creates',
+				[2] = '{C:attention}Resource Card{} of',
+				[3] = 'the corresponding suit.',
+				[4] = '{C:inactive}({C:red}#1#{C:inactive} times per round, {C:red}#2# left{C:inactive})',
+            }
+        }
+    },
+	
 	prssj = {
         ['en-us'] = {
             ['name'] = 'Polychrome Red Seal Steel Joker',
@@ -1322,6 +1345,17 @@ return {
                 [1] = '{C:green}#1# in #2#{} chance for scored {C:attention}Kings{} to upgrade {C:dark_edition}edition',
 				[2] = '{C:green}#1# in #3#{} chance for scored {C:attention}Kings{} to {C:attention}retrigger',
 				[3] = '{C:green}#1# in #4#{} chance for {C:attention}Kings{} held in hand to give {X:mult,C:white}x#5#{} Mult',
+            }
+        }
+    },
+	
+	king_of_pop = {
+        ['en-us'] = {
+            ['name'] = 'King of Pop',
+            ['text'] = {
+                [1] = 'Played {C:attention}Enhanced Kings{} have',
+				[2] = '{C:green}#1# in #2#{} chance to be',
+				[3] = 'destroyed and create 1 {C:dark_edition}Double Tag',
             }
         }
     },

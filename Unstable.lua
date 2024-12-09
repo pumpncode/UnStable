@@ -6754,6 +6754,34 @@ create_joker({
     end
 })
 
+--Jack of All Trades
+create_joker({
+    name = 'Jack of All Trades', id = 1, no_art = true,
+    rarity = 'Rare', cost = 7,
+	
+	vars = {{chips = 15}, {mult = 2}, {xmult = 1.1}, {money = 1}},
+	custom_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.chips, card.ability.extra.mult, card.ability.extra.xmult, card.ability.extra.money}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+	
+    calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card.base.value == 'Jack' then
+				ease_dollars(card.ability.extra.money)
+				return {
+				  chips = card.ability.extra.chips,
+				  mult = card.ability.extra.mult,
+				  x_mult = card.ability.extra.xmult,
+				  card = card
+				}
+			end
+		end
+    end
+})
+
 --Magic Trick Card
 create_joker({
     name = 'Magic Trick Card', id = 0, ex_art = true,
@@ -6856,6 +6884,66 @@ create_joker({
     end
 })
 
+--Queensland
+create_joker({
+    name = 'Queensland', id = 1, no_art = true,
+    rarity = 'Rare', cost = 7,
+	
+	vars = {{count_max = 3}, {count = 0}},
+	custom_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {set = 'Other', key = 'resource_tooltip'}
+		return {vars = {card.ability.extra.count_max, card.ability.extra.count_max - card.ability.extra.count}}
+    end,
+	
+    blueprint = true, eternal = true,
+	
+	
+    calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card.base.value == 'Queen' then
+				if card.ability.extra.count < card.ability.extra.count_max then
+					if not context.blueprint then
+						card.ability.extra.count = card.ability.extra.count + 1
+					end
+					
+					event({func = function()
+									local rank = pseudorandom_element(SMODS.Ranks, pseudoseed('queensland')..G.SEED).card_key
+									local suit = SMODS.Suits[context.other_card.base.suit].card_key
+									
+									local _card = Card(G.play.T.x + G.play.T.w/2, G.play.T.y, G.CARD_W, G.CARD_H, G.P_CARDS[suit..'_'..rank], G.P_CENTERS.m_unstb_resource, {playing_card = G.playing_card})
+									
+									big_juice(context.blueprint_card or card)
+									
+									_card:start_materialize({G.C.SECONDARY_SET.Enhanced})
+									G.play:emplace(_card)
+									table.insert(G.playing_cards, _card)
+									
+									return true end
+							})
+
+					event({func = function()
+						G.deck.config.card_limit = G.deck.config.card_limit + 1
+						draw_card(G.play,G.deck, 90,'up', nil)  
+						return true end
+						})
+						
+					playing_card_joker_effects({true})
+					
+				end
+			end
+		end
+		
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			if card.ability.extra.count > 0 then
+				card.ability.extra.count = 0
+				return {
+					  message = 'Reset!'
+				}
+			end
+		end
+    end
+})
+
 --Polychrome Red Seal Steel Joker
 create_joker({
     name = 'prssj', id = 1, no_art = true,
@@ -6921,6 +7009,50 @@ create_joker({
 						card = context.blueprint_card or card
 					}
 				end
+			end
+		end
+    end
+})
+
+--King of Pop
+create_joker({
+    name = 'King of Pop', id = 1, no_art = true,
+    rarity = 'Rare', cost = 8,
+	
+	vars = {{odds_destroy = 8}},
+	custom_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_TAGS.tag_double
+		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_destroy}}
+    end,
+	
+    blueprint = false, eternal = true,
+	
+    calculate = function(self, card, context)
+		--Pre-hand check
+		if context.before and not context.blueprint then
+			for i=1, #context.scoring_hand do
+				if context.scoring_hand[i].base.value == 'King' and context.scoring_hand[i].config.center ~= G.P_CENTERS.c_base and not context.scoring_hand[i].config.center.disenhancement then
+					if pseudorandom('kingofpop'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_destroy then
+						context.scoring_hand[i].to_destroy = true
+					end
+				end
+			end
+		end
+		
+		if context.destroying_card and not context.blueprint then
+			if context.destroying_card.to_destroy then
+				event({	 trigger = 'after', delay = 0.5, func = function()
+						
+										add_tag(Tag('tag_double'))
+										play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
+										play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
+										
+										return true end
+								}
+							)
+				forced_message("Tag!", card, G.C.SECONDARY_SET.Enhanced)
+			
+				return true --Destroy the card
 			end
 		end
     end
