@@ -1903,7 +1903,7 @@ SMODS.UndiscoveredSprite{
 
 --Booster Pack for Auxiliary Cards
 
-local aux_booster_rate = {0.5, 0.5, 0.3, 0.1}
+local aux_booster_rate = {0.75, 0.75, 0.5, 0.1}
 
 for i = 1, 4 do
     SMODS.Booster{
@@ -5864,6 +5864,14 @@ create_joker({
 	
 		--End of round check, make sure it's checked absolutely once per round
 		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+		
+			--Reduce its own selling price, for the funny
+				
+			if card.sell_cost > 0 then
+				card.ability.extra_value = (card.ability.extra_value or 0) - 1
+				card:set_cost()
+			end
+		
 			if pseudorandom('primate'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.chance_destroy then
 				event({func = function()
 							
@@ -5949,6 +5957,14 @@ create_joker({
 	
 		--End of round check, make sure it's checked absolutely once per round
 		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+		
+			--Reduce its own selling price, for the funny
+				
+			if card.sell_cost > 0 then
+				card.ability.extra_value = (card.ability.extra_value or 0) - 1
+				card:set_cost()
+			end
+		
 			if pseudorandom('primate'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.chance_destroy then
 				event({func = function()
 							
@@ -7485,6 +7501,11 @@ create_joker({
         card.T.w = card.T.w * w_scale
     end,
 	
+	add_to_deck = function(self, card, from_debuff)
+		--Set the flag to true immediately once this joker has been picked up, it can't spawn again for the rest of the session
+		G.GAME.pool_flags.jailfree_get = true
+	end,
+	
     calculate = function(self, card, context)
 		--Referenced from DebugPlus's "Win Blind" function
 		if context.selling_self and not context.blueprint then
@@ -7497,6 +7518,13 @@ create_joker({
 			end_round()
 		end
 	end,
+	
+	custom_in_pool = function(self, args)
+	
+		--Spawns if this card has not been picked before
+		return not G.GAME.pool_flags.jailfree_get
+		
+    end
 	
 })
 
