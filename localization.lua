@@ -1219,9 +1219,9 @@ return {
         }
     },
 	
-	tool_box = {
+	technician = {
         ['en-us'] = {
-            ['name'] = 'Tool Box',
+            ['name'] = 'Technician',
             ['text'] = {
                 [1] = '{C:chips}+#1#{} Chips per {C:auxiliary}Auxiliary{}',
 				[2] = 'card used this run',
@@ -1516,7 +1516,7 @@ return {
                 [1] = 'When a playing card is {C:attention}destroyed{},',
 				[2] = 'gains {C:chips}Chips{} equal to {C:attention}double{}',
 				[3] = 'the rank of the {C:attention}destroyed card{}',
-				[4] = '{C:inactive}(Current: {C:chips}#1#{C:inactive} Chips)',
+				[4] = '{C:inactive}(Current: {C:chips}+#1#{C:inactive} Chips)',
             }
         }
     },

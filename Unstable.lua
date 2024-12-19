@@ -234,6 +234,18 @@ SMODS.Atlas {
   py = 95
 }
 
+--Atlas for Decks
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "deck",
+  -- The name of the file, for the code to pull the atlas from
+  path = "deck.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
 --Atlas for extra ranks
 SMODS.Atlas {
   -- Key for code to find it with
@@ -2596,7 +2608,7 @@ SMODS.Consumable{
 		
 	end,
 
-	pos = get_coordinates(1),
+	pos = get_coordinates(16),
 	
 	--Can spawn only when more than 10 cards the deck is Disenhanced
 	in_pool = function(self, args)
@@ -2674,7 +2686,7 @@ SMODS.Consumable{
 		
 	end,
 
-	pos = get_coordinates(1),
+	pos = get_coordinates(17),
 	
 	--Can spawn only when more than 1/4 of deck is Disenhanced
 	in_pool = function(self, args)
@@ -2741,7 +2753,7 @@ SMODS.Consumable{
 				})
 	end,
 
-	pos = get_coordinates(1),
+	pos = get_coordinates(18),
 }
 
 --Blank
@@ -2774,7 +2786,7 @@ SMODS.Consumable{
 				})
 	end,
 
-	pos = get_coordinates(1),
+	pos = get_coordinates(0),
 	
 	in_pool = function(self, args)
         return (G.GAME.aux_blank_count or 0) < 4
@@ -2828,7 +2840,7 @@ SMODS.Consumable{
 				})
 	end,
 
-	pos = get_coordinates(1),
+	pos = get_coordinates(20),
 	
 	--Can spawn only when redeemed Blank Auxiliary Card enough time
 	in_pool = function(self, args)
@@ -2873,7 +2885,7 @@ SMODS.Consumable{
         delay(0.6)
 	end,
 
-	pos = get_coordinates(1),
+	pos = get_coordinates(19),
 }
 
 --Other Basegame Consumable Supports for new features
@@ -3965,7 +3977,7 @@ SMODS.Voucher({
 	key = "aux2",
 	loc_txt = loc['v_aux2'],
 	atlas = "voucher",
-	pos = { x = 0, y = 0 },
+	pos = { x = 1, y = 0 },
 	unlocked = true,
 	discovered = true,
 	requires = { "v_unstb_aux1" },
@@ -4116,7 +4128,7 @@ create_joker({
 
 --Match Three
 create_joker({
-    name = 'Match Three', id = 1, no_art =  true,
+    name = 'Match Three', id = 67,
     rarity = 'Common', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -4447,7 +4459,7 @@ create_joker({
 
 --Free Trial
 create_joker({
-    name = 'Free Trial', id = 1, no_art = true,
+    name = 'Free Trial', id = 54,
     rarity = 'Uncommon', cost = 4,
 	
 	vars = {{odds = 4}},
@@ -4485,7 +4497,7 @@ create_joker({
 
 --Extended Warranty
 create_joker({
-    name = 'Extended Warranty', id = 1, no_art = true,
+    name = 'Extended Warranty', id = 55,
     rarity = 'Rare', cost = 8,
 	
 	vars = {{xmult = 1.5}},
@@ -4515,9 +4527,9 @@ create_joker({
     end
 })
 
---Tool Box
+--Technician
 create_joker({
-    name = 'Tool Box', id = 1, no_art = true,
+    name = 'Technician', id = 56,
     rarity = 'Common', cost = 6,
 	
 	vars = {{chip_rate = 15}, {chips = 0}},
@@ -4565,7 +4577,7 @@ create_joker({
 
 --Season Pass
 create_joker({
-    name = 'Season Pass', id = 1, no_art = true,
+    name = 'Season Pass', id = 57,
     rarity = 'Uncommon', cost = 4,
 	
 	vars = {{odds = 6}},
@@ -5076,7 +5088,7 @@ create_joker({
 	set_sprites = function(self, card, front)
         local w_scale, h_scale = 41/71, 59/95
         card.children.center.scale.y = card.children.center.scale.y * h_scale
-        card.children.center.scale.x = card.children.center.scale.x * h_scale
+        card.children.center.scale.x = card.children.center.scale.x * w_scale
     end,
 	
 	set_ability = function(self, card, initial, delay_sprites)
@@ -5182,7 +5194,7 @@ create_joker({
 })
 
 create_joker({
-    name = 'Social Experiment', id = 1, no_art = true,
+    name = 'Social Experiment', id = 65,
     rarity = 'Rare', cost = 4,
 	
     blueprint = false, eternal = true,
@@ -5471,7 +5483,7 @@ create_joker({
 
 --Graphic Card
 create_joker({
-    name = 'Graphic Card', id = 1, no_art = true,
+    name = 'Graphic Card', id = 69,
     rarity = 'Rare', cost = 8,
 	
     blueprint = true, eternal = true,
@@ -5481,6 +5493,26 @@ create_joker({
 	custom_vars = function(self, info_queue, card)
         info_queue[#info_queue+1] = G.P_TAGS.tag_double
 		return {vars = {card.ability.extra.count, card.ability.extra.current_count}}
+    end,
+	
+	--Set sprites and hitbox
+	
+	set_sprites = function(self, card, front)
+        local w_scale, h_scale = 48/71, 95/95
+        card.children.center.scale.y = card.children.center.scale.y * h_scale
+        card.children.center.scale.x = card.children.center.scale.x * w_scale
+    end,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+        local w_scale, h_scale = 48/71, 95/95
+        card.T.h = card.T.h * h_scale
+        card.T.w = card.T.w * w_scale
+    end,
+	
+	load = function(self, card, initial, delay_sprites)
+        local w_scale, h_scale = 48/71, 95/95
+        card.T.h = card.T.h * h_scale
+        card.T.w = card.T.w * w_scale
     end,
 	
     calculate = function(self, card, context)
@@ -6325,6 +6357,25 @@ create_joker({
 		end 
     end,
 	
+	--Set sprites and hitbox
+	
+	set_sprites = function(self, card, front)
+        local w_scale, h_scale = 53/71, 95/95
+        card.children.center.scale.y = card.children.center.scale.y * h_scale
+        card.children.center.scale.x = card.children.center.scale.x * w_scale
+    end,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+        local w_scale, h_scale = 53/71, 95/95
+        card.T.h = card.T.h * h_scale
+        card.T.w = card.T.w * w_scale
+    end,
+	
+	load = function(self, card, initial, delay_sprites)
+        local w_scale, h_scale = 53/71, 95/95
+        card.T.h = card.T.h * h_scale
+        card.T.w = card.T.w * w_scale
+    end,
 	
     calculate = function(self, card, context)
 		--Main context
@@ -6578,7 +6629,7 @@ create_joker({
 --Plagiarism
 create_joker({
     name = 'Plagiarism', id = 46,
-    rarity = 'Rare', cost = 10,
+    rarity = 'Uncommon', cost = 10,
 	
 	vars = {{dir = 0}},
 	
@@ -6756,7 +6807,7 @@ create_joker({
 
 --Jack of All Trades
 create_joker({
-    name = 'Jack of All Trades', id = 1, no_art = true,
+    name = 'Jack of All Trades', id = 60,
     rarity = 'Rare', cost = 7,
 	
 	vars = {{chips = 15}, {mult = 2}, {xmult = 1.1}, {money = 1}},
@@ -6886,7 +6937,7 @@ create_joker({
 
 --Queensland
 create_joker({
-    name = 'Queensland', id = 1, no_art = true,
+    name = 'Queensland', id = 61,
     rarity = 'Rare', cost = 7,
 	
 	vars = {{count_max = 3}, {count = 0}},
@@ -6944,9 +6995,53 @@ create_joker({
     end
 })
 
+--King of Pop
+create_joker({
+    name = 'King of Pop', id = 62,
+    rarity = 'Rare', cost = 8,
+	
+	vars = {{odds_destroy = 8}},
+	custom_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_TAGS.tag_double
+		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_destroy}}
+    end,
+	
+    blueprint = false, eternal = true,
+	
+    calculate = function(self, card, context)
+		--Pre-hand check
+		if context.before and not context.blueprint then
+			for i=1, #context.scoring_hand do
+				if context.scoring_hand[i].base.value == 'King' and context.scoring_hand[i].config.center ~= G.P_CENTERS.c_base and not context.scoring_hand[i].config.center.disenhancement then
+					if pseudorandom('kingofpop'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_destroy then
+						context.scoring_hand[i].to_destroy = true
+					end
+				end
+			end
+		end
+		
+		if context.destroying_card and not context.blueprint then
+			if context.destroying_card.to_destroy then
+				event({	 trigger = 'after', delay = 0.5, func = function()
+						
+										add_tag(Tag('tag_double'))
+										play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
+										play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
+										
+										return true end
+								}
+							)
+				forced_message("Tag!", card, G.C.SECONDARY_SET.Enhanced)
+			
+				return true --Destroy the card
+			end
+		end
+    end
+})
+
 --Polychrome Red Seal Steel Joker
 create_joker({
-    name = 'prssj', id = 1, no_art = true,
+    name = 'prssj', id = 63,
     rarity = 'Rare', cost = 10,
 	
 	vars = {{odds_upgrade = 8}, {odds_retrigger = 4}, {odds_hand = 2}, {hand_xmult = 2}},
@@ -7014,53 +7109,9 @@ create_joker({
     end
 })
 
---King of Pop
-create_joker({
-    name = 'King of Pop', id = 1, no_art = true,
-    rarity = 'Rare', cost = 8,
-	
-	vars = {{odds_destroy = 8}},
-	custom_vars = function(self, info_queue, card)
-		info_queue[#info_queue+1] = G.P_TAGS.tag_double
-		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_destroy}}
-    end,
-	
-    blueprint = false, eternal = true,
-	
-    calculate = function(self, card, context)
-		--Pre-hand check
-		if context.before and not context.blueprint then
-			for i=1, #context.scoring_hand do
-				if context.scoring_hand[i].base.value == 'King' and context.scoring_hand[i].config.center ~= G.P_CENTERS.c_base and not context.scoring_hand[i].config.center.disenhancement then
-					if pseudorandom('kingofpop'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_destroy then
-						context.scoring_hand[i].to_destroy = true
-					end
-				end
-			end
-		end
-		
-		if context.destroying_card and not context.blueprint then
-			if context.destroying_card.to_destroy then
-				event({	 trigger = 'after', delay = 0.5, func = function()
-						
-										add_tag(Tag('tag_double'))
-										play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
-										play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
-										
-										return true end
-								}
-							)
-				forced_message("Tag!", card, G.C.SECONDARY_SET.Enhanced)
-			
-				return true --Destroy the card
-			end
-		end
-    end
-})
-
 --Master of One
 create_joker({
-    name = 'Master of One', id = 1, no_art = true,
+    name = 'Master of One', id = 64,
     rarity = 'Uncommon', cost = 7,
 	
 	--vars = {},
@@ -7165,7 +7216,7 @@ create_joker({
 
 --Library Card
 create_joker({
-    name = 'Library Card', id = 1, no_art = true,
+    name = 'Library Card', id = 52,
     rarity = 'Uncommon', cost = 8,
 	
 	vars = {{chips_rate = 5}, {mult_rate = 2}},
@@ -7205,7 +7256,7 @@ create_joker({
 
 --Collector's Album
 create_joker({
-    name = 'Collector Album', id = 1, no_art = true,
+    name = 'Collector Album', id = 53,
     rarity = 'Uncommon', cost = 8,
 	
 	vars = {{chips_rate = 120}},
@@ -7302,7 +7353,7 @@ create_joker({
 
 --Imperial Bower
 create_joker({
-    name = 'Imperial Bower', id = 1, no_art =  true,
+    name = 'Imperial Bower', id = 58,
     rarity = 'Common', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -7340,7 +7391,7 @@ create_joker({
 
 --The Jolly Joker
 create_joker({
-    name = 'The Jolly Joker', id = 1, no_art =  true,
+    name = 'The Jolly Joker', id = 59,
     rarity = 'Uncommon', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -7414,6 +7465,26 @@ create_joker({
 				colours = {activate_color} }}
     end,
 	
+	--Set sprites and hitbox
+	
+	set_sprites = function(self, card, front)
+        local w_scale, h_scale = 64/71, 93/95
+        card.children.center.scale.y = card.children.center.scale.y * h_scale
+        card.children.center.scale.x = card.children.center.scale.x * w_scale
+    end,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+        local w_scale, h_scale = 64/71, 93/95
+        card.T.h = card.T.h * h_scale
+        card.T.w = card.T.w * w_scale
+    end,
+	
+	load = function(self, card, initial, delay_sprites)
+        local w_scale, h_scale = 64/71, 93/95
+        card.T.h = card.T.h * h_scale
+        card.T.w = card.T.w * w_scale
+    end,
+	
     calculate = function(self, card, context)
 		--Referenced from DebugPlus's "Win Blind" function
 		if context.selling_self and not context.blueprint then
@@ -7431,7 +7502,7 @@ create_joker({
 
 --Tanzaku
 create_joker({
-    name = 'Tanzaku', id = 1, no_art = true,
+    name = 'Tanzaku', id = 70,
     rarity = 'Rare', cost = 4,
 	
     blueprint = true, eternal = true,
@@ -7440,6 +7511,26 @@ create_joker({
 	
 	custom_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.repetitions, card.ability.extra.repetition_rate}}
+    end,
+	
+	--Set sprites and hitbox
+	
+	set_sprites = function(self, card, front)
+        local w_scale, h_scale = 50/71, 80/95
+        card.children.center.scale.y = card.children.center.scale.y * h_scale
+        card.children.center.scale.x = card.children.center.scale.x * w_scale
+    end,
+	
+	set_ability = function(self, card, initial, delay_sprites)
+        local w_scale, h_scale = 50/71, 80/95
+        card.T.h = card.T.h * h_scale
+        card.T.w = card.T.w * w_scale
+    end,
+	
+	load = function(self, card, initial, delay_sprites)
+        local w_scale, h_scale = 50/71, 80/95
+        card.T.h = card.T.h * h_scale
+        card.T.w = card.T.w * w_scale
     end,
 	
     calculate = function(self, card, context)
@@ -7484,7 +7575,7 @@ create_joker({
 
 --Glass Cannon
 create_joker({
-    name = 'Glass Cannon', id = 1, no_art = true,
+    name = 'Glass Cannon', id = 68,
     rarity = 'Rare', cost = 8,
 	
     blueprint = true, eternal = true,
@@ -7517,7 +7608,7 @@ create_joker({
 
 --Pity Rate Drop
 create_joker({
-    name = 'Pity Rate Drop', id = 1, no_art = true,
+    name = 'Pity Rate Drop', id = 71,
     rarity = 'Rare', cost = 8,
 	
     blueprint = true, eternal = true,
@@ -7616,7 +7707,7 @@ create_joker({
 
 --Cool S
 create_joker({
-    name = 'Cool S', id = 1, no_art = true,
+    name = 'Cool S', id = 66,
     rarity = 'Uncommon', cost = 4,
 	
 	vars = {},
@@ -7663,7 +7754,7 @@ create_joker({
 
 --Memoriam Photo
 create_joker({
-    name = 'Memoriam Photo', id = 1, no_art = true,
+    name = 'Memoriam Photo', id = 72,
     rarity = 'Uncommon', cost = 6,
 	
 	vars = {{chips = 0}},
@@ -7709,7 +7800,7 @@ create_joker({
 
 --Schrodinger Cat
 create_joker({
-    name = 'Schrodinger Cat', id = 1, no_art = true,
+    name = 'Schrodinger Cat', id = 73,
     rarity = 'Rare', cost = 8,
 	
 	vars = {{odds = 3}},
@@ -7753,7 +7844,7 @@ create_joker({
 
 --Cashback Card
 create_joker({
-    name = 'Cashback Card', id = 1, no_art = true,
+    name = 'Cashback Card', id = 51,
     rarity = 'Rare', cost = 9,
 	
 	vars = {{payout = 0}},
@@ -7787,7 +7878,7 @@ create_joker({
 
 --Raffle
 create_joker({
-    name = 'Raffle', id = 1, no_art = true,
+    name = 'Raffle', id = 50,
     rarity = 'Uncommon', cost = 8,
 	
 	vars = {{odds = 20}, {prize = 20}, {current_odds = 0}},
@@ -8152,7 +8243,7 @@ SMODS.Back{ -- Utility Deck
                 })
     end,
 
-    atlas = 'unstb_jokers_wip'
+    atlas = 'unstb_deck'
 }
 
 SMODS.Back{ -- Lowkey Deck
@@ -8237,7 +8328,7 @@ SMODS.Back{ -- Lowkey Deck
         })
     end,
 
-    atlas = 'unstb_jokers_wip'
+    atlas = 'unstb_deck'
 }
 
 
