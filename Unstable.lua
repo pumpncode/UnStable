@@ -13,9 +13,17 @@
 local unstb = SMODS.current_mod
 local filesystem = NFS or love.filesystem
 local path = unstb.path
+local unstb_config = unstb.config
 
 --Global Table
 unstb_global = {}
+
+-- Debug message
+local function print(message)
+    sendDebugMessage('[UnStable] - '..(tostring(message) or '???'))
+end
+
+print("Starting Unstable")
 
 --Localization Messages
 local loc = filesystem.load(unstb.path..'localization.lua')()
@@ -63,13 +71,159 @@ function loc_colour(_c, default)
     return ref_loc_colour(_c, default)
 end
 
--- Debug message
+--Config Stuff
 
-local function print(message)
-    sendDebugMessage('[UnStable] - '..(tostring(message) or '???'))
+function unstb.save_config(self)
+    SMODS.save_mod_config(self)
 end
 
-print("Starting Unstable")
+local unstb_config_tab = function()
+	return{
+		{
+		label = 'Mechanics Settings',
+		chosen = true,
+		tab_definition_function = function()
+		return {
+			n = G.UIT.ROOT,
+				config = {
+					emboss = 0.05,
+					minh = 6,
+					r = 0.1,
+					minw = 10,
+					align = "cm",
+					padding = 0.2,
+					colour = G.C.BLACK,
+				},
+				nodes = {
+				
+					{n=G.UIT.R, config={align = "cm"}, nodes={
+						
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = "Requires Restart to Apply Effects", colour = G.C.RED, scale = 0.4}}}},
+						}},
+				
+					{n=G.UIT.R, config={align = "cm"}, nodes={ --Base Box containing everything
+		
+					-- Left Side Column
+					{n=G.UIT.C, config={align = "cl", padding = 0.2}, nodes={
+						{n=G.UIT.R, config={align = "cl"}, nodes={
+						
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = "Rank", colour = G.C.ORANGE, scale = 0.5}}}},
+						create_toggle({label = 'Rank 21', ref_table = unstb.config.rank, ref_value = 'rank_21', callback = function() unstb:save_config() end}),
+						create_toggle({label = 'Rank 0 and 1', ref_table = unstb.config.rank, ref_value = 'rank_binary', callback = function() unstb:save_config() end}),
+						create_toggle({label = 'Decimal Ranks', ref_table = unstb.config.rank, ref_value = 'rank_decimal', callback = function() unstb:save_config() end}),
+						
+						}},
+						
+						{n=G.UIT.R, config={align = "cl"}, nodes={
+						
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = "Enhancement", colour = G.C.ORANGE, scale = 0.5}}}},
+						create_toggle({label = 'New Enhancement', ref_table = unstb.config.enh, ref_value = 'enh_custom', callback = function() unstb:save_config() end}),
+						create_toggle({label = 'DisEnhancement', ref_table = unstb.config.enh, ref_value = 'enh_disenh', callback = function() unstb:save_config() end}),
+						
+						}}
+					}}, 
+					
+					-- Right Side Column
+					{n=G.UIT.C, config={align = "cl"}, nodes={
+					
+						{n=G.UIT.R, config={align = "cl"}, nodes={
+						
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = "New Mechanics", colour = G.C.ORANGE, scale = 0.5}}}},
+						create_toggle({label = 'Edition Upgrade', ref_table = unstb.config.gameplay, ref_value = 'edition_upgrade', callback = function() unstb:save_config() end}),
+						create_toggle({label = 'Suit and Face Seal', ref_table = unstb.config.gameplay, ref_value = 'seal_suit', callback = function() unstb:save_config() end}),
+						create_toggle({label = 'Auxiliary Card', ref_table = unstb.config.gameplay, ref_value = 'c_aux', callback = function() unstb:save_config() end}),
+						create_toggle({label = 'Custom Music', ref_table = unstb.config.gameplay, ref_value = 'music', callback = function() unstb:save_config() end}),
+						create_toggle({label = '"Rebundant" Consumables', info = {'Contains same feature as Auxiliary Card, ', 'recommended to turn on if Auxiliary Card is turned off'}, ref_table = unstb.config.gameplay, ref_value = 'c_rebundant', callback = function() unstb:save_config() end}),
+						create_toggle({label = 'New Spectral Cards', ref_table = unstb.config.gameplay, ref_value = 'new_spectrals', callback = function() unstb:save_config() end}),
+						
+						}},
+					}}, 
+				
+				}}
+				},
+		}
+		end
+		},
+		
+		{ --Reserved Tab, in case the settings are expended in the future
+		label = 'Joker Settings',
+		tab_definition_function = function()
+		return {
+			n = G.UIT.ROOT,
+				config = {
+					emboss = 0.05,
+					minh = 6,
+					r = 0.1,
+					minw = 10,
+					align = "cm",
+					padding = 0.2,
+					colour = G.C.BLACK,
+				},
+				nodes = {
+				
+					{n=G.UIT.R, config={align = "cm"}, nodes={
+						
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = "Requires Restart to Apply Effects", colour = G.C.RED, scale = 0.4}}}},
+						}},
+				
+					{n=G.UIT.R, config={align = "cm"}, nodes={ --Base Box containing everything
+					
+					-- Right Side Column
+					{n=G.UIT.C, config={align = "cl"}, nodes={
+						
+						{n=G.UIT.R, config={align = "cl"}, nodes={
+						
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = "Joker", colour = G.C.ORANGE, scale = 0.5}}}},
+						create_toggle({label = 'Vanilla Joker Overrides', info = {'Re-coded Vanilla Jokers to work with new features'}, ref_table = unstb.config.joker, ref_value = 'vanilla', callback = function() unstb:save_config() end}),
+						create_toggle({label = 'Shitpost Jokers', ref_table = unstb.config.joker, ref_value = 'shitpost', callback = function() unstb:save_config() end}),
+						create_toggle({label = 'Major Gameplay-Altering Jokers', info = {'Jokers that may alters the playstyle drastically'}, ref_table = unstb.config.joker, ref_value = 'alter', callback = function() unstb:save_config() end}),
+						create_toggle({label = 'Powerful Jokers', info = {'Jokers that is significantly powerful than base game'}, ref_table = unstb.config.joker, ref_value = 'powerful', callback = function() unstb:save_config() end}),
+						}}
+					}}, 
+				
+				}}
+				
+				},
+			
+		
+		}
+		end
+		}
+	}
+end
+
+unstb.extra_tabs = unstb_config_tab
+
+--Map config value with a single string keyword
+local config_value = {
+    ["rank_21"] = unstb_config.rank.rank_21,
+    ["rank_binary"] = unstb_config.rank.rank_binary,
+    ["rank_decimal"] = unstb_config.rank.rank_decimal,
+    
+    ["enh_custom"] = unstb_config.enh.enh_custom,
+    ["enh_disenh"] = unstb_config.enh.enh_disenh,
+    
+    ["edition_upgrade"] = unstb_config.gameplay.edition_upgrade,
+    ["seal_suit"] = unstb_config.gameplay.seal_suit,
+    ["c_aux"] = unstb_config.gameplay.c_aux,
+	["music"] = unstb_config.gameplay.music,
+    ["c_rebundant"] = unstb_config.gameplay.c_rebundant,
+    ["new_spectrals"] = unstb_config.gameplay.new_spectrals,
+    
+    ["j_vanilla"] = unstb_config.gameplay.vanilla,
+    ["j_shitpost"] = unstb_config.gameplay.shitpost,
+    ["j_alter"] = unstb_config.gameplay.alter,
+    ["j_powerful"] = unstb_config.gameplay.powerful,
+}
+
+--Inclusion Check by a list of keyword
+local function check_enable_taglist(taglist)
+    local isAdded = true
+    for _, v in ipairs(taglist) do
+        isAdded = isAdded and config_value[v]
+    end
+    return isAdded
+end
 
 -- Index-based coordinates generation
 
@@ -339,6 +493,15 @@ end
 --Joker creation wrapper, based on Bunco
 local function create_joker(joker)
 
+	--Check Joker's keyword tag, if the setting is turned off then don't add anything
+	local isAdded = true
+	if joker.gameplay_tag and type(joker.gameplay_tag) == 'table' then 
+		for _, v in ipairs(joker.gameplay_tag) do
+			isAdded = check_enable_taglist(joker.gameplay_tag) 
+		end
+	end
+	if not isAdded then return end
+
     -- Sprite position
 
     local width = 10 -- Width of the spritesheet (in Jokers)
@@ -418,8 +581,9 @@ local function create_joker(joker)
         --unlock_condition = joker.unlock_condition,
         discovered = true, --false,
 
-        blueprint_compat = joker.blueprint,
-        eternal_compat = joker.eternal,
+        blueprint_compat = joker.blueprint or false,
+        eternal_compat = joker.eternal or true,
+		perishable_compat = joker.perishable or true,
 
         loc_txt = loc[key],
         process_loc_text = joker.process_loc_text,
@@ -535,29 +699,33 @@ end
 
 --Face Seal
 
+if unstb_config.gameplay.seal_suit then
+
 SMODS.Seal({
-    key = "face",
-    atlas = "suit_seal",
+	key = "face",
+	atlas = "suit_seal",
 	
-    pos = { x = 4, y = 0 },
-    badge_colour = HEX "f59c00",
+	pos = { x = 4, y = 0 },
+	badge_colour = HEX "f59c00",
 	shiny = true,
 	
-    weight = 0,
-    config = {extra = {}},
-    loc_txt = loc["seal_face"],
-    loc_vars = function(self, info_queue, card)
-        return {vars = {}}
-    end,
-    --[[calculate = function(self, card, context)
+	weight = 0,
+	config = {extra = {}},
+	loc_txt = loc["seal_face"],
+	loc_vars = function(self, info_queue, card)
+		return {vars = {}}
+	end,
+	--[[calculate = function(self, card, context)
 
-    end]]
+	end]]
 	
 	--This cannot spawn naturally at all
 	in_pool = function(self, args)
-        return false
-    end
+		return false
+	end
 	})
+	
+end
 
 --Hook into is_face to account for Face Seal
 local card_isfaceref = Card.is_face
@@ -622,6 +790,8 @@ unstb_global.SUIT_SEAL = {}
 --TODO: A function wrapper that registers extra suit seal, corresponding auxillary card at the same time
 --Might be a part of UnStableEX
 
+if unstb_config.gameplay.seal_suit then
+
 for i = 1, #suit_seal_list do
 	SuitSeal.initSeal(suit_seal_list[i], "suit_seal", i-1 )
 	
@@ -629,6 +799,8 @@ for i = 1, #suit_seal_list do
 	
 	unstb_global.SUIT_SEAL[suit_seal_list[i]].seal_key = 'unstb_'..string.lower(suit_seal_list[i])
 	unstb_global.SUIT_SEAL[suit_seal_list[i]].aux_key = 'c_unstb_aux_'..string.lower(suit_seal_list[i])
+end
+
 end
 
 --Heal Seal
@@ -643,6 +815,8 @@ function Card:heal(initial, delay_sprites)
 	
 	self:set_ability(prev_center, initial, delay_sprites)
 end
+
+if unstb_config.enh.enh_disenh then
 
 SMODS.Seal({
     key = "heal",
@@ -697,6 +871,8 @@ SMODS.Seal({
         return false
     end
 	})
+	
+end
 
 
 --New Enhancements
@@ -733,7 +909,9 @@ function Card:get_chip_bonus()
 	
 	return cardGetChipBonusPointer(self)
 end
- 
+
+if unstb_config.enh.enh_custom then
+
 --Acorn
 SMODS.Enhancement {
 	key = "acorn",
@@ -1197,6 +1375,8 @@ SMODS.Enhancement {
     end
  }
  
+ end
+ 
 --"Negative" Enhancements
 
 --Global function wrapper to set DisEnhancements
@@ -1239,6 +1419,8 @@ function Card:set_disenhancement(center, initial, delay_sprites)
 	--Calling appropriate set_ability
 	self:set_ability(center, initial, delay_sprites)
 end
+
+if unstb_config.enh.enh_disenh then
 
 --Radioactive
 SMODS.Enhancement {
@@ -1456,7 +1638,9 @@ SMODS.Enhancement {
     end
  }
  
- --Add proper tag to stone cards, nothing should change gameplay-wise
+end
+ 
+--Add proper tag to stone cards, nothing should change gameplay-wise
 SMODS.Enhancement:take_ownership('m_stone', {
     replace_base_card = true,
     no_suit = true,
@@ -1886,6 +2070,8 @@ end
 
 --Auxiliary Card
 
+if unstb_config.gameplay.c_aux then
+
 SMODS.ConsumableType{
     key = 'Auxiliary',
     primary_colour = HEX('424e54'),
@@ -2030,6 +2216,8 @@ end
 
 --Auxiliary Cards Code Starts Here--
 
+if unstb_config.gameplay.seal_suit then
+
 --Suit Seals Addition Cards
 for i = 1, #suit_seal_list do
 	SMODS.Consumable{
@@ -2127,6 +2315,8 @@ SMODS.Consumable{
 
 	pos = get_coordinates(6),
 }
+
+end
 
 -- +2
 SMODS.Consumable{
@@ -2340,6 +2530,8 @@ SMODS.Consumable{
 	pos = get_coordinates(12),
 }
 
+if unstb_config.rank.rank_binary then
+
 --All for One
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
@@ -2392,6 +2584,10 @@ SMODS.Consumable{
 
 	pos = get_coordinates(13),
 }
+
+end
+
+if unstb_config.rank.rank_21 then
 
 --The Twenty-One
 SMODS.Consumable{
@@ -2461,6 +2657,10 @@ SMODS.Consumable{
 
 	pos = get_coordinates(14),
 }
+
+end
+
+if check_enable_taglist({'edition_upgrade', 'enh_disenh'}) then
 
 --Monkey Paw
 SMODS.Consumable{
@@ -2557,6 +2757,10 @@ SMODS.Consumable{
 
 	pos = get_coordinates(15),
 }
+
+end
+
+if unstb_config.enh.enh_disenh then
 
 --Heal Seal Card
 SMODS.Consumable{
@@ -2702,6 +2906,8 @@ SMODS.Consumable{
         return count > #G.playing_cards * 0.25
     end,
 }
+
+end
 
 --Lottery
 SMODS.Consumable{
@@ -2888,6 +3094,8 @@ SMODS.Consumable{
 	pos = get_coordinates(19),
 }
 
+end
+
 --Other Basegame Consumable Supports for new features
 
 --Tarots
@@ -2917,6 +3125,7 @@ local function conversionTarot(hand, newcenter)
 	delay(0.5)
 end
 
+if unstb_config.enh.enh_custom then
 
 --The Time
 SMODS.Consumable{
@@ -3026,6 +3235,8 @@ SMODS.Consumable{
 	pos = get_coordinates(2),
 }
 
+end
+
 --New Rank-based Tarot
 
 local tarot_half_rankList = {['unstb_0'] = 'unstb_0',
@@ -3041,6 +3252,8 @@ local tarot_half_rankList = {['unstb_0'] = 'unstb_0',
 							['10'] = '5',
 							['Ace'] = '5',
 							['unstb_21'] = '10',}
+							
+if check_enable_taglist({'rank_binary', 'rank_decimal'}) then
 
 SMODS.Consumable{
 	set = 'Tarot', atlas = 'tarot',
@@ -3149,6 +3362,10 @@ SMODS.Consumable{
 	pos = get_coordinates(3),
 }
 
+end
+
+if unstb_config.rank.rank_decimal then
+
 SMODS.Consumable{
 	set = 'Tarot', atlas = 'tarot',
 	key = 'trt_knowledge', loc_txt = loc['trt_knowledge'],
@@ -3202,8 +3419,13 @@ SMODS.Consumable{
 
 	pos = get_coordinates(4),
 }
+end
 
 --"Rebundant" Spectral (Same ability set as some Auxiliary exclusives, but worse)
+
+if unstb_config.gameplay.c_rebundant then
+
+if unstb_config.enh.enh_disenh then
 
 --Elixir of Life
 SMODS.Consumable{
@@ -3287,6 +3509,10 @@ SMODS.Consumable{
         return count > #G.playing_cards * 0.3
     end,
 }
+
+end
+
+if unstb_config.gameplay.seal_suit then
 
 --Vessel
 SMODS.Consumable{
@@ -3430,6 +3656,10 @@ SMODS.Consumable{
 	pos = get_coordinates(2),
 }
 
+end
+
+if unstb_config.rank.rank_binary then
+
 --Amnesia
 SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
@@ -3502,6 +3732,10 @@ SMODS.Consumable{
 
 	pos = get_coordinates(3),
 }
+
+end
+
+if unstb_config.rank.rank_21 then
 
 --Altar
 SMODS.Consumable{
@@ -3594,6 +3828,10 @@ SMODS.Consumable{
 	pos = get_coordinates(4),
 }
 
+end
+
+if check_enable_taglist({'edition_upgrade', 'enh_disenh'}) then
+
 --Devil's Contract
 SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
@@ -3669,7 +3907,13 @@ SMODS.Consumable{
 	pos = get_coordinates(5),
 }
 
+end
+
+end
+
 --Other Spectrals
+
+if unstb_config.gameplay.new_spectrals then
 
 --Poltergeist
 SMODS.Consumable{
@@ -3952,7 +4196,11 @@ SMODS.Consumable{
     end,
 }
 
+end
+
 --Vouchers
+
+if unstb_config.gameplay.c_aux then
 
 SMODS.Voucher({
 	object_type = "Voucher",
@@ -3982,6 +4230,8 @@ SMODS.Voucher({
 	discovered = true,
 	requires = { "v_unstb_aux1" },
 })
+
+end
 
 -------- Joker Code Starts Here ------
 
@@ -4322,7 +4572,9 @@ create_joker({
 --Vainglorious Joker
 create_joker({
     name = 'Vainglorious Joker', id = 32,
-    rarity = 'Common', cost = 4,
+    rarity = 'Common', cost = 5,
+	
+	gameplay_tag = {'seal_suit'},
 	
     blueprint = true, eternal = true,
 	
@@ -4359,7 +4611,9 @@ create_joker({
 --Acedia Joker
 create_joker({
     name = 'Acedia Joker', id = 31,
-    rarity = 'Common', cost = 4,
+    rarity = 'Common', cost = 5,
+	
+	gameplay_tag = {'seal_suit'},
 	
     blueprint = true, eternal = true,
 	
@@ -4409,7 +4663,9 @@ create_joker({
 --Cinnabar
 create_joker({
     name = 'Cinnabar', id = 33,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 7,
+	
+	gameplay_tag = {'seal_suit', 'c_aux'},
 	
     blueprint = true, eternal = true,
 	
@@ -4462,6 +4718,8 @@ create_joker({
     name = 'Free Trial', id = 54,
     rarity = 'Uncommon', cost = 4,
 	
+	gameplay_tag = {'c_aux'},
+	
 	vars = {{odds = 4}},
 	custom_vars = function(self, info_queue, card)
 		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
@@ -4500,6 +4758,8 @@ create_joker({
     name = 'Extended Warranty', id = 55,
     rarity = 'Rare', cost = 8,
 	
+	gameplay_tag = {'c_aux'},
+	
 	vars = {{xmult = 1.5}},
 	custom_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.xmult}}
@@ -4531,6 +4791,8 @@ create_joker({
 create_joker({
     name = 'Technician', id = 56,
     rarity = 'Common', cost = 6,
+	
+	gameplay_tag = {'c_aux'},
 	
 	vars = {{chip_rate = 15}, {chips = 0}},
 	custom_vars = function(self, info_queue, card)
@@ -4578,7 +4840,9 @@ create_joker({
 --Season Pass
 create_joker({
     name = 'Season Pass', id = 57,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 5,
+	
+	gameplay_tag = {'c_aux'},
 	
 	vars = {{odds = 6}},
 	
@@ -4617,6 +4881,8 @@ create_joker({
 create_joker({
     name = 'Black Jack', id = 15,
     rarity = 'Common', cost = 4,
+	
+	gameplay_tag = {'rank_21'},
 	
     blueprint = true, eternal = true,
 	
@@ -4685,7 +4951,9 @@ create_joker({
 --What
 create_joker({
     name = 'What', id = 14,
-    rarity = 'Rare', cost = 4,
+    rarity = 'Rare', cost = 6,
+	
+	gameplay_tag = {'rank_21'},
 	
     blueprint = true, eternal = true,
 	
@@ -8246,6 +8514,8 @@ create_joker({
 
 --Decks
 
+if unstb_config.gameplay.c_aux then
+
 SMODS.Back{ -- Utility Deck
 	key = "utility", loc_txt = loc.deck_util,
 	pos = {x = 0, y = 0},
@@ -8273,6 +8543,10 @@ SMODS.Back{ -- Utility Deck
 
     atlas = 'unstb_deck'
 }
+
+end
+
+if check_enable_taglist({'rank_binary', 'rank_decimal'}) then
 
 SMODS.Back{ -- Lowkey Deck
 	key = "lowkey", loc_txt = loc.deck_lowkey,
@@ -8358,6 +8632,7 @@ SMODS.Back{ -- Lowkey Deck
 
     atlas = 'unstb_deck'
 }
+end
 
 
 --Compatibility / Tweaks / Rework Stuff
