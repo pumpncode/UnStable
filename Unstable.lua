@@ -210,10 +210,10 @@ local config_value = {
     ["c_rebundant"] = unstb_config.gameplay.c_rebundant,
     ["new_spectrals"] = unstb_config.gameplay.new_spectrals,
     
-    ["j_vanilla"] = unstb_config.gameplay.vanilla,
-    ["j_shitpost"] = unstb_config.gameplay.shitpost,
-    ["j_alter"] = unstb_config.gameplay.alter,
-    ["j_powerful"] = unstb_config.gameplay.powerful,
+    ["j_vanilla"] = unstb_config.joker.vanilla,
+    ["j_shitpost"] = unstb_config.joker.shitpost,
+    ["j_alter"] = unstb_config.joker.alter,
+    ["j_powerful"] = unstb_config.joker.powerful,
 }
 
 --Inclusion Check by a list of keyword
@@ -425,7 +425,7 @@ SMODS.Atlas {
 
 --Music
 
-local aux_music_enable = true
+local aux_music_enable = unstb_config.gameplay.music
 
 SMODS.Sound({
 	key = "music_aux",
@@ -4240,9 +4240,9 @@ end
 --Lunar Calendar
 create_joker({
     name = 'Lunar Calendar', id = 40,
-    rarity = 'Common', cost = 4,
+    rarity = 'Common', cost = 5,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = { {odds_spawn = 8} },
 	
@@ -4300,7 +4300,7 @@ create_joker({
     name = 'Dragon Hoard', id = 42,
     rarity = 'Common', cost = 4,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{mult_rate = 5}, {held_amount = 2}, {mult_current = 0}},
 	
@@ -4334,9 +4334,9 @@ create_joker({
 --Card Dealer
 create_joker({
     name = 'Card Dealer', id = 41,
-    rarity = 'Common', cost = 4,
+    rarity = 'Common', cost = 5,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = { {chip_rate = 10}, {chips = 0} },
 	
@@ -4379,9 +4379,9 @@ create_joker({
 --Match Three
 create_joker({
     name = 'Match Three', id = 67,
-    rarity = 'Common', cost = 4,
+    rarity = 'Common', cost = 6,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = { {mult = 15}, {count = 3} },
 	
@@ -4438,9 +4438,9 @@ create_joker({
 
 create_joker({
     name = 'Furry Joker', id = 44,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 7,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = { {odds_poly = 12} },
 	
@@ -4499,9 +4499,9 @@ end
 
 create_joker({
     name = 'Luxurious Handbag', id = 43,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 6,
 	
-    blueprint = false, eternal = true,
+    blueprint = false, eternal = true, perishable = true,
 	
 	vars = { {add_slot = 2}, {inflation = 2} },
 	
@@ -4545,9 +4545,9 @@ create_joker({
 --Portal
 create_joker({
     name = 'Portal', id = 39,
-    rarity = 'Rare', cost = 4,
+    rarity = 'Rare', cost = 7,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	--vars = { {times = 1}},
 	
@@ -4555,16 +4555,6 @@ create_joker({
     --[[calculate = function(self, card, context)
 		
 	end,]]
-	
-	custom_in_pool = function(self, args)
-	
-		--Spawns if there is at least one decimal card
-		for _, v in pairs(G.playing_cards) do
-			if is_decimal(v) then return true end
-		end
-		return false
-		
-    end
 })
 
 --Suit Seal Support Jokers
@@ -4576,7 +4566,7 @@ create_joker({
 	
 	gameplay_tag = {'seal_suit'},
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = { {mult = 2} },
 	
@@ -4615,7 +4605,7 @@ create_joker({
 	
 	gameplay_tag = {'seal_suit'},
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = { {mult = 6} },
 	
@@ -4667,7 +4657,7 @@ create_joker({
 	
 	gameplay_tag = {'seal_suit', 'c_aux'},
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = { {odds = 6} },
 	
@@ -4725,7 +4715,7 @@ create_joker({
 		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 		
@@ -4765,7 +4755,7 @@ create_joker({
 		return {vars = {card.ability.extra.xmult}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 		
@@ -4799,7 +4789,7 @@ create_joker({
 		return {vars = {card.ability.extra.chip_rate, card.ability.extra.chips}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	set_ability = function(self, card, initial, delay_sprites)
 		if G.GAME and G.GAME.consumeable_usage_total then
@@ -4880,11 +4870,11 @@ create_joker({
 --Black Jack
 create_joker({
     name = 'Black Jack', id = 15,
-    rarity = 'Common', cost = 4,
+    rarity = 'Common', cost = 5,
 	
-	gameplay_tag = {'rank_21'},
+	gameplay_tag = {'rank_21', 'j_alter'},
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = false,
 	
 	vars = {{maxRank = 21}, {chips = 0}},
 	
@@ -4955,7 +4945,7 @@ create_joker({
 	
 	gameplay_tag = {'rank_21'},
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = { {chips = 420}, {mult = 69} },
 	
@@ -4988,7 +4978,9 @@ create_joker({
     name = 'Floating Point Error', id = 34,
     rarity = 'Uncommon', cost = 4,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'rank_decimal'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	--vars = { {bonus = 10}},
 	
@@ -5027,9 +5019,11 @@ create_joker({
 --Academic Journal
 create_joker({
     name = 'Academic Journal', id = 35,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 6,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'rank_decimal'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = { {times_max = 1}},
 	
@@ -5127,9 +5121,11 @@ create_joker({
 --Engineer
 create_joker({
     name = 'Engineer', id = 37,
-    rarity = 'Common', cost = 4,
+    rarity = 'Common', cost = 5,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'rank_decimal'},
+	
+    blueprint = false, eternal = true, perishable = true,
 	
 	--vars = { {times = 1}},
 	
@@ -5152,9 +5148,11 @@ create_joker({
 --Thesis Proposal
 create_joker({
     name = 'Thesis Proposal', id = 36,
-    rarity = 'Rare', cost = 4,
+    rarity = 'Uncommon', cost = 6,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'rank_decimal'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{ repetitions = 1 }},
 	
@@ -5184,9 +5182,11 @@ create_joker({
 --Rainbow Flag
 create_joker({
     name = 'Rainbow Flag', id = 38,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 5,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'rank_decimal'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = { {odds_poly = 8} },
 	
@@ -5257,7 +5257,9 @@ local chipsAbilityMatch = {
 
 create_joker({
     name = 'Dummy Data', id = 6,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 6,
+	
+	gameplay_tag = {'rank_binary'},
 	
 	vars = {{odds = 2}, {unscored_card = {}}},
 	
@@ -5265,7 +5267,7 @@ create_joker({
 		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
     end,
 	
-    blueprint = false, eternal = true,
+    blueprint = false, eternal = true, perishable = true,
 	
 	add_to_deck = function(self, card, from_debuff)
 		--Enable rank 0 card in pools
@@ -5332,7 +5334,9 @@ create_joker({
 
 create_joker({
     name = 'Micro SD Card', id = 4,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 7,
+	
+	gameplay_tag = {'rank_binary', 'j_alter', 'j_powerful'},
 	
 	vars = {{odds_current = 0}, {odds_destroy = 512}, {stored_chips = 0}},
 	
@@ -5349,7 +5353,7 @@ create_joker({
 				colours = {activate_color} }}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = false, perishable = false,
 	
 	--Set sprites and hitbox
 	
@@ -5463,9 +5467,11 @@ create_joker({
 
 create_joker({
     name = 'Social Experiment', id = 65,
-    rarity = 'Rare', cost = 4,
+    rarity = 'Rare', cost = 9,
 	
-    blueprint = false, eternal = true,
+	gameplay_tag = {'rank_binary', 'j_powerful'},
+	
+    blueprint = false, eternal = true, perishable = true,
 	
 	add_to_deck = function(self, card, from_debuff)
 		--Enable rank 0 card in pools
@@ -5552,9 +5558,11 @@ create_joker({
 
 create_joker({
     name = 'Power of One', id = 13,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 7,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'rank_binary'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{mult_rate = '2'}, {mult = '0'}},
 	
@@ -5606,9 +5614,11 @@ local binary_rank = {'unstb_0', 'unstb_1', '2', '3', '4', '5', '6', '7', '8', '9
 
 create_joker({
     name = 'Binary Number', id = 5,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 7,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'rank_binary'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {},
 	
@@ -5699,9 +5709,9 @@ create_joker({
 --Quintuplets
 create_joker({
     name = 'Quintuplets', id = 2,
-    rarity = 'Rare', cost = 4,
+    rarity = 'Rare', cost = 8,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{scoring_name = ''}, {scoring_hand = {}}},
 	
@@ -5754,7 +5764,7 @@ create_joker({
     name = 'Graphic Card', id = 69,
     rarity = 'Rare', cost = 8,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{ count = 8 }, {current_count = 0}},
 	
@@ -5829,9 +5839,11 @@ create_joker({
 --Connoiseur
 create_joker({
     name = 'Connoiseur', id = 45,
-    rarity = 'Rare', cost = 4,
+    rarity = 'Rare', cost = 8,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'j_powerful'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{ repetitions = 1 }},
 	
@@ -5861,7 +5873,9 @@ create_joker({
 --Jeweler
 create_joker({
     name = 'Jeweler', id = 0,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 8,
+	
+	gameplay_tag = {'edition_upgrade'},
 	
 	vars = {{odds = 4}},
 	
@@ -5877,7 +5891,7 @@ create_joker({
         return {vars = vars}
     end,
 	
-    blueprint = false, eternal = true,
+    blueprint = false, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 		
@@ -5920,9 +5934,11 @@ create_joker({
 --Joker Diffusion
 create_joker({
     name = 'Joker Diffusion', id = 26,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 6,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'enh_custom'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{count = '1'}},
 	
@@ -5988,7 +6004,9 @@ create_joker({
     name = 'NonFungible Joker', id = 27,
     rarity = 'Uncommon', cost = 6,
 	
-    blueprint = false, eternal = true,
+	gameplay_tag = {'enh_custom'},
+	
+    blueprint = false, eternal = false, perishable = true,
 	
 	vars = {{count = '1'}, {max_payout = 10}},
 	
@@ -6060,9 +6078,11 @@ create_joker({
 --Prompt
 create_joker({
     name = 'Prompt', id = 28,
-    rarity = 'Common', cost = 4,
+    rarity = 'Common', cost = 7,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'enh_custom'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	--vars = { {times = 1}},
 	
@@ -6092,9 +6112,11 @@ create_joker({
 --Uninterested Primate
 create_joker({
     name = 'Uninterested Primate', id = 29,
-    rarity = 'Common', cost = 4,
+    rarity = 'Common', cost = 5,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'enh_custom'},
+	
+    blueprint = true, eternal = false, perishable = false,
 	
 	vars = { {chips = 50}, {chips_rate = 10}, {slop_scored = 0}, {slop_cycle = 5}, {chance_destroy = 8}},
 	
@@ -6185,9 +6207,11 @@ create_joker({
 --Lethargic Lion
 create_joker({
     name = 'Lethargic Lion', id = 30,
-    rarity = 'Common', cost = 4,
+    rarity = 'Common', cost = 5,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'enh_custom'},
+	
+    blueprint = true, eternal = false, perishable = false,
 	
 	vars = { {xmult = 2}, {xmult_rate = 0.02}, {slop_scored = 0}, {slop_cycle = 5}, {chance_destroy = 8}},
 	
@@ -6277,9 +6301,11 @@ create_joker({
 --Vintage Joker
 create_joker({
     name = 'Vintage Joker', id = 23,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 6,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'enh_custom'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{chance_fix = '4'}},
 	
@@ -6322,9 +6348,11 @@ create_joker({
 --Rules Errata
 create_joker({
     name = 'Rules Errata', id = 24,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 5,
 	
-    blueprint = false, eternal = true,
+	gameplay_tag = {'enh_custom'},
+	
+    blueprint = false, eternal = true, perishable = true,
 	
 	--vars = {{}},
 	
@@ -6358,9 +6386,11 @@ create_joker({
 --Auction Winner
 create_joker({
     name = 'Auction Winner', id = 25,
-    rarity = 'Common', cost = 4,
+    rarity = 'Common', cost = 6,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'enh_custom'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	--vars = {{}},
 	
@@ -6408,7 +6438,9 @@ create_joker({
 
 create_joker({
     name = 'Joker Island', id = 7,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 6,
+	
+	gameplay_tag = {'enh_custom'},
 	
 	vars = {{target_rank = 2}, {odds_ticket = 6}},
 	
@@ -6417,7 +6449,7 @@ create_joker({
         return {vars = {localize(card.ability.extra.target_rank, 'ranks'), G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_ticket}}
     end,
 	
-    blueprint = false, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	set_ability = function(self, card, initial, delay_sprites)
 		--Random possible rank
@@ -6480,7 +6512,9 @@ create_joker({
 
 create_joker({
     name = 'Kaiju', id = 17,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 8,
+	
+	gameplay_tag = {'enh_disenh'},
 	
 	vars = {{add_slot = 3}},
 	
@@ -6491,7 +6525,7 @@ create_joker({
         return {vars = {card.ability.extra.add_slot}}
     end,
 	
-    blueprint = false, eternal = true,
+    blueprint = false, eternal = true, perishable = true,
 	
 	add_to_deck = function(self, card, from_debuff)
 		if not G.GAME.pool_flags.radioactive_enabled then
@@ -6528,7 +6562,9 @@ create_joker({
 
 create_joker({
     name = 'Poison the Well', id = 18,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 8,
+	
+	gameplay_tag = {'enh_disenh'},
 	
 	vars = {{discard_size = 3}},
 	
@@ -6539,7 +6575,7 @@ create_joker({
         return {vars = {card.ability.extra.discard_size}}
     end,
 	
-    blueprint = false, eternal = true,
+    blueprint = false, eternal = true, perishable = true,
 	
 	add_to_deck = function(self, card, from_debuff)
 		if not G.GAME.pool_flags.poison_enabled then
@@ -6571,7 +6607,9 @@ create_joker({
 
 create_joker({
     name = 'Petri Dish', id = 19,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 8,
+	
+	gameplay_tag = {'enh_disenh'},
 	
 	vars = {{adds_hand = 3}, {odds = 2}},
 	
@@ -6582,7 +6620,7 @@ create_joker({
         return {vars = {card.ability.extra.adds_hand, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
     end,
 	
-    blueprint = false, eternal = true,
+    blueprint = false, eternal = true, perishable = true,
 	
 	add_to_deck = function(self, card, from_debuff)
 		if not G.GAME.pool_flags.biohazard_enabled then
@@ -6619,9 +6657,11 @@ create_joker({
 --Anti-Enhancement Supports
 create_joker({
     name = 'Geiger Counter', id = 20,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 6,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'enh_disenh'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{mult_rate = '4'}, {mult = '0'}},
 	
@@ -6692,9 +6732,11 @@ create_joker({
 
 create_joker({
     name = 'Strych Nine', id = 21,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 5,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'enh_disenh'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{chip_rate = '9'}, {chip = '0'}},
 	
@@ -6746,9 +6788,11 @@ create_joker({
 
 create_joker({
     name = 'Vaccination Card', id = 22,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 7,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'enh_disenh'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{xmult_rate = '0.25'}, {xmult = '1'}},
 	
@@ -6811,12 +6855,14 @@ create_joker({
     name = 'Joker2', id = 11,
     rarity = 'Common', cost = 4,
 	
+	gameplay_tag = {'j_shitpost'},
+	
 	vars = {{mult = 4}, {xmult = 2}, {odds_destroy = 4}},
 	custom_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.mult, card.ability.extra.xmult, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_destroy}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = false, perishable = true,
 	
     calculate = function(self, card, context)
 		
@@ -6870,14 +6916,16 @@ create_joker({
 -- Joker Stairs
 create_joker({
     name = 'Joker Stairs', id = 12,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 8,
+	
+	gameplay_tag = {'j_shitpost'},
 	
 	vars = {{mult_rate = 4}, {mult = 0}},
 	custom_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.mult_rate, card.ability.extra.mult}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = false,
 	
     calculate = function(self, card, context)
 		--Shop
@@ -6915,13 +6963,15 @@ create_joker({
     name = 'Plagiarism', id = 46,
     rarity = 'Uncommon', cost = 10,
 	
+	gameplay_tag = {'j_shitpost'},
+	
 	vars = {{dir = 0}},
 	
 	custom_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.dir==0 and 'Left' or 'Right'}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	set_ability = function(self, card, initial, delay_sprites)
 		--Random direction
@@ -6995,7 +7045,7 @@ create_joker({
 		return {vars = {card.ability.extra.reduce, G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_destroy, card.ability.extra.rate}}
     end,
 	
-    blueprint = false, eternal = true,
+    blueprint = false, eternal = true, perishable = false,
 	
     calculate = function(self, card, context)
 		--Reduce Blind Size
@@ -7036,14 +7086,16 @@ create_joker({
 --Jackhammer
 create_joker({
     name = 'Jackhammer', id = 16,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 7,
+	
+	gameplay_tag = {'j_shitpost', 'j_powerful'},
 	
 	vars = {{retrigger_times = 5}, {is_activate = false}},
 	custom_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.retrigger_times}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 		
@@ -7092,14 +7144,16 @@ create_joker({
 --Jack of All Trades
 create_joker({
     name = 'Jack of All Trades', id = 60,
-    rarity = 'Rare', cost = 7,
+    rarity = 'Rare', cost = 6,
+	
+	gameplay_tag = {'j_shitpost'},
 	
 	vars = {{chips = 15}, {mult = 2}, {xmult = 1.1}, {money = 1}},
 	custom_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.chips, card.ability.extra.mult, card.ability.extra.xmult, card.ability.extra.money}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	
     calculate = function(self, card, context)
@@ -7137,7 +7191,7 @@ create_joker({
 		return {vars = {rank1..' of '..suit1, rank2..' of '..suit2, colours = {colour1, colour2}}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = false, eternal = true, perishable = true,
 	
 	set_ability = function(self, card, initial, delay_sprites)
 		if card.ability.extra.side == 0 then
@@ -7158,7 +7212,7 @@ create_joker({
 	
     calculate = function(self, card, context)
 	
-		if context.pre_discard then
+		if context.pre_discard and not context.blueprint then
             event({trigger = 'after', delay = 0.3, blockable = false,
 				func = function()
 				
@@ -7224,13 +7278,15 @@ create_joker({
     name = 'Queensland', id = 61,
     rarity = 'Rare', cost = 7,
 	
+	gameplay_tag = {'j_shitpost', 'enh_custom'},
+	
 	vars = {{count_max = 3}, {count = 0}},
 	custom_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'resource_tooltip'}
 		return {vars = {card.ability.extra.count_max, card.ability.extra.count_max - card.ability.extra.count}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	
     calculate = function(self, card, context)
@@ -7284,13 +7340,15 @@ create_joker({
     name = 'King of Pop', id = 62,
     rarity = 'Rare', cost = 8,
 	
+	gameplay_tag = {'j_powerful'},
+	
 	vars = {{odds_destroy = 8}},
 	custom_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = G.P_TAGS.tag_double
 		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_destroy}}
     end,
 	
-    blueprint = false, eternal = true,
+    blueprint = false, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 		--Pre-hand check
@@ -7328,6 +7386,8 @@ create_joker({
     name = 'prssj', id = 63,
     rarity = 'Rare', cost = 10,
 	
+	gameplay_tag = {'j_shitpost', 'j_powerful', 'edition_upgrade'},
+	
 	vars = {{odds_upgrade = 8}, {odds_retrigger = 4}, {odds_hand = 2}, {hand_xmult = 2}},
 	custom_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'upgrade_edition'}
@@ -7335,7 +7395,7 @@ create_joker({
 		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_upgrade, card.ability.extra.odds_retrigger, card.ability.extra.odds_hand,  card.ability.extra.hand_xmult}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 	
@@ -7398,12 +7458,14 @@ create_joker({
     name = 'Master of One', id = 64,
     rarity = 'Uncommon', cost = 7,
 	
+	gameplay_tag = {'rank_binary', 'j_alter'},
+	
 	--vars = {},
 	custom_vars = function(self, info_queue, card)
 		return {vars = {}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	add_to_deck = function(self, card, from_debuff)
 		--Enable rank 1 card in pools
@@ -7455,14 +7517,14 @@ create_joker({
 --Spectre
 create_joker({
     name = 'Spectre', id = 9,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 7,
 	
 	vars = {{xmult_rate = 0.25}, {xmult = 1}},
 	custom_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.xmult_rate, card.ability.extra.xmult}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	set_ability = function(self, card, initial, delay_sprites)
 		if G.GAME and G.GAME.consumeable_usage_total then
@@ -7508,7 +7570,7 @@ create_joker({
 		return {vars = {card.ability.extra.chips_rate, card.ability.extra.mult_rate}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	
     calculate = function(self, card, context)
@@ -7548,7 +7610,7 @@ create_joker({
 		return {vars = {card.ability.extra.chips_rate, card.ability.extra.mult_rate}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	
     calculate = function(self, card, context)
@@ -7601,7 +7663,7 @@ create_joker({
 		return {vars = {card.ability.extra.xmult_good, card.ability.extra.xmult_bad, card.ability.extra.target_hand}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	set_ability = function(self,card, initial, delay_sprites)
 	
@@ -7638,9 +7700,9 @@ create_joker({
 --Imperial Bower
 create_joker({
     name = 'Imperial Bower', id = 58,
-    rarity = 'Common', cost = 4,
+    rarity = 'Common', cost = 7,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = { {xmult = 3}},
 	
@@ -7676,9 +7738,9 @@ create_joker({
 --The Jolly Joker
 create_joker({
     name = 'The Jolly Joker', id = 59,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 6,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = false,
 	
 	vars = { {mult_rate = 8}, {mult = 0}},
 	
@@ -7732,7 +7794,7 @@ create_joker({
     name = 'Get Out of Jail Free Card', id = 48,
     rarity = 'Rare', cost = 10,
 	
-    blueprint = false, eternal = true,
+    blueprint = false, eternal = false, perishable = true,
 	
 	--vars = { {times = 1}},
 	
@@ -7799,9 +7861,11 @@ create_joker({
 --Tanzaku
 create_joker({
     name = 'Tanzaku', id = 70,
-    rarity = 'Rare', cost = 4,
+    rarity = 'Rare', cost = 8,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'j_powerful'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{ repetitions = 0 }, { repetition_rate = 1 } },
 	
@@ -7874,7 +7938,9 @@ create_joker({
     name = 'Glass Cannon', id = 68,
     rarity = 'Rare', cost = 8,
 	
-    blueprint = true, eternal = true,
+	gameplay_tag = {'j_powerful'},
+	
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{ repetitions = 1 }},
 	
@@ -7907,7 +7973,7 @@ create_joker({
     name = 'Pity Rate Drop', id = 71,
     rarity = 'Rare', cost = 8,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
 	vars = {{ odds = 12 }, {odds_rate = 1}, {odds_current = 1}},
 	
@@ -7961,14 +8027,14 @@ create_joker({
 --Salmon Run
 create_joker({
     name = 'Salmon Run', id = 10,
-    rarity = 'Rare', cost = 4,
+    rarity = 'Rare', cost = 7,
 	
 	vars = {{odds = 7}},
 	custom_vars = function(self, info_queue, card)
 		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
@@ -8004,14 +8070,14 @@ create_joker({
 --Cool S
 create_joker({
     name = 'Cool S', id = 66,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 8,
 	
 	vars = {},
 	custom_vars = function(self, info_queue, card)
 		return {vars = {}}
     end,
 	
-    blueprint = false, eternal = true,
+    blueprint = false, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 		if context.after and not context.blueprint then
@@ -8058,7 +8124,7 @@ create_joker({
 		return {vars = {card.ability.extra.chips}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = false,
 	
     calculate = function(self, card, context)
 		--Upgrades
@@ -8104,7 +8170,7 @@ create_joker({
 		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = true, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 		--Upgrades
@@ -8148,7 +8214,7 @@ create_joker({
 		return {vars = {card.ability.extra.payout}}
     end,
 	
-    blueprint = false, eternal = true,
+    blueprint = false, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 		if context.using_consumeable and not context.blueprint then
@@ -8182,7 +8248,7 @@ create_joker({
 		return {vars = {(G.GAME and G.GAME.probabilities.normal or 1)*card.ability.extra.current_odds, card.ability.extra.odds, card.ability.extra.prize, G.GAME and G.GAME.probabilities.normal or 1, }}
     end,
 	
-    blueprint = false, eternal = true,
+    blueprint = false, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 		--All upgraded part
@@ -8268,7 +8334,7 @@ create_joker({
 		return {vars = {card.ability.extra.money_rate, card.ability.extra.round_max, card.ability.extra.balance, card.ability.extra.round_left}}
     end,
 	
-    blueprint = false, eternal = false,
+    blueprint = false, eternal = false, perishable = false,
 	
 	set_ability = function(self, card, initial, delay_sprites)
 		card.ability.extra.round_left = card.ability.extra.round_max
@@ -8345,7 +8411,9 @@ local rank_2048 = { unstb_0 = true, unstb_1 = true, ['2'] = true, ['4'] = true, 
 --2048
 create_joker({
     name = 'j2048', id = 3,
-    rarity = 'Uncommon', cost = 4,
+    rarity = 'Uncommon', cost = 7,
+	
+	gameplay_tag = {'j_alter'},
 	
 	vars = {{card_to_destroy = {}}},
 	
@@ -8363,7 +8431,7 @@ create_joker({
         SMODS.process_loc_text(G.localization.descriptions.Joker, self.key..'_ex', loc.j2048_ex)
     end,
 	
-    blueprint = true, eternal = true,
+    blueprint = false, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 		if context.before and context.scoring_hand and not context.blueprint then
@@ -8424,7 +8492,9 @@ create_joker({
 --Inductor
 create_joker({
     name = 'Inductor', id = 1,
-    rarity = 'Rare', cost = 4,
+    rarity = 'Rare', cost = 8,
+	
+	gameplay_tag = {'j_powerful'},
 	
 	vars = {{odds_en = 4}, {odds_ed = 8}, {odds_s = 12}},
 	
@@ -8438,7 +8508,7 @@ create_joker({
         return {vars = vars}
     end,
 	
-    blueprint = false, eternal = true,
+    blueprint = false, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 		
@@ -8641,7 +8711,11 @@ end
 filesystem.load(unstb.path..'/override/ui.lua')()
 
 --Reworked Vanilla Joker to support new features
+if unstb_config.joker.vanilla then
+
 filesystem.load(unstb.path..'/override/vanilla_joker.lua')()
+
+end
 
 --Suits, supports for Suit Seals, a lot of suit-based Joker, and modded suits support for Smeared
 filesystem.load(unstb.path..'/override/suits.lua')()
