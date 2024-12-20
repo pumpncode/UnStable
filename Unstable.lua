@@ -1,8 +1,8 @@
 --- STEAMODDED HEADER
 --- MOD_NAME: UnStable
 --- MOD_ID: UNSTB
---- MOD_AUTHOR: [Kirbio, Ram]
---- MOD_DESCRIPTION: Assorted Mish-mash of Various Idea
+--- MOD_AUTHOR: [Kirbio, RamChops Games]
+--- MOD_DESCRIPTION: Mod with a lot of new but vanilla-style mechanics. Contains new Jokers, consumables, and other stuff!
 --- DEPENDENCIES: [Steamodded>=1.0.0~ALPHA-0812d]
 --- BADGE_COLOR: 41c300
 --- PREFIX: unstb
