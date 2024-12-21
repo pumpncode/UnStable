@@ -39,7 +39,7 @@ return {
 	
 	disenhancement = {
         ['en-us'] = {
-            ['name'] = 'DisEnhancement',
+            ['name'] = 'Unhancement',
             ['text'] = {
                 [1] = "Enhancement that have",
 				[2] = "negative effects",
@@ -230,9 +230,9 @@ return {
 			['label'] = 'Heal Seal',
             ['name'] = 'Heal Seal',
             ['text'] = {
-				[1] = 'Removes {C:red}Disenhancement{} from one',
+				[1] = 'Removes {C:red}Unhancement{} from one',
 				[2] = 'of random cards held in hand when scored.',
-				[3] = 'This card also cannot be {C:red}Disenhanced{}.',
+				[3] = 'This card also cannot be {C:red}Unhanced{}.',
             }
         }
 	},
@@ -459,7 +459,7 @@ return {
         ['en-us'] = {
             ['name'] = 'Heal Aura',
             ['text'] = {
-                [1] = 'Heal all {C:attention}Disenhanced Cards{}',
+                [1] = 'Heal all {C:attention}Unhanced Cards{}',
                 [2] = 'holding in hand'
             }
         }
@@ -578,7 +578,7 @@ return {
         ['en-us'] = {
             ['name'] = 'Elixir of Life',
             ['text'] = {
-                [1] = 'Heal all {C:red}Disenhanced Cards{} in the deck',
+                [1] = 'Heal all {C:red}Unhanced Cards{} in the deck',
                 [2] = 'Reduce money by half {C:inactive}(rounded up){}'
             }
         }
@@ -640,7 +640,7 @@ return {
 				[2] = 'card in your hand,',
 				[3] = 'converts {C:attention}#2#{} random',
 				[4] = 'cards in your hand into',
-				[5] = '{C:attention}random {C:red}DisEnhancement{}',
+				[5] = '{C:attention}random {C:red}Unhancement{}',
             }
         }
     },
@@ -1068,11 +1068,11 @@ return {
         ['en-us'] = {
             ['name'] = 'Lethargic Lion',
             ['text'] = {
-                [1] = 'Gains {X:mult,C:white}x#1#{} Mult every {C:attention}#2# {C:inactive}[#6#]',
+                [1] = 'Gains {X:mult,C:white}X#1#{} Mult every {C:attention}#2# {C:inactive}[#6#]',
 				[2] = '{C:attention}Slop Cards{} scored.',
 				[3] = '{C:green}#3# in #4#{} chance to destroy',
 				[4] = 'itself at the end of the round',
-				[5] = '{C:inactive}(Currently: {X:mult,C:white}x#5#{C:inactive} Mult)',
+				[5] = '{C:inactive}(Currently: {X:mult,C:white}X#5#{C:inactive} Mult)',
 				
             }
         }
@@ -1156,9 +1156,9 @@ return {
             ['name'] = 'Vaccination Card',
             ['text'] = {
 				[1] = 'Neutralize all {C:attention}Biohazard Card{} passive effects',
-                [2] = 'Gives additional {X:mult,C:white}x#1#{} Mult for each',
+                [2] = 'Gives additional {X:mult,C:white}X#1#{} Mult for each',
 				[3] = '{C:attention}Biohazard Card{} held in hand.',
-				[4] = "{C:inactive}(Currently {X:mult,C:white}x#2#{C:inactive} Mult)",
+				[4] = "{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)",
             }
         }
     },
@@ -1249,7 +1249,7 @@ return {
             ['name'] = 'Joker2',
             ['text'] = {
                 [1] = '{C:mult}+#1#{} Mult',
-				[2] = '{X:mult,C:white}x#2#{} Mult',
+				[2] = '{X:mult,C:white}X#2#{} Mult',
 				[3] = '{C:green}#3# in #4#{} chance of destroying itself',
 				[4] = 'at the end of round',
             }
@@ -1344,7 +1344,7 @@ return {
             ['text'] = {
                 [1] = '{C:green}#1# in #2#{} chance for scored {C:attention}Kings{} to upgrade {C:dark_edition}edition',
 				[2] = '{C:green}#1# in #3#{} chance for scored {C:attention}Kings{} to {C:attention}retrigger',
-				[3] = '{C:green}#1# in #4#{} chance for {C:attention}Kings{} held in hand to give {X:mult,C:white}x#5#{} Mult',
+				[3] = '{C:green}#1# in #4#{} chance for {C:attention}Kings{} held in hand to give {X:mult,C:white}X#5#{} Mult',
             }
         }
     },
@@ -1374,9 +1374,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Spectre',
             ['text'] = {
-                [1] = '{X:mult,C:white}x#1#{} Mult per {C:spectral}Spectral{}',
+                [1] = '{X:mult,C:white}X#1#{} Mult per {C:spectral}Spectral{}',
 				[2] = 'card used this run',
-				[3] = '{C:inactive}(Currently {X:mult,C:white}x#2#{C:inactive} Mult){}',
+				[3] = '{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult){}',
             }
         }
     },
@@ -1409,8 +1409,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Throwing Hands',
             ['text'] = {
-                [1] = '{X:mult,C:white}x#1#{} Mult if the played hand is {C:attention}#3#{}',
-				[2] = '{X:mult,C:white}x#2#{} Mult otherwise',
+                [1] = '{X:mult,C:white}X#1#{} Mult if the played hand is {C:attention}#3#{}',
+				[2] = '{X:mult,C:white}X#2#{} Mult otherwise',
 				[3] = '{s:0.8}Hand changes at the end of round',
             }
         }
@@ -1420,7 +1420,7 @@ return {
         ['en-us'] = {
             ['name'] = 'Imperial Bower',
             ['text'] = {
-                [1] = '{X:mult,C:white}x#1#{} Mult if the played hand',
+                [1] = '{X:mult,C:white}X#1#{} Mult if the played hand',
 				[2] = "contains a {C:attention}Straight{} and",
 				[3] = 'has at least one {C:attention}face card{}',
             }
