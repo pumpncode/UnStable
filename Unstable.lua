@@ -597,7 +597,7 @@ local function create_joker(joker)
         unlocked = true,
         --check_for_unlock = joker.check_for_unlock,
         --unlock_condition = joker.unlock_condition,
-        discovered = true, --false,
+        --discovered = true, --false,
 
         blueprint_compat = joker.blueprint or false,
         eternal_compat = joker.eternal or true,
@@ -2243,7 +2243,7 @@ for i = 1, #suit_seal_list do
 		key = 'aux_'..string.lower(suit_seal_list[i]), loc_txt = loc['aux_'..string.lower(suit_seal_list[i])],
 
 		config = {extra = {count = 2, seal = 'unstb_'..string.lower(suit_seal_list[i])}},
-		discovered = true,
+		--discovered = true,
 
 		loc_vars = function(self, info_queue, card)
 			local suit = localize(suit_seal_list[i], 'suits_singular') ..' Seal'
@@ -2294,7 +2294,7 @@ SMODS.Consumable{
 	key = 'aux_face', loc_txt = loc['aux_face'],
 
 	config = {extra = {count = 2, seal = 'unstb_face'}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'unstb_face_seal'}
@@ -2342,7 +2342,7 @@ SMODS.Consumable{
 	key = 'aux_plus_two', loc_txt = loc['aux_plus_two'],
 
 	config = {extra = {count = 2}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.count}}
@@ -2389,7 +2389,7 @@ SMODS.Consumable{
 	key = 'aux_plus_four_wild', loc_txt = loc['aux_plus_four_wild'],
 
 	config = {extra = {count = 4}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.count}}
@@ -2455,7 +2455,7 @@ for i = 1, #aux_instants do
 		key = aux_instants[i], loc_txt = loc[aux_instants[i]],
 
 		config = {extra = {amount = 3}},
-		discovered = true,
+		--discovered = true,
 
 		loc_vars = function(self, info_queue, card)
 			return {vars = {card.ability.extra.amount}}
@@ -2493,7 +2493,7 @@ SMODS.Consumable{
 	key = 'aux_seal_move', loc_txt = loc['aux_seal_move'],
 
 	config = {extra = {}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		return {vars = {}}
@@ -2556,7 +2556,7 @@ SMODS.Consumable{
 	key = 'aux_conv_1', loc_txt = loc['aux_conv_1'],
 
 	config = {extra = {count = 3}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.count}}
@@ -2613,7 +2613,7 @@ SMODS.Consumable{
 	key = 'aux_21', loc_txt = loc['aux_21'],
 
 	config = {extra = {count = 5}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.count}}
@@ -2686,7 +2686,7 @@ SMODS.Consumable{
 	key = 'aux_upgrade', loc_txt = loc['aux_upgrade'],
 
 	config = {extra = {}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 	
@@ -2786,7 +2786,7 @@ SMODS.Consumable{
 	key = 'aux_heal', loc_txt = loc['aux_heal'],
 
 	config = {extra = {count = 1, seal = 'unstb_heal'}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'unstb_heal_seal'}
@@ -2854,7 +2854,7 @@ SMODS.Consumable{
 	key = 'aux_heal_hand', loc_txt = loc['aux_heal_hand'],
 
 	config = {extra = {}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'disenhancement'}
@@ -2934,7 +2934,7 @@ SMODS.Consumable{
 	key = 'aux_lottery', loc_txt = loc['aux_lottery'],
 
 	config = {extra = {odds_win = 4, prize = 20}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_win, card.ability.extra.prize }}
@@ -2987,7 +2987,7 @@ SMODS.Consumable{
 	key = 'aux_blank', loc_txt = loc['aux_blank'],
 
 	config = {extra = {}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		return {vars = {}}
@@ -3024,7 +3024,7 @@ SMODS.Consumable{
 	key = 'aux_dark_matter', loc_txt = loc['aux_dark_matter'],
 
 	config = {extra = {slot = 1}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 	
@@ -3079,7 +3079,7 @@ SMODS.Consumable{
 	key = 'aux_random', loc_txt = loc['aux_random'],
 
 	config = {extra = {count = 2}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.count}}
@@ -3155,7 +3155,7 @@ SMODS.Consumable{
     end,
 
 	config = {extra = {count = 2}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 	
@@ -3191,7 +3191,7 @@ SMODS.Consumable{
     end,
 
 	config = {extra = {count = 1}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 	
@@ -3227,7 +3227,7 @@ SMODS.Consumable{
     end,
 
 	config = {extra = {count = 2}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 	
@@ -3282,7 +3282,7 @@ SMODS.Consumable{
     end,
 
 	config = {extra = {count = 2}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 
@@ -3393,7 +3393,7 @@ SMODS.Consumable{
     end,
 
 	config = {extra = {count = 1}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 
@@ -3452,7 +3452,7 @@ SMODS.Consumable{
 	key = 'spc_elixir', loc_txt = loc['spc_elixir'],
 
 	config = {extra = {}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'disenhancement'}
@@ -3539,7 +3539,7 @@ SMODS.Consumable{
 	key = 'spc_vessel', loc_txt = loc['spc_vessel'],
 
 	config = {extra = {count = 1}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'suit_seal'}
@@ -3612,7 +3612,7 @@ SMODS.Consumable{
 	key = 'spc_conferment', loc_txt = loc['spc_conferment'],
 
 	config = {extra = {count = 2, cost = 8}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'unstb_face_seal'}
@@ -3685,7 +3685,7 @@ SMODS.Consumable{
 	key = 'spc_amnesia', loc_txt = loc['spc_amnesia'],
 
 	config = {extra = {count = 3}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 
@@ -3762,7 +3762,7 @@ SMODS.Consumable{
 	key = 'spc_altar', loc_txt = loc['spc_altar'],
 
 	config = {extra = {destroy_count = 3, create_count = 2}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 
@@ -3857,7 +3857,7 @@ SMODS.Consumable{
 	key = 'spc_contract', loc_txt = loc['spc_contract'],
 
 	config = {extra = {upgrade_count = 1, disenc_count = 3}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 
@@ -3940,7 +3940,7 @@ SMODS.Consumable{
 	key = 'spc_poltergeist', loc_txt = loc['spc_poltergeist'],
 
 	config = {extra = {}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 
@@ -4027,7 +4027,7 @@ SMODS.Consumable{
 	key = 'spc_projection', loc_txt = loc['spc_projection'],
 
 	config = {extra = {odds_break = 4}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 
@@ -4157,7 +4157,7 @@ SMODS.Consumable{
 	key = 'spc_siphon', loc_txt = loc['spc_siphon'],
 
 	config = {extra = {count = 4}},
-	discovered = true,
+	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 
@@ -4238,7 +4238,7 @@ SMODS.Voucher({
 	atlas = "voucher",
 	pos = { x = 0, y = 0 },
 	unlocked = true,
-	discovered = true,
+	--discovered = true,
 	redeem = function(self)
 		event({
 			func = function()
@@ -4256,7 +4256,7 @@ SMODS.Voucher({
 	atlas = "voucher",
 	pos = { x = 1, y = 0 },
 	unlocked = true,
-	discovered = true,
+	--discovered = true,
 	requires = { "v_unstb_aux1" },
 })
 
