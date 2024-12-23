@@ -22,7 +22,7 @@ end'''
 target = "functions/state_events.lua"
 pattern = '''if effects[ii].h_mult then'''
 position = "before"
-match_indent = false
+match_indent = true
 payload = '''
 if effects[ii].h_chips then
 	mod_percent = true

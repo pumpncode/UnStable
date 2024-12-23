@@ -74,7 +74,7 @@ return {
             ['name'] = 'Suit Seal',
             ['text'] = {
 				[1] = 'Makes the card also',
-				[2] = 'count as {C:attention}(Respective Suit){}',
+				[2] = 'counts as {C:attention}(Respective Suit){}',
             }
         }
 	},
@@ -84,11 +84,11 @@ return {
             ['name'] = 'Resource Card',
             ['text'] = {
                 [1] = 'Has no rank, always scored.',
-				[2] = 'Gives {X:mult,C:white}X5{} Mult',
+				[2] = 'Give {X:mult,C:white}X5{} Mult',
 				[3] = 'if the played hand has at least',
 				[4] = 'one card with {C:attention}(Corresponding Suit){} suit',
-				[5] = '{C:red}Destroys itself after scored{}',
-				[6] = '{C:inactive}(Does not count other Resource Cards){}',
+				[5] = '{C:red}Destroy itself after scored{}',
+				[6] = '{C:inactive}(Does not count another Resource Card){}',
             }
         }
 	},
@@ -97,9 +97,9 @@ return {
 		['en-us'] = {
             ['name'] = 'Acorn Mark Card',
             ['text'] = {
-                [1] = 'Gives {C:chips}double amount{}',
-				[2] = 'of chips when in hand,',
-				[3] = 'does not give any chips when scored',
+                [1] = 'Give {C:chips}double amount{}',
+				[2] = 'of chips when in hand',
+				[3] = 'Does not give any chips when scored',
             }
         }
 	},
@@ -108,9 +108,9 @@ return {
 		['en-us'] = {
             ['name'] = 'Poison Card',
             ['text'] = {
-				[1] = 'Gives {C:red}negative amount{} of chips,',
-				[2] = 'discarded {C:attention}Poison Cards{}',
-				[3] = 'go back into the deck',
+				[1] = 'Give {C:red}negative amount{} of chips',
+				[2] = 'Discarded {C:attention}Poison Cards{}',
+				[3] = 'goes back into the deck',
             }
         }
 	},
@@ -121,8 +121,8 @@ return {
 		['en-us'] = {
             ['name'] = 'Acorn Mark Card',
             ['text'] = {
-                [1] = 'Gives {C:chips}+#1#{} chips when in hand,',
-				[2] = 'does not give any chips when scored',
+                [1] = 'Give {C:chips}+#1#{} chips when in hand',
+				[2] = 'Does not give any chips when scored',
             }
         }
 	},
@@ -142,9 +142,10 @@ return {
 		['en-us'] = {
             ['name'] = 'Promo Card',
             ['text'] = {
-                [1] = 'Gives {C:gold}$#1#{} while this card stays in hand',
-				[2] = 'Gains {C:gold}+$#2#{} when scored',
-				[3] = '{C:green}#3# in #4#{} chance to destroy when scored',
+                [1] = 'Gives {C:gold}$#1#{} while this',
+				[2] = 'card stays in hand',
+                [3] = 'Gains {C:gold}+$#2#{} when scored',
+                [4] = '{C:green}#3# in #4#{} chance to destroy when scored',
             }
         }
 	},
@@ -166,11 +167,11 @@ return {
             ['name'] = 'Resource Card',
             ['text'] = {
                 [1] = 'Has no rank, always scored.',
-				[2] = 'Gives {X:mult,C:white}X#1#{} Mult',
+				[2] = 'Give {X:mult,C:white}X#1#{} Mult',
 				[3] = 'if the played hand has at least',
 				[4] = 'one card with {V:1}#2#{} suit',
-				[5] = '{C:red}Destroys itself after scored{}',
-				[6] = '{C:inactive}(Does not count other Resource Cards){}',
+				[5] = '{C:red}Destroy itself after scored{}',
+				[6] = '{C:inactive}(Does not count another Resource Card){}',
             }
         }
 	},
@@ -182,10 +183,10 @@ return {
             ['text'] = {
                 [1] = '{C:chips}+#1#{} Chips, no rank or suit',
 				[2] = 'When played, {C:green}#2# in #3#{} chance to',
-				[3] = 'convert other played cards to {C:attention}Radioactive Cards{}',
+				[3] = 'convert other played cards to {C:attention}Radioactive Card{}',
 				[4] = '',
 				[5] = 'When held in hand, {C:green}#2# in #4#{} chance to give',
-				[6] = '{X:mult,C:white}X#5#{} Mult, otherwise gives {X:mult,C:white}X#6#{} Mult',
+				[6] = '{X:mult,C:white}X#5#{} Mult, otherwise give {X:mult,C:white}X#6#{} Mult',
             }
         }
 	},
@@ -195,9 +196,9 @@ return {
             ['name'] = 'Biohazard Card',
             ['text'] = {
                 [1] = '{X:mult,C:white}X#1#{} Mult, no rank or suit',
-				[2] = 'Lose {C:red}-$#2#{} while this card stays in hand',
-				[3] = 'When discarded, {C:green}#3# in #4#{} chance to turn one random',
-				[4] = 'card in the deck into {C:attention}Biohazard Card{}',
+                [2] = 'Lose {C:red}-$#2#{} while this card stays in hand',
+                [3] = 'When discarded, {C:green}#3# in #4#{} chance to turn one random',
+                [4] = 'card in the deck into {C:attention}Biohazard Card{}',
             }
         }
 	},
@@ -207,8 +208,8 @@ return {
             ['name'] = 'Poison Card',
             ['text'] = {
 				[1] = '{C:red}-#1#{} Chips',
-				[2] = 'Goes back into deck',
-				[3] = 'when discarded',
+                [2] = 'Goes back into deck',
+                [3] = 'when discarded',
             }
         }
 	},
@@ -262,7 +263,7 @@ return {
             ['name'] = 'Face Seal',
             ['text'] = {
 				[1] = 'This card also',
-				[2] = 'counts as {C:attention}face{} card',
+				[2] = 'counts as {C:attention}face card{}',
             }
         }
 	},
@@ -273,7 +274,7 @@ return {
             ['name'] = 'Heal Seal',
             ['text'] = {
 				[1] = 'Removes {C:red}Unhancement{} from one',
-				[2] = 'random card held in hand when scored.',
+				[2] = 'of random cards held in hand when scored.',
 				[3] = 'This card also cannot be {C:red}Unhanced{}.',
             }
         }
@@ -302,7 +303,7 @@ return {
             ['text'] = {
                 [1] = 'Choose {C:attention}#1#{} of up to',
                 [2] = '{C:attention}#2#{C:auxiliary} Auxiliary{} cards to',
-                [3] = 'add to your consumable area'
+                [3] = 'adds to your consumable area'
             }
         }
     },
@@ -313,7 +314,7 @@ return {
             ['text'] = {
                 [1] = 'Choose {C:attention}#1#{} of up to',
                 [2] = '{C:attention}#2#{C:auxiliary} Auxiliary{} cards to',
-                [3] = 'add to your consumable area'
+                [3] = 'adds to your consumable area'
             }
         }
     },
@@ -324,7 +325,7 @@ return {
             ['text'] = {
                 [1] = 'Choose {C:attention}#1#{} of up to',
                 [2] = '{C:attention}#2#{C:auxiliary} Auxiliary{} cards to',
-                [3] = 'add to your consumable area'
+                [3] = 'adds to your consumable area'
             }
         }
     },
@@ -352,9 +353,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Essence of Spades',
             ['text'] = {
-                [1] = 'Add {V:1}#2#{} to',
-                [2] = '{C:attention}#1#{} selected cards',
-                [3] = 'in your hand'
+                [1] = 'Adds {V:1}#2#{} onto',
+                [2] = '{C:attention}#1#{} selected cards.'
             }
         }
     },
@@ -363,9 +363,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Essence of Hearts',
             ['text'] = {
-                [1] = 'Add {V:1}#2#{} to',
-                [2] = '{C:attention}#1#{} selected cards',
-                [3] = 'in your hand'
+                [1] = 'Adds {V:1}#2#{} onto',
+                [2] = '{C:attention}#1#{} selected cards.'
             }
         }
     },
@@ -374,9 +373,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Essence of Clubs',
             ['text'] = {
-                [1] = 'Add {V:1}#2#{} to',
-                [2] = '{C:attention}#1#{} selected cards',
-                [3] = 'in your hand'
+                [1] = 'Adds {V:1}#2#{} onto',
+                [2] = '{C:attention}#1#{} selected cards.'
             }
         }
     },
@@ -385,9 +383,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Essence of Diamonds',
             ['text'] = {
-                [1] = 'Add {V:1}#2#{} to',
-                [2] = '{C:attention}#1#{} selected cards',
-                [3] = 'in your hand'
+                [1] = 'Adds {V:1}#2#{} onto',
+                [2] = '{C:attention}#1#{} selected cards.'
             }
         }
     },
@@ -396,9 +393,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Possessions',
             ['text'] = {
-                [1] = 'Add a {C:attention}Face Seal{}',
-                [2] = 'to {C:attention}#1#{} selected cards',
-                [3] = 'in your hand'
+                [1] = 'Adds {C:attention}Face Seal{} onto',
+                [2] = '{C:attention}#1#{} selected cards.'
             }
         }
     },
@@ -407,10 +403,8 @@ return {
         ['en-us'] = {
             ['name'] = '+2',
             ['text'] = {
-                [1] = 'Creates a {C:attention}#1#{} card in',
-                [2] = 'your hand with a random',
-                [3] = '{C:attention}rank{} and the same {C:attention}suit{}',
-                [4] = 'as the selected card'
+                [1] = 'Adds {C:attention}#1#{} cards of any ranks',
+                [2] = 'with same suit of selected card to hand'
             }
         }
     },
@@ -419,10 +413,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Wild +4',
             ['text'] = {
-                [1] = 'Creates a {C:attention}#1#{} card in',
-                [2] = 'your hand with a random',
-                [3] = '{C:attention}suit{} and the same {C:attention}rank{}',
-                [4] = 'as the selected card'
+                [1] = 'Adds {C:attention}#1#{} cards of any suits',
+                [2] = 'with same rank of selected card to hand'
             }
         }
     },
@@ -458,8 +450,7 @@ return {
         ['en-us'] = {
             ['name'] = 'Seal Exchange',
             ['text'] = {
-                [1] = 'Swap {C:attention}seals{} between',
-                [2] = '{C:attention}2{} selected cards'
+                [1] = 'Swaps {C:attention}seal{} between two selected cards',
             }
         }
     },
@@ -469,7 +460,7 @@ return {
             ['name'] = 'All for One',
             ['text'] = {
                 [1] = 'Converts rank of',
-				[2] = 'up to {C:attention}#1#{} selected',
+                [2] = 'up to {C:attention}#1#{} selected',
                 [3] = 'cards to {C:attention}1{}'
             }
         }
@@ -479,9 +470,9 @@ return {
         ['en-us'] = {
             ['name'] = 'The Twenty-One',
             ['text'] = {
-                [1] = 'Select up to {C:attention}#1#{} cards',
-				[2] = 'with total rank of {C:attention}21 or more{}.',
-				[3] = 'Destroys all selected cards and creates one',
+                [1] = 'Selects up to {C:attention}#1#{} cards',
+				[2] = 'with total ranks of {C:attention}21 or more{}.',
+				[3] = 'Destroys all selected cards and gets one',
 				[4] = '{C:attention}rank 21{} card of a random suit.',
             }
         }
@@ -491,9 +482,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Monkey Paw',
             ['text'] = {
-                [1] = "{C:purple}Upgrades {C:attention}1{} selected card's {C:attention}edition{}",
-				[2] = 'Turns adjacent cards into {C:attention}Poison Cards{}',
-				[3] = '{C:inactive}(Loops around hand edges){}',
+                [1] = 'Selects {C:attention}1{} card to {C:attention}upgrade edition{}',
+				[2] = 'Turns adjacent cards into {C:attention}Poison Card{}',
+				[3] = '{C:inactive}(Loops around){}',
             }
         }
     },
@@ -502,9 +493,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Heal Guardian',
             ['text'] = {
-                [1] = 'Add a {C:attention}Heal Seal{}',
-                [2] = 'to {C:attention}#1#{} selected',
-                [3] = 'card in your hand'
+                [1] = 'Adds {C:attention}Heal Seal{} onto',
+                [2] = '{C:attention}#1#{} selected cards.'
             }
         }
     },
@@ -513,9 +503,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Heal Aura',
             ['text'] = {
-                [1] = 'Heal all',
-                [2] = '{C:red}Unhanced Cards{}',
-                [3] = 'in your hand'
+                [1] = 'Heal all {C:attention}Unhanced Cards{}',
+                [2] = 'holding in hand'
             }
         }
     },
@@ -543,9 +532,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Dark Matter',
             ['text'] = {
-                [1] = 'Permanently gain',
-                [2] = '{C:dark_edition}+#1#{} Joker slot',
-				[3] = '{C:red}Cannot be Negative'
+                [1] = '{C:dark_edition}+#1#{} Joker Slot',
+				[2] = '{C:red}Cannot be Negative'
             }
         }
     },
@@ -554,8 +542,7 @@ return {
         ['en-us'] = {
             ['name'] = 'Dark Matter..?',
             ['text'] = {
-                [1] = 'Permanently gain',
-                [2] = '{C:red}-#1#{} Joker slot',
+                [1] = '{C:red}-#1#{} Joker Slot',
             }
         }
     },
@@ -564,8 +551,8 @@ return {
         ['en-us'] = {
             ['name'] = 'The Question',
             ['text'] = {
-                [1] = 'Creates up to {C:attention}#1#{}',
-				[2] = 'random {C:auxiliary}Auxiliary{} cards',
+                [1] = 'Create {C:attention}#1#{} random',
+				[2] = '{C:auxiliary}Auxiliary{} Card',
 				[3] = '{C:inactive}(Must have room)',
             }
         }
@@ -576,7 +563,7 @@ return {
 	--Tarots
 	trt_time = {
         ['en-us'] = {
-            ['name'] = 'Time',
+            ['name'] = 'The Time',
             ['text'] = {
                 [1] = 'Enhances {C:attention}#1#{} ',
 				[2] = 'selected cards to',
@@ -589,16 +576,16 @@ return {
         ['en-us'] = {
             ['name'] = 'The Acorn',
             ['text'] = {
-                [1] = 'Enhances {C:attention}#1#{} selected',
-				[2] = 'card into an',
-				[3] = '{C:attention}Acorn Mark Card{}',
+                [1] = 'Enhances {C:attention}#1#{} ',
+				[2] = 'selected cards to',
+				[3] = '{C:attention}Acorn Mark Cards{}',
             }
         }
     },
 	
 	trt_greed = {
         ['en-us'] = {
-            ['name'] = 'Greed',
+            ['name'] = 'The Greed',
             ['text'] = {
                 [1] = 'Enhances {C:attention}#1#{} ',
 				[2] = 'selected cards to',
@@ -612,19 +599,19 @@ return {
             ['name'] = 'The Half',
             ['text'] = {
                 [1] = 'Splits {C:attention}1{} selected {C:attention}integer-numbered rank{} card',
-				[2] = 'into {C:attention}2{} cards with {C:attention}half the rank{} (rounded down).',
-				[3] = 'If the initial rank is {C:attention}odd{}, also adds {C:attention}1{}',
-				[4] = '{C:attention}0.5 rank{} card of the same {C:attention}enhancement{}.',
+                [2] = 'into {C:attention}2{} cards with {C:attention}half the rank{} (rounded down).',
+                [3] = 'If the initial rank is {C:attention}odd{}, also adds {C:attention}1{}',
+                [4] = '{C:attention}0.5 rank{} card of the same {C:attention}enhancement{}.',
             }
         }
     },
 	
 	trt_knowledge = {
         ['en-us'] = {
-            ['name'] = 'Knowledge',
+            ['name'] = 'The Knowledge',
             ['text'] = {
                 [1] = 'Adds one random {C:attention}decimal-rank{} card',
-				[2] = "of {C:attention}1{} selected card's suit to hand",
+				[2] = 'of the selected suit to hand',
             }
         }
     },
@@ -645,11 +632,11 @@ return {
         ['en-us'] = {
             ['name'] = 'Vessel',
             ['text'] = {
-                [1] = 'Select {C:attention}2{} cards,',
+                [1] = 'Selects {C:attention}2{} card,',
 				[2] = 'destroy the {C:attention}left{} card',
-				[3] = 'and give the corresponding {C:red}Suit Seal{}',
+				[3] = 'and gives corresponding {C:red}Suit Seal{}',
 				[4] = 'to the {C:attention}right{} card',
-				[5] = '{C:inactive}(Drag to rearrange){}',
+				[5] = '{C:inactive}(Drags to rearrange){}',
             }
         }
     },
@@ -694,9 +681,9 @@ return {
             ['name'] = "Devil's Contract",
             ['text'] = {
                 [1] = '{C:purple}Upgrades {C:attention}#1#{} random',
-				[2] = 'card in your hand',
-				[3] = 'Randomly {C:red}unhances {C:attention}#2#{}',
-				[4] = 'random cards in your hand',
+                [2] = 'card in your hand',
+                [3] = 'Randomly {C:red}unhances {C:attention}#2#{}',
+                [4] = 'random cards in your hand',
             }
         }
     },
@@ -706,7 +693,7 @@ return {
             ['name'] = "Poltergeist",
             ['text'] = {
                 [1] = 'Shuffles all',
-				[2] = "Jokers' {C:dark_edition}editions{}",
+				[2] = "Joker's {C:dark_edition}edition{}",
             }
         }
     },
@@ -717,7 +704,7 @@ return {
             ['text'] = {
                 [1] = 'Swap {C:dark_edition}editions{} between',
 				[2] = 'the {C:attention}selected Joker{}',
-				[3] = 'and the one {C:attention}to its right{}',
+				[3] = 'and the one {C:attention}on the right{}',
 				[4] = '{C:green}#1# in #2#{} chance that',
 				[5] = 'one of the Jokers are {C:red}destroyed{}',
             }
@@ -728,8 +715,8 @@ return {
         ['en-us'] = {
             ['name'] = "Siphon",
             ['text'] = {
-                [1] = 'Destroys {C:attention}1{} selected {C:attention}Joker{}',
-				[2] = 'with an {C:dark_edition}edition{}',
+                [1] = 'Destroy a selected {C:attention}Joker{}',
+				[2] = 'with {C:dark_edition}edition{}',
 				[3] = "Gives the {C:attention}Joker's {C:dark_edition}edition{} to",
 				[4] = '{C:attention}#1#{} random card in your hand',
 				[5] = '{C:inactive}({C:dark_edition}Negative{} excluded){}',
@@ -742,9 +729,8 @@ return {
         ['en-us'] = {
             ['name'] = "Hardware Store",
             ['text'] = {
-                [1] = '{C:auxiliary}Auxiliary{} cards',
-				[2] = 'can be purchased',
-                [3] = 'from the {C:attention}shop{}',
+                [1] = '{C:auxiliary}Auxiliary{} cards can',
+				[2] = 'spawn in the shop',
             }
         }
     },
@@ -753,9 +739,9 @@ return {
         ['en-us'] = {
             ['name'] = "Heavy Duty Tools",
             ['text'] = {
-                [1] = '{C:auxiliary}Auxiliary{} cards in',
-				[2] = '{C:attention}Expansion Packs{} can',
-				[3] = "sometimes be {C:dark_edition}Negative{}",
+                [1] = '{C:auxiliary}Auxiliary{} card in the',
+				[2] = '{C:attention}Expansion Pack{} can sometimes',
+				[3] = "has {C:dark_edition}negative{} edition.",
             }
         }
     },
@@ -767,8 +753,8 @@ return {
             ['name'] = 'Lunar Calendar',
             ['text'] = {
                 [1] = 'Played cards with',
-				[2] = '{V:1}#1#{} suit have',
-				[3] = '{C:green}#2# in #3#{} chance to create a',
+				[2] = '{V:1}#1#{} suit has',
+				[3] = '{C:green}#2# in #3#{} chance to create',
 				[4] = "random {C:planet}Planet{} card when scored",
 				[5] = '{C:inactive}(Must have room)',
 				[6] = '{s:0.8}Suit changes at the end of the round',
@@ -781,8 +767,8 @@ return {
             ['name'] = 'Dragon Hoard',
             ['text'] = {
                 [1] = 'Gives {C:mult}+#1#{} Mult for',
-				[2] = 'every {C:attention}#2#{} {C:attention}consumables{}',
-				[3] = 'in your {C:attention}consumable{} area',
+				[2] = 'every {C:attention}#2#{} consumables',
+				[3] = 'held in hand',
 				[4] = "{C:inactive}(Currently {C:mult}+#3#{C:inactive} Mult)",
             }
         }
@@ -805,7 +791,7 @@ return {
         ['en-us'] = {
             ['name'] = 'Match Three',
             ['text'] = {
-                [1] = '{C:mult}+#1#{} Mult if played hand contains',
+                [1] = '{C:mult}+#1#{} Mult if the scoring hand has',
 				[2] = '{C:attention}#2#{} or more adjacent cards',
 				[3] = 'with the {C:attention}same base suit{}',
             }
@@ -816,9 +802,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Furry Joker',
             ['text'] = {
-                [1] = 'Played {C:attention}Wild Cards{} have',
+                [1] = 'Played {C:attention}Wild Card{} has',
 				[2] = "{C:green}#1# in #2#{} chance to",
-				[3] = "turn {C:dark_edition}Polychrome{} when scored",
+				[3] = "turns {C:dark_edition}Polychrome{} when scored",
             }
         }
     },
@@ -827,9 +813,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Luxurious Handbag',
             ['text'] = {
-                [1] = '{C:attention}+#1#{} consumable slot',
-				[2] = "{C:red}Raises prices{} of everything in the",
-				[3] = "{C:attention}shop{} (except reroll) by {C:gold}$#2#{}",
+                [1] = '{C:attention}+#1#{} Consumable Slot',
+				[2] = "{C:red}Raises price{} of everything in",
+				[3] = "shop (except reroll) by {C:gold}$#2#{}",
             }
         }
     },
@@ -838,7 +824,7 @@ return {
         ['en-us'] = {
             ['name'] = 'Portal',
             ['text'] = {
-                [1] = '{C:attention}Aces{} can be used in the',
+                [1] = '{C:attention}Aces{} can be used in a',
 				[2] = "middle of a {C:purple}Straight{} hand",
 				[3] = "{C:inactive}(Ex: 3, 2, Ace, King, Queen)",
             }
@@ -850,7 +836,7 @@ return {
             ['name'] = 'Vainglorious Joker',
             ['text'] = {
                 [1] = 'Played cards with',
-				[2] = '{C:attention}Suit Seal{} give',
+				[2] = '{C:attention}Suit Seal{} gives',
 				[3] = "{C:attention}+#1#{} Mult when scored",
             }
         }
@@ -862,8 +848,8 @@ return {
             ['text'] = {
                 [1] = 'Played cards with',
 				[2] = '{C:attention}Suit Seal{} in the same',
-				[3] = "{C:purple}suit category{} as the card's suit",
-				[4] = "give {C:attention}+#1#{} Mult when scored",
+				[3] = "{C:purple}suit category{} of the card's suit gives",
+				[4] = "{C:attention}+#1#{} Mult when scored",
             }
         }
     },
@@ -872,10 +858,11 @@ return {
         ['en-us'] = {
             ['name'] = 'Cinnabar',
             ['text'] = {
-                [1] = 'Played cards with {C:attention}Suit Seal{} have',
-				[2] = "{C:green}#1# in #2#{} chance to create respective",
-				[3] = "{C:auxiliary}Seal Auxiliary{} Card when scored",
-				[4] = '{C:inactive}(Must have room)',
+                [1] = 'Played cards with',
+				[2] = '{C:attention}Suit Seal{} has',
+				[3] = "{C:green}#1# in #2#{} chance to create respective",
+				[4] = "{C:auxiliary}Seal Auxiliary{} Card when scored",
+				[5] = '{C:inactive}(Must have room)',
             }
         }
     },
@@ -884,9 +871,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Black Jack',
             ['text'] = {
-                [1] = 'This Joker gains {C:chips}Chips{} equal to {C:attention}total rank{}',
+                [1] = 'This Joker gains {C:chips}Chips{} equals to total rank',
 				[2] = 'of the played hand if it is under {C:attention}#1#{}.',
-				[3] = 'Doubles gained chips if the {C:attention}total rank{} is exactly {C:attention}#1#{}.',
+				[3] = 'Doubled the amount of gained chips if the total rank is exactly {C:attention}#1#{}.',
 				[4] = 'Resets if the total rank is more than {C:attention}#1#{}.',
 				[5] = '{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)'
             }
@@ -897,8 +884,8 @@ return {
         ['en-us'] = {
             ['name'] = 'What',
             ['text'] = {
-                [1] = 'Played {C:attention}???{}',
-				[2] = 'give {C:chips}+#1#{} Chips and',
+                [1] = 'Each played {C:attention}???{}',
+				[2] = 'gives {C:chips}+#1#{} Chips and',
 				[3] = '{C:mult}+#2#{} Mult when scored',
             }
         }
@@ -908,9 +895,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Floating-Point Error',
             ['text'] = {
-                [1] = 'Every played {C:attention}Decimal Rank{} card',
-                [2] = 'permanently gains {C:chips}extra chips{}',
-				[3] = 'equal to its own {C:attention}rank{}',
+                [1] = 'Scored cards with {C:attention}Decimal Rank{}',
+				[2] = 'Gains {C:chips}extra chips{} equal to its own {C:attention}rank{}',
             }
         }
     },
@@ -921,7 +907,7 @@ return {
             ['text'] = {
                 [1] = 'Adds one random {C:attention}Enhanced Card{}',
 				[2] = 'with {C:attention}decimal rank{} to deck if',
-				[3] = 'played hand does not have a {C:attention}face{} card',
+				[3] = 'the played hand does not have {C:attention}face card{}',
 				[4] = '{C:inactive}(Once per round. Currently {C:red}#1#/#2#{C:inactive})',
             }
         }
@@ -931,9 +917,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Engineer',
             ['text'] = {
-                [1] = 'Cards with {C:attention}decimal ranks{} count as',
+                [1] = 'Card with {C:attention}decimal ranks{} counts as',
 				[2] = 'the nearest {C:attention}integer rank{} rounded up when',
-				[3] = 'played in non-{C:purple}Straight{} hands',
+				[3] = 'played in non-{C:purple}Straight{} hands.',
 				[4] = '{C:inactive}(EX: 3.14 -> 4)',
             }
         }
@@ -954,9 +940,9 @@ return {
             ['name'] = 'Rainbow Flag',
             ['text'] = {
                 [1] = 'If a hand containing {C:purple}Straight{} has',
-				[2] = 'at least 1 {C:attention}decimal rank{} card,',
-				[3] = "{C:green}#1# in #2#{} chance to turn",
-				[4] = "one of the cards {C:dark_edition}Polychrome{}",
+				[2] = 'at least 1 {C:attention}decimal rank{} cards',
+				[3] = "{C:green}#1# in #2#{} chance to turns",
+				[4] = "one of the card {C:dark_edition}Polychrome{}",
             }
         }
     },
@@ -965,10 +951,10 @@ return {
         ['en-us'] = {
             ['name'] = 'Dummy Data',
             ['text'] = {
-                [1] = 'For each {C:attention}unscored card{}',
+                [1] = 'For each {C:attention}unscored cards{}',
 				[2] = '{C:green}#1# in #2#{} chance to',
-				[3] = "convert its rank to {C:attention}0{}",
-				[4] = "(Retains amount of Chips)",
+				[3] = "Converts rank to {C:attention}0{}",
+				[4] = "(Retains amount of chips)",
             }
         }
     },
@@ -977,11 +963,11 @@ return {
         ['en-us'] = {
             ['name'] = 'Micro SD Card',
             ['text'] = {
-				[1] = 'If this Joker is in the {C:attention}leftmost position{},',
-                [2] = 'take all Chips from discarded base {C:attention}numbered cards{}',
-				[3] = "and strip those cards' ranks to {C:attention}0{}",
+				[1] = 'If this Joker is in the {C:attention}leftmost position{}',
+                [2] = 'take all {C:chips}chips{} from discarded base {C:attention}numbered cards{}',
+				[3] = "Strips card's rank to {C:attention}0{}",
 				[4] = "{C:green}#1# in #2#{} chance to destroy itself at the end of round",
-				[5] = "Chance increases by the amount of Chips stored",
+				[5] = "Chance increases by the amount of chip stored",
 				[6] = '{C:inactive}(Currently {C:chips}+#4#{C:inactive} Chips)',
 				[7] = '{C:inactive}Status: {V:1}#5#{}',
             }
@@ -992,9 +978,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Social Experiment',
             ['text'] = {
-                [1] = 'For each played {C:attention}numbered card{},',
-				[2] = 'double its Chips, give it to the next card',
-				[3] = "and strip its {C:attention}rank{} to {C:attention}0{}",
+                [1] = 'For each {C:attention}Numbered Cards{},',
+				[2] = 'Double all chips and give it to next card',
+				[3] = "Strips card's rank to {C:attention}0{}",
             }
         }
     },
@@ -1003,7 +989,7 @@ return {
         ['en-us'] = {
             ['name'] = 'Power of One',
             ['text'] = {
-                [1] = 'Gives {C:mult}+#1#{} Mult for each',
+                [1] = 'Gains {C:mult}+#1#{} Mult for each',
 				[2] = '{C:attention}1{} in your {C:attention}full deck{}',
 				[3] = "{C:inactive}(Currently {C:mult}+#2#{C:inactive})",
             }
@@ -1014,10 +1000,10 @@ return {
         ['en-us'] = {
             ['name'] = 'Binary Number',
             ['text'] = {
-                [1] = 'If played hand contains {C:attention}4{} or fewer cards',
-				[2] = 'and only consists of {C:attention}rank 0{} and {C:attention}1{} cards,',
-				[3] = "create a card with {C:attention}rank{} equal",
-				[4] = "to the number represented in binary",
+                [1] = 'If the {C:attention}full played hand{} only have {C:attention}four or less{} cards',
+				[2] = 'and only consists of {C:attention}rank 0{} and {C:attention}1{} cards',
+				[3] = "Creates a card with rank equal",
+				[4] = "to number represented in binary",
 				[5] = "({C:red}Ex:{} {C:attention}1001{} -> {C:attention}9{})",
 				[6] = "{C:inactive}[Jack, Queen, King, Ace is 11-14, respectively]{}",
             }
@@ -1028,9 +1014,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Quintuplets',
             ['text'] = {
-                [1] = 'If the winning hand is a {C:attention}Flush Five{}',
-                [2] = 'containing all {C:attention}Enhanced cards{},',
-				[3] = 'create a {C:dark_edition}Negative Tag{}',
+                [1] = 'If the winning hand is {C:attention}Flush Five{}',
+                [2] = 'with all {C:attention}Enhanced cards{},',
+				[3] = 'Create {C:dark_edition}Negative Tag{}',
             }
         }
     },
@@ -1039,11 +1025,11 @@ return {
         ['en-us'] = {
             ['name'] = 'Graphic Card',
             ['text'] = {
-                [1] = 'Create a {C:attention}Double Tag{}',
+                [1] = 'Create {C:attention}Double Tag{}',
 				[2] = 'at the end of the round',
-                [3] = 'if {C:attention}#1#{} or more cards with',
-				[4] = '{C:dark_edition}editions{} were scored this round',
-				[5] = '{C:inactive}(Currently {C:attention}#2# {C:inactive}cards)',
+                [3] = 'if scored {C:attention}#1#{} or more cards',
+				[4] = 'with {C:dark_edition}editions{} this round',
+				[5] = '{C:inactive}(Current: {C:attention}#2#{C:inactive})',
             }
         }
     },
@@ -1064,7 +1050,7 @@ return {
             ['text'] = {
                 [1] = '{C:green}#1# in #2#{} chance to downgrade',
 				[2] = 'level of played {C:attention}poker hand{}',
-				[3] = 'and {C:purple}upgrade{} edition',
+				[3] = 'and {C:attention}upgrade{} edition',
 				[4] = 'of all scored cards',
             }
         }
@@ -1088,9 +1074,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Non-Fungible Joker',
             ['text'] = {
-                [1] = 'If a discarded hand contains',
-				[2] = 'only {C:attention}#1# Slop Card{}, destroy it and',
-				[3] = 'earn random amount of up to {C:gold}$#2#',
+                [1] = 'If the discarded hand contains',
+				[2] = 'only {C:attention}#1# Slop Card{}, destroy it and ',
+				[3] = 'earn random amount up to {C:gold}$#2#',
 				[4] = '{s:0.8,C:red}Maximum Payout and Sell Value drops at the end of the round',
             }
         }
@@ -1100,10 +1086,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Prompt',
             ['text'] = {
-                [1] = 'Scored {C:attention}Slop Cards{} take',
-                [2] = 'the {C:attention}rank{} and {C:attention}suit{} from',
-				[3] = 'other scored {C:attention}non-Slop Cards{}',
-				[4] = 'instead of random (if possible)',
+                [1] = 'Scored {C:attention}Slop Card{} takes {C:attention}rank{} and {C:attention}suit',
+				[2] = 'from other scored {C:attention}non-Slop Card{}',
+				[3] = 'instead of random if possible',
             }
         }
     },
@@ -1114,9 +1099,9 @@ return {
             ['text'] = {
                 [1] = 'Gains {C:chips}+#1#{} Chips every {C:attention}#2# {C:inactive}[#6#]',
 				[2] = '{C:attention}Slop Cards{} scored.',
-				[3] = '{C:green}#3# in #4#{} chance this card is',
-				[4] = 'destroyed at end of round',
-				[5] = '{C:inactive}(Currently {C:chips}+#5# {C:inactive}Chips)',
+				[3] = '{C:green}#3# in #4#{} chance to destroy',
+				[4] = 'itself at the end of the round',
+				[5] = '{C:inactive}(Currently: {C:chips}+#5# {C:inactive}Chips)',
 				
             }
         }
@@ -1128,9 +1113,9 @@ return {
             ['text'] = {
                 [1] = 'Gains {X:mult,C:white}X#1#{} Mult every {C:attention}#2# {C:inactive}[#6#]',
 				[2] = '{C:attention}Slop Cards{} scored.',
-				[3] = '{C:green}#3# in #4#{} chance this card is',
-				[4] = 'destroyed at end of round',
-				[5] = '{C:inactive}(Currently {X:mult,C:white}X#5#{C:inactive} Mult)',
+				[3] = '{C:green}#3# in #4#{} chance to destroy',
+				[4] = 'itself at the end of the round',
+				[5] = '{C:inactive}(Currently: {X:mult,C:white}X#5#{C:inactive} Mult)',
 				
             }
         }
@@ -1142,11 +1127,11 @@ return {
         ['en-us'] = {
             ['name'] = 'Joker Island',
             ['text'] = {
-                [1] = 'For every scored card',
-				[2] = 'with {C:attention}rank{} {C:attention}#1#{},',
-				[3] = '{C:green}#2# in #3#{} chance to add a',
-				[4] = '{C:attention}Resource Card{} of the same suit to deck',
-				[5] = '{s:0.8}rank changes at end of round',
+                [1] = 'For every played card',
+				[2] = 'with rank {C:attention}#1#{}',
+				[3] = '{C:green}#2# in #3#{} chance to create',
+				[4] = 'a new {C:attention}Resource Card{} of the same scored suit',
+				[5] = '{s:0.8}Rank changes at the end of the round',
             }
         }
     },
@@ -1157,9 +1142,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Kaiju',
             ['text'] = {
-                [1] = '{C:dark_edition}+#1#{} Joker slot',
-				[2] = 'Converts one random card',
-				[3] = 'into a {C:attention}Radioactive Card{} when',
+                [1] = '{C:dark_edition}+#1#{} Joker Slot',
+				[2] = 'Turns one random card',
+				[3] = 'into {C:attention}Radioactive Card{} when',
 				[4] = 'first hand is drawn',
             }
         }
@@ -1170,9 +1155,8 @@ return {
             ['name'] = 'Poison the Well',
             ['text'] = {
                 [1] = '{C:red}+#1#{} Discards',
-				[2] = 'Converts one random card',
-                [3] = 'in each discarded hand',
-				[4] = 'into a {C:attention}Poison Card{}'
+				[2] = 'Turns one random card in each discarded hand',
+				[3] = 'into {C:attention}Poison Card{}'
             }
         }
     },
@@ -1182,9 +1166,9 @@ return {
             ['name'] = 'Petri Dish',
             ['text'] = {
                 [1] = '{C:blue}+#1#{} Hands',
-				[2] = '{C:green}#2# in #3#{} chance of converting',
+				[2] = '{C:green}#2# in #3#{} chance of turning',
 				[3] = 'one random played card',
-				[4] = 'into a {C:attention}Biohazard Card{}'
+				[4] = 'into {C:attention}Biohazard Card{}'
             }
         }
     },
@@ -1193,10 +1177,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Geiger Counter',
             ['text'] = {
-                [1] = 'Gives {C:mult}+#1#{} Mult for',
-				[2] = 'each {C:attention}Radioactive Card{}',
-                [3] = 'in your {C:attention}full deck{}',
-				[4] = "{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)",
+                [1] = 'Gives {C:mult}+#1#{} Mult for each',
+				[2] = '{C:attention}Radioactive Card{} in your {C:attention}full deck{}',
+				[3] = "{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)",
             }
         }
     },
@@ -1205,10 +1188,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Strych-Nine',
             ['text'] = {
-                [1] = 'Gives {C:chips}+#1#{} Chips',
-				[2] = 'for each {C:attention}Poison Card{}',
-                [3] = 'in your {C:attention}full deck{}',
-				[4] = "{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
+                [1] = 'Gives {C:chips}+#1#{} Chips for each',
+				[2] = '{C:attention}Poison Card{} in your {C:attention}full deck{}',
+				[3] = "{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
             }
         }
     },
@@ -1219,7 +1201,7 @@ return {
             ['text'] = {
 				[1] = 'Neutralize all {C:attention}Biohazard Card{} passive effects',
                 [2] = 'Gives additional {X:mult,C:white}X#1#{} Mult for each',
-				[3] = '{C:attention}Biohazard Card{} held in hand',
+				[3] = '{C:attention}Biohazard Card{} held in hand.',
 				[4] = "{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)",
             }
         }
@@ -1232,7 +1214,7 @@ return {
             ['text'] = {
 				[1] = 'Scored {C:attention}Vintage Cards{} have',
                 [2] = '{C:green}#1# in #2#{} chance to reduce',
-				[3] = 'their destroy chance by half',
+				[3] = 'the destroyed chance by half',
             }
         }
     },
@@ -1241,8 +1223,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Rules Errata',
             ['text'] = {
-				[1] = '{C:attention}Acorn Mark Cards{} give {C:attention}half{} of their',
-                [2] = "{C:attention}rank{}'s value as Mult when scored",
+				[1] = '{C:attention}Acorn Mark Cards{} give {C:attention}half{} of a',
+                [2] = "rank's value as Mult when scored",
             }
         }
     },
@@ -1251,11 +1233,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Auction Winner',
             ['text'] = {
-				[1] = 'If a {C:attention}Promo Card{} is',
-                [2] = 'destroyed from scoring, this Joker',
-                [3] = "gains {C:gold}money{} equal to",
-				[4] = "the {C:gold}money{} that card gave",
-                [5] = "before its destruction",
+				[1] = 'If {C:attention}Promo Card{} is destroyed after scored',
+                [2] = "gains {C:gold}money{} equals to amount the card",
+				[3] = "gives before breaks",
             }
         }
     },
@@ -1267,7 +1247,7 @@ return {
             ['name'] = 'Free Trial',
             ['text'] = {
 				[1] = '{C:green}#1# in #2#{} chance to create',
-                [2] = "a {C:dark_edition}Negative{} random {C:auxiliary}Auxiliary{} Card",
+                [2] = "a {C:dark_edition}negative{} random {C:auxiliary}Auxiliary{} Card",
 				[3] = "when an {C:auxiliary}Auxiliary{} Card is used",
             }
         }
@@ -1277,9 +1257,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Extended Warranty',
             ['text'] = {
-				[1] = '{C:auxiliary}Auxiliary{} Cards in',
-                [2] = 'your {C:attention}consumable{} area',
-                [3] = "give {X:mult,C:white}X#1#{} Mult",
+				[1] = '{C:auxiliary}Auxiliary{} Cards held in hand',
+                [2] = "give {X:mult,C:white}X#1#{} Mult",
             }
         }
     },
@@ -1288,10 +1267,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Technician',
             ['text'] = {
-                [1] = '{C:chips}+#1#{} Chips per',
-                [2] = '{C:auxiliary}Auxiliary{} Card',
-				[3] = 'used this run',
-				[4] = '{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips){}',
+                [1] = '{C:chips}+#1#{} Chips per {C:auxiliary}Auxiliary{}',
+				[2] = 'card used this run',
+				[3] = '{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips){}',
             }
         }
     },
@@ -1302,7 +1280,7 @@ return {
             ['text'] = {
                 [1] = '{C:green}#1# in #2#{} chance to create',
                 [2] = "a random {C:auxiliary}Auxiliary{} Card",
-				[3] = 'when discarding a {C:attention}face{} card',
+				[3] = 'when discard a {C:attention}face{} card',
 				[4] = '{C:inactive}(Must have room)',
             }
         }
@@ -1316,9 +1294,8 @@ return {
             ['text'] = {
                 [1] = '{C:mult}+#1#{} Mult',
 				[2] = '{X:mult,C:white}X#2#{} Mult',
-				[3] = '{C:green}#3# in #4#{} chance this',
-                [4] = 'card is destroyed',
-				[4] = 'at end of round',
+				[3] = '{C:green}#3# in #4#{} chance of destroying itself',
+				[4] = 'at the end of round',
             }
         }
     },
@@ -1327,8 +1304,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Joker Stairs',
             ['text'] = {
-                [1] = 'Gain {C:mult}+#1#{} Mult when buying a Joker',
-				[2] = 'with {C:attention}"Joker"{} in its name',
+                [1] = 'Gain {C:mult}+#1#{} Mult when buying a joker',
+				[2] = 'with {C:attention}"Joker"{} in the name.',
 				[3] = '{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult){}',
             }
         }
@@ -1341,8 +1318,8 @@ return {
                 [1] = 'Copies ability of',
 				[2] = '{C:attention}Joker{} to the',
 				[3] = 'left or right at random',
-				[4] = '{s:0.8}Direction changes each hand played',
-				[5] = '{C:inactive}(Currently {C:red}#1#{C:inactive})',
+				[4] = '{s:0.8}Direction changes each hands played',
+				[5] = '{C:inactive}(Currently: {C:red}#1#{C:inactive})',
             }
         }
     },
@@ -1351,9 +1328,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Joker Throwing Card',
             ['text'] = {
-                [1] = 'Decrease {C:attention}Blind{} size by {C:attention}#1#%{}',
+                [1] = 'Decrease blind size by {C:attention}#1#%{}',
 				[2] = '{C:green}#2# in #3#{} chance to destroy',
-				[3] = 'one of the scored cards',
+				[3] = 'one of the scored card',
 				[4] = 'Increases percentage by {C:attention}#4#%{}',
 				[5] = 'if a card is destroyed this way',
             }
@@ -1364,8 +1341,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Jackhammer',
             ['text'] = {
-                [1] = 'If the {C:attention}played hand{} has only one {C:attention}Jack{},',
-				[2] = 'retrigger it {C:attention}#1#{} more times',
+                [1] = 'If the {C:attention}scoring hand{} has only one {C:attention}Jack{}',
+				[2] = 'retrigger it {C:attention}#1#{} more times ',
 				[3] = 'and {C:red}destroy it{} afterward',
             }
         }
@@ -1375,9 +1352,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Jack of All Trades',
             ['text'] = {
-                [1] = 'Played {C:attention}Jacks{} give',
+                [1] = 'Played {C:attention}Jack{} gives',
 				[2] = '{C:chips}+#1#{} Chips, {C:mult}+#2#{} Mult, ',
-				[3] = '{X:mult,C:white}X#3#{} Mult, and {C:gold}$#4#',
+				[3] = '{X:mult,C:white}X#3#{} XMult, and {C:gold}$#4#',
             }
         }
     },
@@ -1386,8 +1363,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Magic Trick Card',
             ['text'] = {
-                [1] = 'Scored {V:1}#1#{} cards',
-				[2] = 'turn into {V:2}#2#{} cards',
+                [1] = 'Scored {V:1}#1#',
+				[2] = 'turns into {V:2}#2#',
 				[3] = '{s:0.8}On discard, flips over the Joker',
             }
         }
@@ -1397,9 +1374,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Queensland',
             ['text'] = {
-                [1] = 'Scored {C:attention}Queens{} add',
-				[2] = '{C:attention}Resource Cards{} of',
-				[3] = 'the corresponding suits to deck',
+                [1] = 'Played {C:attention}Queen{} creates',
+				[2] = '{C:attention}Resource Card{} of',
+				[3] = 'the corresponding suit.',
 				[4] = '{C:inactive}({C:red}#1#{C:inactive} times per round, {C:red}#2# left{C:inactive})',
             }
         }
@@ -1409,7 +1386,7 @@ return {
         ['en-us'] = {
             ['name'] = 'Polychrome Red Seal Steel Joker',
             ['text'] = {
-                [1] = '{C:green}#1# in #2#{} chance for scored {C:attention}Kings{} to {C:purple}upgrade{} edition',
+                [1] = '{C:green}#1# in #2#{} chance for scored {C:attention}Kings{} to upgrade {C:dark_edition}edition',
 				[2] = '{C:green}#1# in #3#{} chance for scored {C:attention}Kings{} to {C:attention}retrigger',
 				[3] = '{C:green}#1# in #4#{} chance for {C:attention}Kings{} held in hand to give {X:mult,C:white}X#5#{} Mult',
             }
@@ -1422,7 +1399,7 @@ return {
             ['text'] = {
                 [1] = 'Played {C:attention}Enhanced Kings{} have',
 				[2] = '{C:green}#1# in #2#{} chance to be',
-				[3] = 'destroyed and create a {C:dark_edition}Double Tag',
+				[3] = 'destroyed and create 1 {C:dark_edition}Double Tag',
             }
         }
     },
@@ -1431,8 +1408,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Master of One',
             ['text'] = {
-                [1] = 'Adds one {C:attention}Enhanced Rank 1{} card',
-				[2] = 'to deck when {C:attention}Blind{} is selected',
+                [1] = 'Adds one {C:attention}Enhanced Rank 1{} Card',
+				[2] = 'to the deck when {C:attention}Blind{} is selected',
             }
         }
     },
@@ -1452,8 +1429,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Library Card',
             ['text'] = {
-                [1] = "For each scored card's {C:attention}singular",
-				[2] = '{C:attention}suit name{} in English, give:',
+                [1] = "For each scoring card's {C:attention}singular",
+				[2] = '{C:attention}suit name{} in English. Give:',
 				[3] = '{C:chips}+#1#{} Chips per {C:attention}Consonant',
 				[4] = '{C:mult}+#2#{} Mult per {C:attention}Vowel',
 				[5] = '{C:inactive}(Example: Spade = {C:chips}+15{C:inactive} Chips, {C:mult}+4{C:inactive} Mult)'
@@ -1465,8 +1442,8 @@ return {
         ['en-us'] = {
             ['name'] = "Collector's Album",
             ['text'] = {
-                [1] = 'Jokers with {C:attention}"Card"{} in',
-				[2] = 'their name each give',
+                [1] = 'Jokers with {C:attention}"Card"{} in ',
+				[2] = 'the name each gives',
 				[3] = '{C:chips}+#1#{} Chips',
             }
         }
@@ -1476,9 +1453,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Throwing Hands',
             ['text'] = {
-                [1] = '{X:mult,C:white}X#1#{} Mult if poker hand is {C:attention}#3#{}',
+                [1] = '{X:mult,C:white}X#1#{} Mult if the played hand is {C:attention}#3#{}',
 				[2] = '{X:mult,C:white}X#2#{} Mult otherwise',
-				[3] = '{s:0.8}hand changes at end of round',
+				[3] = '{s:0.8}Hand changes at the end of round',
             }
         }
     },
@@ -1487,9 +1464,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Imperial Bower',
             ['text'] = {
-                [1] = '{X:mult,C:white}X#1#{} Mult if played hand',
+                [1] = '{X:mult,C:white}X#1#{} Mult if the played hand',
 				[2] = "contains a {C:attention}Straight{} and",
-				[3] = 'has at least one {C:attention}face{} card',
+				[3] = 'has at least one {C:attention}face card{}',
             }
         }
     },
@@ -1499,9 +1476,9 @@ return {
             ['name'] = 'The "Jolly Joker"',
             ['text'] = {
                 [1] = 'Gains {C:mult}+#1#{} Mult if',
-				[2] = 'played hand contains a {C:attention}Pair{}',
+				[2] = 'played hand contains {C:attention}Pair{}',
 				[3] = "{C:red}Resets{} if played hand",
-				[4] = "does not contain a {C:attention}Pair{}",
+				[4] = "does not contain {C:attention}Pair{}",
 				[5] = '{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)',
             }
         }
@@ -1522,11 +1499,11 @@ return {
         ['en-us'] = {
             ['name'] = 'Tanzaku',
             ['text'] = {
-                [1] = 'Retrigger played cards with',
-                [2] = '{C:attention}seals{} {C:attention}#1#{} additional times',
-				[3] = 'Amount increases by {C:attention}#2#{} for',
-				[4] = 'every discarded card with a {C:attention}seal{}',
-				[5] = '{s:0.8}Resets after each round',
+                [1] = 'Retrigger played card',
+                [2] = 'with {C:attention}seal{} additional {C:attention}#1#{} times',
+				[3] = 'Amount increase by {C:attention}#2#{} for',
+				[4] = 'every discarded card with {C:attention}seal{}',
+				[5] = '{s:0.8}Reset after each round',
             }
         }
     },
@@ -1538,7 +1515,7 @@ return {
                 [1] = 'Retrigger each',
                 [2] = 'played {C:attention}Glass Card{}',
 				[3] = '{C:red}Glass Cards are guaranteed',
-				[4] = '{C:red}to break when scored',
+				[4] = '{C:red}breaking after scored',
             }
         }
     },
@@ -1548,9 +1525,9 @@ return {
             ['name'] = 'Pity Rate Drop',
             ['text'] = {
                 [1] = 'When {C:attention}Blind{} is selected,',
-                [2] = '{C:green}#1# in #2#{} chance to create a {C:red}Rare {C:attention}Joker{}',
+                [2] = '{C:green}#1# in #2#{} chance to create {C:red}Rare {C:attention}Joker{}',
 				[3] = 'Chance increase by {C:green}#3#{} if no {C:attention}Joker{} created,',
-				[4] = 'resets to {C:green}#4#{} otherwise',
+				[4] = 'resets to {C:green}#4#{} otherwise.',
 				[5] = '{C:inactive}(Must have room)',
             }
         }
@@ -1560,9 +1537,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Salmon Run',
             ['text'] = {
-                [1] = 'Each played {C:attention}7{} has a',
-                [2] = '{C:green}#1# in #2#{} chance of adding a',
-                [3] = 'permanent copy to deck when scored',
+                [1] = '{C:green}#1# in #2#{} chance of',
+				[2] = 'duplicating any scored {C:attention}7{}',
             }
         }
     },
@@ -1571,8 +1547,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Cool S',
             ['text'] = {
-                [1] = 'Played {C:attention}8s{} become',
-				[2] = 'a random {C:attention}Enhanced card{}',
+                [1] = 'Played {C:attention}8s{} became',
+				[2] = 'a random {C:attention}enhanced card{}',
             }
         }
     },
@@ -1582,9 +1558,9 @@ return {
             ['name'] = 'Memoriam Photo',
             ['text'] = {
                 [1] = 'When a playing card is {C:attention}destroyed{},',
-				[2] = 'this Joker gains Chips equal to {C:attention}double{}',
+				[2] = 'gains {C:chips}Chips{} equal to {C:attention}double{}',
 				[3] = 'the rank of the {C:attention}destroyed card{}',
-				[4] = '{C:inactive}(Currently {C:chips}+#1#{C:inactive} Chips)',
+				[4] = '{C:inactive}(Current: {C:chips}+#1#{C:inactive} Chips)',
             }
         }
     },
@@ -1595,7 +1571,7 @@ return {
             ['text'] = {
                 [1] = 'When a playing card is {C:attention}destroyed{},',
 				[2] = '{C:green}#1# in #2#{} chance to add',
-				[3] = 'a copy of the card to deck',
+				[3] = 'a copy of the card to your deck',
             }
         }
     },
@@ -1604,10 +1580,10 @@ return {
         ['en-us'] = {
             ['name'] = 'Cashback Card',
             ['text'] = {
-                [1] = 'At the end of a {C:attention}Boss Blind{},',
-				[2] = 'earn {C:gold}money{} equals to the amount',
-				[3] = 'of {C:attention}consumables{} used this {C:attention}Ante',
-				[4] = '{C:inactive}(Currently {C:gold}$#1#{C:inactive})',
+                [1] = 'At the end of {C:attention}Boss Blind{},',
+				[2] = 'earn {C:gold}money{} equals to amount',
+				[3] = 'of {C:attention}consumables{} used this Ante',
+				[4] = '{C:inactive}(Current: {C:gold}$#1#{C:inactive})',
             }
         }
     },
@@ -1616,11 +1592,11 @@ return {
         ['en-us'] = {
             ['name'] = 'Raffle',
             ['text'] = {
-                [1] = 'At the end of each {C:attention}shop{},',
+                [1] = 'At the end of shop,',
 				[2] = '{C:green}#1# in #2#{} chance to win {C:gold}$#3#',
 				[3] = 'Chance increases by {C:green}#4#{}',
-				[4] = 'for each purchase in the {C:attention}shop',
-				[5] = '{s:0.8, C:red}Resets after exiting the shop',
+				[4] = 'per each purchase in the shop',
+				[5] = '{s:0.8, C:red}Resets after rolling the prize',
             }
         }
     },
@@ -1629,12 +1605,12 @@ return {
         ['en-us'] = {
             ['name'] = 'IC Card',
             ['text'] = {
-                [1] = 'Gain {C:gold}$#1#{} to store in this Joker',
+                [1] = 'Gain {C:gold}$#1#{} to store in this card',
 				[2] = 'every time a hand is played',
-				[3] = 'When spending money, the {C:attention}balance',
-				[4] = 'in this Joker is spent first',
+				[3] = 'When spending money, the {C:attention}balances',
+				[4] = 'in this card are used first.',
 				[5] = '{C:red}Only usable for #2# rounds',
-				[6] = '{C:inactive}(Currently {C:gold}$#3#{C:inactive}, {C:red}#4# Rounds left{C:inactive}){}',
+				[6] = '{C:inactive}(Current: {C:gold}$#3#{C:inactive}, {C:red}#4# Rounds left{C:inactive}){}',
             }
         }
     },
@@ -1643,9 +1619,9 @@ return {
         ['en-us'] = {
             ['name'] = '2048',
             ['text'] = {
-                [1] = 'If played hand contains a {C:attention}Pair{} with',
-				[2] = 'rank of power of two {C:attention}(2, 4, 8){},',
-				[3] = 'destroy the left one and give all chips to the other',
+                [1] = 'If played hand contains {C:attention}Pair{} of rank ',
+				[2] = 'with power of two {C:attention}(2, 4, 8){}',
+				[3] = 'destroy the left one and gives all chips to another',
 				[4] = '{C:inactive}(Drag to rearrange){}',
             }
         }
@@ -1655,9 +1631,9 @@ return {
         ['en-us'] = {
             ['name'] = '2048',
             ['text'] = {
-                [1] = 'If played hand contains a {C:attention}Pair{} with',
-				[2] = 'rank of power of two {C:attention}(0, 1, 2, 4, 8){},',
-				[3] = 'destroy the left one and give all chips to the other',
+                [1] = 'If played hand contains {C:attention}Pair{} of rank ',
+				[2] = 'with power of two {C:attention}(0, 1, 2, 4, 8){}',
+				[3] = 'destroy the left one and gives all chips to another',
 				[4] = '{C:inactive}(Drag to rearrange){}',
             }
         }
@@ -1667,8 +1643,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Inductor',
             ['text'] = {
-                [1] = 'For every played card with the same',
-				[2] = '{C:attention}rank{} and suit{C:attention}{} as another played card:',
+                [1] = 'For every played card with',
+				[2] = 'the same rank and suits',
 				[3] = '{C:green}#1# in #2#{} chance to copy {C:attention}Enhancement{}',
 				[4] = '{C:green}#1# in #3#{} chance to copy {C:attention}Edition{}',
 				[5] = '{C:green}#1# in #4#{} chance to copy {C:attention}Seal{}',
@@ -1684,9 +1660,9 @@ return {
             ['text'] = {
                 [1] = 'Start run with the',
 				[2] = '{C:auxiliary}Hardware Store{} voucher',
-                [3] = 'and {C:attention}1{} copy of {C:auxiliary}The Question{},',
-                [4] = '{C:auxiliary}Auxiliary Cards{} can appear',
-				[5] = 'in the {C:attention}shop{} more often',
+                [3] = 'and one copy of {C:auxiliary}The Question.',
+                [4] = '{C:auxiliary}Auxiliary Card{} can appear',
+				[5] = 'in the shop more often.',
             },
         }
     },
@@ -1698,7 +1674,7 @@ return {
                 [1] = 'Start run with only',
 				[2] = '{C:attention}rank 0-5{} cards',
                 [3] = 'and all {C:attention}decimal',
-				[4] = '{C:attention}ranks{} in between',
+				[4] = '{C:attention}ranks{} inbetween',
             },
         }
     },
@@ -1711,7 +1687,7 @@ return {
             ['text'] = {
                 [1] = 'Each played {C:attention}Ace{},',
 				[2] = '{C:attention}2{}, {C:attention}3{}, {C:attention}5{}, or {C:attention}8{} gives',
-				[3] = '{C:mult}+#1#{} Mult when scored',
+				[3] = 'gives {C:mult}+#1#{} Mult when scored',
             }
         }
     },
@@ -1722,7 +1698,7 @@ return {
             ['text'] = {
                 [1] = 'Each played {C:attention}0{}, {C:attention}1{}, {C:attention}Ace{},',
 				[2] = '{C:attention}2{}, {C:attention}3{}, {C:attention}5{}, {C:attention}8{}, or {C:attention}21{}',
-				[3] = '{C:mult}+#1#{} Mult when scored',
+				[3] = 'gives {C:mult}+#1#{} Mult when scored',
             }
         }
     },
@@ -1732,7 +1708,7 @@ return {
             ['name'] = 'Odd Todd',
             ['text'] = {
                 [1] = 'Played cards with',
-				[2] = '{C:attention}odd{} rank give',
+				[2] = '{C:attention}odd{} rank gives',
 				[3] = '{C:chips}+#1#{} Chips when scored',
 				[4] = '{C:inactive}(A, 9, 7, 5, 3){}',
             }
@@ -1744,7 +1720,7 @@ return {
             ['name'] = 'Odd Todd',
             ['text'] = {
                 [1] = 'Played cards with',
-				[2] = '{C:attention}odd{} rank give',
+				[2] = '{C:attention}odd{} rank gives',
 				[3] = '{C:chips}+#1#{} Chips when scored',
 				[4] = '{C:inactive}(21, A, 9, 7, 5, 3, 1){}',
             }
@@ -1756,7 +1732,7 @@ return {
             ['name'] = 'Even Steven',
             ['text'] = {
                 [1] = 'Played cards with',
-				[2] = '{C:attention}even{} rank give',
+				[2] = '{C:attention}even{} rank gives',
 				[3] = '{C:mult}+#1#{} Mult when scored',
 				[4] = '{C:inactive}(10, 8, 6, 4, 2){}',
             }
@@ -1768,7 +1744,7 @@ return {
             ['name'] = 'Even Steven',
             ['text'] = {
                 [1] = 'Played cards with',
-				[2] = '{C:attention}even{} rank give',
+				[2] = '{C:attention}even{} rank gives',
 				[3] = '{C:mult}+#1#{} Mult when scored',
 				[4] = '{C:inactive}(10, 8, 6, 4, 2, 0){}',
             }

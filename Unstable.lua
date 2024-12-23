@@ -50,6 +50,12 @@ function unstb.process_loc_text()
 	
 	SMODS.process_loc_text(G.localization.descriptions.Other, 'resource_tooltip', loc.resource_tooltip)
     G.P_CENTERS['resource_tooltip'] = {key = 'resource_tooltip', set = 'Other'}
+	
+	SMODS.process_loc_text(G.localization.descriptions.Other, 'poison_tooltip', loc.poison_tooltip)
+    G.P_CENTERS['poison_tooltip'] = {key = 'poison_tooltip', set = 'Other'}
+	
+	SMODS.process_loc_text(G.localization.descriptions.Other, 'acorn_tooltip', loc.acorn_tooltip)
+    G.P_CENTERS['acorn_tooltip'] = {key = 'acorn_tooltip', set = 'Other'}
 end
 
 --Initialize All Colors
@@ -80,7 +86,7 @@ end
 local unstb_config_tab = function()
 	return{
 		{
-		label = 'Mechanics Settings',
+		label = loc.dictionary.mechanic_settings,
 		chosen = true,
 		tab_definition_function = function()
 		return {
@@ -98,7 +104,7 @@ local unstb_config_tab = function()
 				
 					{n=G.UIT.R, config={align = "cm"}, nodes={
 						
-						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = "Requires Restart to Apply Effects", colour = G.C.RED, scale = 0.4}}}},
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = loc.dictionary.requires_restart, colour = G.C.RED, scale = 0.4}}}},
 						}},
 				
 					{n=G.UIT.R, config={align = "cm"}, nodes={ --Base Box containing everything
@@ -107,18 +113,18 @@ local unstb_config_tab = function()
 					{n=G.UIT.C, config={align = "cl", padding = 0.2}, nodes={
 						{n=G.UIT.R, config={align = "cl"}, nodes={
 						
-						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = "Rank", colour = G.C.ORANGE, scale = 0.5}}}},
-						create_toggle({label = 'Rank 21', ref_table = unstb.config.rank, ref_value = 'rank_21', callback = function() unstb:save_config() end}),
-						create_toggle({label = 'Rank 0 and 1', ref_table = unstb.config.rank, ref_value = 'rank_binary', callback = function() unstb:save_config() end}),
-						create_toggle({label = 'Decimal Ranks', ref_table = unstb.config.rank, ref_value = 'rank_decimal', callback = function() unstb:save_config() end}),
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = loc.dictionary.config_header_rank, colour = G.C.ORANGE, scale = 0.5}}}},
+						create_toggle({label = loc.dictionary.config_rank21, ref_table = unstb.config.rank, ref_value = 'rank_21', callback = function() unstb:save_config() end}),
+						create_toggle({label = loc.dictionary.config_rank_bi, ref_table = unstb.config.rank, ref_value = 'rank_binary', callback = function() unstb:save_config() end}),
+						create_toggle({label = loc.dictionary.config_rank_decimal, ref_table = unstb.config.rank, ref_value = 'rank_decimal', callback = function() unstb:save_config() end}),
 						
 						}},
 						
 						{n=G.UIT.R, config={align = "cl"}, nodes={
 						
-						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = "Enhancement", colour = G.C.ORANGE, scale = 0.5}}}},
-						create_toggle({label = 'New Enhancement', ref_table = unstb.config.enh, ref_value = 'enh_custom', callback = function() unstb:save_config() end}),
-						create_toggle({label = 'DisEnhancement', ref_table = unstb.config.enh, ref_value = 'enh_disenh', callback = function() unstb:save_config() end}),
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = loc.dictionary.config_header_enh, colour = G.C.ORANGE, scale = 0.5}}}},
+						create_toggle({label = loc.dictionary.config_enh_custom, ref_table = unstb.config.enh, ref_value = 'enh_custom', callback = function() unstb:save_config() end}),
+						create_toggle({label = loc.dictionary.config_enh_disenh, ref_table = unstb.config.enh, ref_value = 'enh_disenh', callback = function() unstb:save_config() end}),
 						
 						}}
 					}}, 
@@ -128,13 +134,13 @@ local unstb_config_tab = function()
 					
 						{n=G.UIT.R, config={align = "cl"}, nodes={
 						
-						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = "New Mechanics", colour = G.C.ORANGE, scale = 0.5}}}},
-						create_toggle({label = 'Edition Upgrade', ref_table = unstb.config.gameplay, ref_value = 'edition_upgrade', callback = function() unstb:save_config() end}),
-						create_toggle({label = 'Suit and Face Seal', ref_table = unstb.config.gameplay, ref_value = 'seal_suit', callback = function() unstb:save_config() end}),
-						create_toggle({label = 'Auxiliary Card', ref_table = unstb.config.gameplay, ref_value = 'c_aux', callback = function() unstb:save_config() end}),
-						create_toggle({label = 'Custom Music', ref_table = unstb.config.gameplay, ref_value = 'music', callback = function() unstb:save_config() end}),
-						create_toggle({label = '"Rebundant" Consumables', info = {'Contains same feature as Auxiliary Card, ', 'recommended to turn on if Auxiliary Card is turned off'}, ref_table = unstb.config.gameplay, ref_value = 'c_rebundant', callback = function() unstb:save_config() end}),
-						create_toggle({label = 'New Spectral Cards', ref_table = unstb.config.gameplay, ref_value = 'new_spectrals', callback = function() unstb:save_config() end}),
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = loc.dictionary.config_header_mechanics, colour = G.C.ORANGE, scale = 0.5}}}},
+						create_toggle({label = loc.dictionary.config_mech_upgrade, ref_table = unstb.config.gameplay, ref_value = 'edition_upgrade', callback = function() unstb:save_config() end}),
+						create_toggle({label = loc.dictionary.config_mech_suitseal, ref_table = unstb.config.gameplay, ref_value = 'seal_suit', callback = function() unstb:save_config() end}),
+						create_toggle({label = loc.dictionary.config_mech_aux, ref_table = unstb.config.gameplay, ref_value = 'c_aux', callback = function() unstb:save_config() end}),
+						create_toggle({label = loc.dictionary.config_mech_music, ref_table = unstb.config.gameplay, ref_value = 'music', callback = function() unstb:save_config() end}),
+						create_toggle({label = loc.dictionary.config_mech_fallback, info = loc.dictionary.config_mech_fallback_desc, ref_table = unstb.config.gameplay, ref_value = 'c_rebundant', callback = function() unstb:save_config() end}),
+						create_toggle({label = loc.dictionary.config_mech_suitseal, ref_table = unstb.config.gameplay, ref_value = 'new_spectrals', callback = function() unstb:save_config() end}),
 						
 						}},
 					}}, 
@@ -146,7 +152,7 @@ local unstb_config_tab = function()
 		},
 		
 		{ --Reserved Tab, in case the settings are expended in the future
-		label = 'Joker Settings',
+		label = loc.dictionary.joker_settings,
 		tab_definition_function = function()
 		return {
 			n = G.UIT.ROOT,
@@ -163,7 +169,7 @@ local unstb_config_tab = function()
 				
 					{n=G.UIT.R, config={align = "cm"}, nodes={
 						
-						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = "Requires Restart to Apply Effects", colour = G.C.RED, scale = 0.4}}}},
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = loc.dictionary.requires_restart, colour = G.C.RED, scale = 0.4}}}},
 						}},
 				
 					{n=G.UIT.R, config={align = "cm"}, nodes={ --Base Box containing everything
@@ -338,6 +344,18 @@ SMODS.Atlas {
 }
 
 --Atlas for Auxiliary Cards
+
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "auxiliary_undiscovered",
+  -- The name of the file, for the code to pull the atlas from
+  path = "auxiliary_undiscovered.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
 SMODS.Atlas {
   -- Key for code to find it with
   key = "auxiliary",
@@ -1017,7 +1035,7 @@ SMODS.Enhancement {
 	
 	after_play = function(self, card, context)
 	
-		print('Trigger afterplay')
+		--print('Trigger afterplay')
 	
 		local isDestroy = pseudorandom('vintage'..G.SEED) < card.ability.extra.current_odd * G.GAME.probabilities.normal / card.ability.extra.odd_destroy
 		
@@ -2083,7 +2101,7 @@ SMODS.ConsumableType{
 
 SMODS.UndiscoveredSprite{
     key = 'Auxiliary',
-    atlas = 'auxiliary',
+    atlas = 'auxiliary_undiscovered',
     pos = get_coordinates(0)
 }
 
@@ -2673,7 +2691,7 @@ SMODS.Consumable{
 	loc_vars = function(self, info_queue, card)
 	
 		info_queue[#info_queue+1] = {set = 'Other', key = 'upgrade_edition'}
-		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_poison']
+		info_queue[#info_queue+1] = {set = 'Other', key = 'poison_tooltip'}
 	
 		return {vars = {}}
 	end,
@@ -2703,7 +2721,7 @@ SMODS.Consumable{
 			end
 		end
 		
-		print(selected_index)
+		--print(selected_index)
 		
 		--Cover edge cases
 		
@@ -2771,6 +2789,7 @@ SMODS.Consumable{
 	discovered = true,
 
 	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {set = 'Other', key = 'unstb_heal_seal'}
 		return {vars = {card.ability.extra.count}}
 	end,
 
@@ -3019,7 +3038,7 @@ SMODS.Consumable{
 	
 	process_loc_text = function(self)
         SMODS.Consumable.process_loc_text(self)
-        SMODS.process_loc_text(G.localization.descriptions.Auxiliary, self.key..'_n', loc.aux_dark_matter_ex)
+        SMODS.process_loc_text(G.localization.descriptions.Auxiliary, self.key..'_n', loc.aux_dark_matter_n)
     end,
 
 	can_use = function(self, card)
@@ -3176,7 +3195,7 @@ SMODS.Consumable{
 
 	loc_vars = function(self, info_queue, card)
 	
-		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_acorn']
+		info_queue[#info_queue+1] = {set = 'Other', key = 'acorn_tooltip'}
 	
 		return {vars = {card and card.ability.extra.count or self.config.extra.count}}
 	end,
@@ -3783,7 +3802,7 @@ SMODS.Consumable{
 			func = function() 
 				for i=#destroyed_cards, 1, -1 do
 					local c = destroyed_cards[i]
-					print(c)
+					--print(c)
 					
 					if c.ability.name == 'Glass Card' then 
 						c:shatter()
@@ -3794,7 +3813,7 @@ SMODS.Consumable{
 				return true end })
 		--Calling Jokers to process the card destroying
 		delay(0.3)
-		print('joker')
+		--print('joker')
 		for i = 1, #G.jokers.cards do
 			G.jokers.cards[i]:calculate_joker({remove_playing_cards = true, removed = destroyed_cards})
 		end
@@ -4122,6 +4141,16 @@ SMODS.Consumable{
     end,
 }
 
+unstb_global.siphon_blacklist = {}
+unstb_global.siphon_blacklist['e_negative'] = true
+
+--Global register function, just in case more modded edition can blackList them
+function unstb_global.register_siphon_blacklist(edition_list)
+	for i=1, #edition_list do
+		unstb_global.siphon_blacklist[edition_list[i]] = true
+	end
+end
+
 --Siphon
 SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
@@ -4137,7 +4166,7 @@ SMODS.Consumable{
 
 	can_use = function(self, card)
 		if G.hand and #G.jokers.cards >= 1 and G.jokers.highlighted[1] then
-			return G.jokers.highlighted[1].edition --and G.jokers.highlighted[1].edition.key ~= 'e_negative'
+			return G.jokers.highlighted[1].edition and not unstb_global.siphon_blacklist[G.jokers.highlighted[1].edition.key]
 		end
 		return false
 	end,
@@ -4422,8 +4451,8 @@ create_joker({
 				max_card_count = card_count
 			end
 			
-			print(max_card_count)
-			print(card.ability.extra.count)
+			--print(max_card_count)
+			--print(card.ability.extra.count)
 			
 			if max_card_count >= card.ability.extra.count then
 				return {
@@ -4491,7 +4520,7 @@ create_joker({
 local ref_set_cost = Card.set_cost
 function Card.set_cost(self)
 	ref_set_cost(self)
-	for k,v in ipairs(SMODS.find_card("j_unstb_expensive_handbag")) do
+	for k,v in ipairs(SMODS.find_card("j_unstb_luxurious_handbag")) do
 		self.cost = self.cost + v.ability.extra.inflation
 	end
 	
@@ -4712,6 +4741,8 @@ create_joker({
 	
 	vars = {{odds = 4}},
 	custom_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {key = 'e_negative_consumable', set = 'Edition', config = {extra = 1}}
+		
 		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds}}
     end,
 	
@@ -5657,8 +5688,8 @@ create_joker({
 				
 				local target_rank = binary_rank[final_rank+1] or 'unstb_???'
 				
-				print(final_rank)
-				print(target_rank)
+				--print(final_rank)
+				--print(target_rank)
 				
 				--Create Card
 				event({func = function()
@@ -6358,7 +6389,7 @@ create_joker({
 	
 	custom_vars = function(self, info_queue, card)
         
-		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_acorn']
+		info_queue[#info_queue+1] = {set = 'Other', key = 'acorn_tooltip'}
 		
 		return { vars = {}}
     end,
@@ -6570,7 +6601,7 @@ create_joker({
 	
     custom_vars = function(self, info_queue, card)
 	
-		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_poison']
+		info_queue[#info_queue+1] = {set = 'Other', key = 'poison_tooltip'}
 	
         return {vars = {card.ability.extra.discard_size}}
     end,
@@ -6742,7 +6773,7 @@ create_joker({
 	
 	custom_vars = function(self, info_queue, card)
         
-		info_queue[#info_queue+1] = G.P_CENTERS['m_unstb_poison']
+		info_queue[#info_queue+1] = {set = 'Other', key = 'poison_tooltip'}
 		
 		--Check the number of poison card in the deck
 		local count =0
@@ -6994,7 +7025,7 @@ create_joker({
 			
 			forced_message(card.ability.extra.dir==0 and 'Left' or 'Right', card, G.C.ORANGE, true)
 			
-			print(card.config.center.key)
+			--print(card.config.center.key)
 		end
 		
 		local other_joker = nil
@@ -7584,11 +7615,11 @@ create_joker({
 				local totalChips = card.ability.extra.chips_rate * (string.len(consonant))
 				local totalMult = card.ability.extra.mult_rate * (string.len(vowel))
 				
-				print(vowel)
-				print(consonant)
+				--print(vowel)
+				--print(consonant)
 				
-				print(totalChips)
-				print(totalMult)
+				--print(totalChips)
+				--print(totalMult)
 				
 				return {
 				  chips = totalChips,
@@ -8442,11 +8473,11 @@ create_joker({
 				local c = context.scoring_hand[i]
 				local key = c.base.value
 				
-				print(rank_2048[c.base.value])
+				--print(rank_2048[c.base.value])
 				
 				if rank_2048[c.base.value] then
 					if card_list[key] then
-						print('found the card list: '..c.base.value)
+						--print('found the card list: '..c.base.value)
 					
 						local prev_card = card_list[key]
 						card_to_destroy[#card_to_destroy+1] = prev_card
@@ -8464,23 +8495,23 @@ create_joker({
 						--Erase the slot, if there's the next one then it counts as a new pair
 						card_list[key] = nil
 					else
-						print('adding to card list: '..c.base.value)
+						--print('adding to card list: '..c.base.value)
 						card_list[key] = c
 					end
 				end
 			end
 			
-			print('done')
+			--print('done')
 			--print(inspectDepth(card_to_destroy, nil, 1))
 			
 			card.ability.extra.card_to_destroy = card_to_destroy
 		end
 		
 		if context.destroying_card and not context.blueprint then
-			print('check card to destroy main')
+			--print('check card to destroy main')
 			for i = 1, #card.ability.extra.card_to_destroy do
-				print('check card to destroy')
-				print(context.destroying_card == card.ability.extra.card_to_destroy[i])
+				--print('check card to destroy')
+				--print(context.destroying_card == card.ability.extra.card_to_destroy[i])
 				if context.destroying_card == card.ability.extra.card_to_destroy[i] then
 					return true
 				end
