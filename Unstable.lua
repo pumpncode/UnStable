@@ -3,10 +3,11 @@
 --- MOD_ID: UNSTB
 --- MOD_AUTHOR: [Kirbio, RamChops Games]
 --- MOD_DESCRIPTION: Mod with a lot of new but vanilla-style mechanics. Contains new Jokers, consumables, and other stuff!
---- DEPENDENCIES: [Steamodded>=1.0.0~ALPHA-0812d]
+--- DEPENDENCIES: [Steamodded>=1.0.0~ALPHA-1217d]
 --- BADGE_COLOR: 41c300
 --- PREFIX: unstb
 --- PRIORITY: 777
+--- VERSION: 1.0.0
 ----------------------------------------------
 ------------MOD CODE -------------------------
 
