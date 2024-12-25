@@ -986,7 +986,7 @@ SMODS.Enhancement {
 			card.ability.extra.totalchips = (card.base.nominal + (card.ability.perma_bonus or 0)) * 2
 			
 			if not card.debuff then
-				ret.h_chips = card.ability.extra.totalchips
+				ret.unstb_h_chips = card.ability.extra.totalchips
 			end
 			
 		end
