@@ -26,39 +26,6 @@ end
 
 print("Starting Unstable")
 
---Localization Messages
-local loc = filesystem.load(unstb.path..'localization.lua')()
-unstb_global.loc = loc
-
---Dictionary wrapper, based on Bunco
-function unstb.process_loc_text()
-    SMODS.process_loc_text(G.localization.misc.dictionary, 'unstb', loc.dictionary)
-
-    loc.dictionary = G.localization.misc.dictionary.unstb
-
-    -- Other localization
-	SMODS.process_loc_text(G.localization.descriptions.Other, 'decimal_rank_ability', loc.dictionary.decimal_rank_ability)
-	SMODS.process_loc_text(G.localization.descriptions.Other, 'no_chip', loc.dictionary.no_chip)
-	
-	SMODS.process_loc_text(G.localization.descriptions.Other, 'upgrade_edition', loc.upgrade_edition)
-    G.P_CENTERS['upgrade_edition'] = {key = 'upgrade_edition', set = 'Other'}
-	
-	SMODS.process_loc_text(G.localization.descriptions.Other, 'disenhancement', loc.disenhancement)
-    G.P_CENTERS['disenhancement'] = {key = 'disenhancement', set = 'Other'}
-	
-	SMODS.process_loc_text(G.localization.descriptions.Other, 'suit_seal', loc.suit_seal)
-    G.P_CENTERS['suit_seal'] = {key = 'suit_seal', set = 'Other'}
-	
-	SMODS.process_loc_text(G.localization.descriptions.Other, 'resource_tooltip', loc.resource_tooltip)
-    G.P_CENTERS['resource_tooltip'] = {key = 'resource_tooltip', set = 'Other'}
-	
-	SMODS.process_loc_text(G.localization.descriptions.Other, 'poison_tooltip', loc.poison_tooltip)
-    G.P_CENTERS['poison_tooltip'] = {key = 'poison_tooltip', set = 'Other'}
-	
-	SMODS.process_loc_text(G.localization.descriptions.Other, 'acorn_tooltip', loc.acorn_tooltip)
-    G.P_CENTERS['acorn_tooltip'] = {key = 'acorn_tooltip', set = 'Other'}
-end
-
 --Initialize All Colors
 G.C.UNSTB_AUX = HEX('00a669')
 
@@ -87,7 +54,7 @@ end
 local unstb_config_tab = function()
 	return{
 		{
-		label = loc.dictionary.mechanic_settings,
+		label = localize("unstb_config_header_mech_setting"),
 		chosen = true,
 		tab_definition_function = function()
 		return {
@@ -105,7 +72,7 @@ local unstb_config_tab = function()
 				
 					{n=G.UIT.R, config={align = "cm"}, nodes={
 						
-						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = loc.dictionary.requires_restart, colour = G.C.RED, scale = 0.4}}}},
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = localize("unstb_config_requires_restart"), colour = G.C.RED, scale = 0.4}}}},
 						}},
 				
 					{n=G.UIT.R, config={align = "cm"}, nodes={ --Base Box containing everything
@@ -114,18 +81,18 @@ local unstb_config_tab = function()
 					{n=G.UIT.C, config={align = "cl", padding = 0.2}, nodes={
 						{n=G.UIT.R, config={align = "cl"}, nodes={
 						
-						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = loc.dictionary.config_header_rank, colour = G.C.ORANGE, scale = 0.5}}}},
-						create_toggle({label = loc.dictionary.config_rank21, ref_table = unstb.config.rank, ref_value = 'rank_21', callback = function() unstb:save_config() end}),
-						create_toggle({label = loc.dictionary.config_rank_bi, ref_table = unstb.config.rank, ref_value = 'rank_binary', callback = function() unstb:save_config() end}),
-						create_toggle({label = loc.dictionary.config_rank_decimal, ref_table = unstb.config.rank, ref_value = 'rank_decimal', callback = function() unstb:save_config() end}),
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = localize("unstb_config_header_rank"), colour = G.C.ORANGE, scale = 0.5}}}},
+						create_toggle({label = localize("unstb_config_rank21"), ref_table = unstb.config.rank, ref_value = 'rank_21', callback = function() unstb:save_config() end}),
+						create_toggle({label = localize("unstb_config_rank_bi"), ref_table = unstb.config.rank, ref_value = 'rank_binary', callback = function() unstb:save_config() end}),
+						create_toggle({label = localize("unstb_config_rank_decimal"), ref_table = unstb.config.rank, ref_value = 'rank_decimal', callback = function() unstb:save_config() end}),
 						
 						}},
 						
 						{n=G.UIT.R, config={align = "cl"}, nodes={
 						
-						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = loc.dictionary.config_header_enh, colour = G.C.ORANGE, scale = 0.5}}}},
-						create_toggle({label = loc.dictionary.config_enh_custom, ref_table = unstb.config.enh, ref_value = 'enh_custom', callback = function() unstb:save_config() end}),
-						create_toggle({label = loc.dictionary.config_enh_disenh, ref_table = unstb.config.enh, ref_value = 'enh_disenh', callback = function() unstb:save_config() end}),
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = localize("unstb_config_header_enh"), colour = G.C.ORANGE, scale = 0.5}}}},
+						create_toggle({label = localize("unstb_config_enh_custom"), ref_table = unstb.config.enh, ref_value = 'enh_custom', callback = function() unstb:save_config() end}),
+						create_toggle({label = localize("unstb_config_enh_disenh"), ref_table = unstb.config.enh, ref_value = 'enh_disenh', callback = function() unstb:save_config() end}),
 						
 						}}
 					}}, 
@@ -135,13 +102,13 @@ local unstb_config_tab = function()
 					
 						{n=G.UIT.R, config={align = "cl"}, nodes={
 						
-						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = loc.dictionary.config_header_mechanics, colour = G.C.ORANGE, scale = 0.5}}}},
-						create_toggle({label = loc.dictionary.config_mech_upgrade, ref_table = unstb.config.gameplay, ref_value = 'edition_upgrade', callback = function() unstb:save_config() end}),
-						create_toggle({label = loc.dictionary.config_mech_suitseal, ref_table = unstb.config.gameplay, ref_value = 'seal_suit', callback = function() unstb:save_config() end}),
-						create_toggle({label = loc.dictionary.config_mech_aux, ref_table = unstb.config.gameplay, ref_value = 'c_aux', callback = function() unstb:save_config() end}),
-						create_toggle({label = loc.dictionary.config_mech_music, ref_table = unstb.config.gameplay, ref_value = 'music', callback = function() unstb:save_config() end}),
-						create_toggle({label = loc.dictionary.config_mech_fallback, info = loc.dictionary.config_mech_fallback_desc, ref_table = unstb.config.gameplay, ref_value = 'c_rebundant', callback = function() unstb:save_config() end}),
-						create_toggle({label = loc.dictionary.config_mech_suitseal, ref_table = unstb.config.gameplay, ref_value = 'new_spectrals', callback = function() unstb:save_config() end}),
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = localize("unstb_config_header_mechanics"), colour = G.C.ORANGE, scale = 0.5}}}},
+						create_toggle({label = localize("unstb_config_mech_upgrade"), ref_table = unstb.config.gameplay, ref_value = 'edition_upgrade', callback = function() unstb:save_config() end}),
+						create_toggle({label = localize("unstb_config_mech_suitseal"), ref_table = unstb.config.gameplay, ref_value = 'seal_suit', callback = function() unstb:save_config() end}),
+						create_toggle({label = localize("unstb_config_mech_aux"), ref_table = unstb.config.gameplay, ref_value = 'c_aux', callback = function() unstb:save_config() end}),
+						create_toggle({label = localize("unstb_config_mech_music"), ref_table = unstb.config.gameplay, ref_value = 'music', callback = function() unstb:save_config() end}),
+						create_toggle({label = localize("unstb_config_mech_fallback"), info = localize("unstb_config_mech_fallback_desc"), ref_table = unstb.config.gameplay, ref_value = 'c_rebundant', callback = function() unstb:save_config() end}),
+						create_toggle({label = localize("unstb_config_mech_new_spectral"), ref_table = unstb.config.gameplay, ref_value = 'new_spectrals', callback = function() unstb:save_config() end}),
 						
 						}},
 					}}, 
@@ -153,7 +120,7 @@ local unstb_config_tab = function()
 		},
 		
 		{ --Reserved Tab, in case the settings are expended in the future
-		label = loc.dictionary.joker_settings,
+		label = localize("unstb_config_header_joker_settings"),
 		tab_definition_function = function()
 		return {
 			n = G.UIT.ROOT,
@@ -170,7 +137,7 @@ local unstb_config_tab = function()
 				
 					{n=G.UIT.R, config={align = "cm"}, nodes={
 						
-						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = loc.dictionary.requires_restart, colour = G.C.RED, scale = 0.4}}}},
+						{n=G.UIT.R, config={align = "cm"}, nodes={{n = G.UIT.T, config = {text = localize("unstb_config_requires_restart"), colour = G.C.RED, scale = 0.4}}}},
 						}},
 				
 					{n=G.UIT.R, config={align = "cm"}, nodes={ --Base Box containing everything
@@ -604,7 +571,7 @@ local function create_joker(joker)
         eternal_compat = joker.eternal or true,
 		perishable_compat = joker.perishable or true,
 
-        loc_txt = loc[key],
+        
         process_loc_text = joker.process_loc_text,
 
         config = joker.custom_config or joker.config,
@@ -730,7 +697,7 @@ SMODS.Seal({
 	
 	weight = 0,
 	config = {extra = {}},
-	loc_txt = loc["seal_face"],
+	
 	loc_vars = function(self, info_queue, card)
 		return {vars = {}}
 	end,
@@ -789,7 +756,7 @@ function SuitSeal.initSeal(suit, atlas, posX)
     badge_colour = SuitSeal.suit_seal_colors[suit],
     weight = 0,
     config = {extra = {}},
-    loc_txt = loc["seal_"..string.lower(suit)],
+    
     loc_vars = function(self, info_queue, card)
         return {vars = {localize(self.suit_seal, 'suits_plural'), colours = {G.C.SUITS[self.suit_seal]}}}
     end,
@@ -846,7 +813,7 @@ SMODS.Seal({
 	
     weight = 0,
     config = {extra = {}},
-    loc_txt = loc["seal_heal"],
+    
     loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'disenhancement'}
         return {vars = {}}
@@ -952,7 +919,7 @@ SMODS.Enhancement {
         }
     end,
 	
-	loc_txt = loc["enh_acorn"],
+	
 	
 	--Override genere_ui so it does not display any chips
 	generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
@@ -1022,7 +989,7 @@ SMODS.Enhancement {
         }
     end,
 	
-	loc_txt = loc["enh_vintage"],
+	
 
 	
 	calculate = function(self, card, context, ret)
@@ -1070,7 +1037,7 @@ SMODS.Enhancement {
         }
     end,
 	
-	loc_txt = loc["enh_promo"],
+	
 	
 	calculate = function(self, card, context, ret)
         if context.cardarea == G.play and not context.repetition then
@@ -1138,7 +1105,7 @@ SMODS.Enhancement {
         }
     end,
 	
-	loc_txt = loc["enh_slop"],
+	
 	
 	suit_map = {
 		Hearts = 0,
@@ -1307,7 +1274,7 @@ SMODS.Enhancement {
         Spades = 3,
 	},
 	
-	loc_txt = loc["enh_resource"],
+	
 	
 	set_sprites = function(self, card, front)
 		
@@ -1464,7 +1431,7 @@ SMODS.Enhancement {
         }
     end,
 	
-	loc_txt = loc["enh_radioactive"],
+	
     
 	set_ability = function(self, card, initial, delay_sprites)
 		--Set the hand multiplier the first time
@@ -1545,7 +1512,7 @@ SMODS.Enhancement {
         }
     end,
 	
-	loc_txt = loc["enh_biohazard"],
+	
 
 	
 	calculate = function(self, card, context, ret)
@@ -1629,7 +1596,7 @@ SMODS.Enhancement {
         }
     end,
 	
-	loc_txt = loc["enh_poison"],
+	
 	
 	--Override genere_ui so it does not display any chips
 	generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
@@ -1737,7 +1704,7 @@ SMODS.Rank {
 	hc_atlas = 'rank_ex_hc',
     lc_atlas = 'rank_ex',
 	
-	loc_txt = loc.ranks['0'],
+	
 	hidden = true,
 
     key = '0',
@@ -1761,7 +1728,7 @@ SMODS.Rank {
 	hc_atlas = 'rank_ex_hc',
     lc_atlas = 'rank_ex',
 	
-	loc_txt = loc.ranks['Half'],
+	
 	hidden = true,
 
     key = '0.5',
@@ -1781,7 +1748,7 @@ SMODS.Rank {
 	hc_atlas = 'rank_ex_hc',
     lc_atlas = 'rank_ex',
 	
-	loc_txt = loc.ranks['1'],
+	
 	hidden = true,
 
     key = '1',
@@ -1803,7 +1770,7 @@ SMODS.Rank {
 	hc_atlas = 'rank_ex_hc',
     lc_atlas = 'rank_ex',
 	
-	loc_txt = loc.ranks['Root'],
+	
 	hidden = true,
 
     key = 'r2',
@@ -1823,7 +1790,7 @@ SMODS.Rank {
 	hc_atlas = 'rank_ex_hc',
     lc_atlas = 'rank_ex',
 	
-	loc_txt = loc.ranks['Euler'],
+	
 	hidden = true,
 
     key = 'e',
@@ -1843,7 +1810,7 @@ SMODS.Rank {
 	hc_atlas = 'rank_ex_hc',
     lc_atlas = 'rank_ex',
 	
-	loc_txt = loc.ranks['Pi'],
+	
 	hidden = true,
 
     key = 'Pi',
@@ -1863,7 +1830,7 @@ SMODS.Rank {
 	hc_atlas = 'rank_ex_hc',
     lc_atlas = 'rank_ex',
 	
-	loc_txt = loc.ranks['Question'],
+	
 	hidden = true,
 
     key = '???',
@@ -1880,7 +1847,7 @@ SMODS.Rank {
 	hc_atlas = 'rank_ex_hc',
     lc_atlas = 'rank_ex',
 
-	loc_txt = loc.ranks['21'],
+	
 	hidden = true,
 	
     key = '21', -- the number or name (ex. "Jack") of your rank if it has one
@@ -2095,7 +2062,7 @@ SMODS.ConsumableType{
     key = 'Auxiliary',
     primary_colour = HEX('424e54'),
     secondary_colour = G.C.UNSTB_AUX,
-    loc_txt = loc.auxiliary,
+    loc_txt = {},
 	default = 'c_unstb_aux_seal_move',
     collection_rows = {5, 5}
 }
@@ -2112,7 +2079,7 @@ local aux_booster_rate = {0.75, 0.75, 0.5, 0.1}
 
 for i = 1, 4 do
     SMODS.Booster{
-        key = 'aux_'..(i <= 2 and i or i == 3 and 'jumbo' or 'mega'), loc_txt = loc['auxpack'..(i <= 2 and '' or i == 3 and '_jumbo' or '_mega')],
+        key = 'aux_'..(i <= 2 and i or i == 3 and 'jumbo' or 'mega'), 
 
         config = {extra = i <= 2 and 3 or 5, choose =  i <= 3 and 1 or 2},
         draw_hand = false,
@@ -2241,7 +2208,7 @@ if unstb_config.gameplay.seal_suit then
 for i = 1, #suit_seal_list do
 	SMODS.Consumable{
 		set = 'Auxiliary', atlas = 'auxiliary',
-		key = 'aux_'..string.lower(suit_seal_list[i]), loc_txt = loc['aux_'..string.lower(suit_seal_list[i])],
+		key = 'aux_'..string.lower(suit_seal_list[i]), 
 
 		config = {extra = {count = 2, seal = 'unstb_'..string.lower(suit_seal_list[i])}},
 		--discovered = true,
@@ -2292,7 +2259,7 @@ end
 --Face Seal Card
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
-	key = 'aux_face', loc_txt = loc['aux_face'],
+	key = 'aux_face', 
 
 	config = {extra = {count = 2, seal = 'unstb_face'}},
 	--discovered = true,
@@ -2340,7 +2307,7 @@ end
 -- +2
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
-	key = 'aux_plus_two', loc_txt = loc['aux_plus_two'],
+	key = 'aux_plus_two', 
 
 	config = {extra = {count = 2}},
 	--discovered = true,
@@ -2387,7 +2354,7 @@ SMODS.Consumable{
 -- Wild +4
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
-	key = 'aux_plus_four_wild', loc_txt = loc['aux_plus_four_wild'],
+	key = 'aux_plus_four_wild', 
 
 	config = {extra = {count = 4}},
 	--discovered = true,
@@ -2453,7 +2420,7 @@ local aux_instants = {'aux_inst_disc', 'aux_inst_hsize', 'aux_inst_hand'}
 for i = 1, #aux_instants do
 	SMODS.Consumable{
 		set = 'Auxiliary', atlas = 'auxiliary',
-		key = aux_instants[i], loc_txt = loc[aux_instants[i]],
+		key = aux_instants[i], 
 
 		config = {extra = {amount = 3}},
 		--discovered = true,
@@ -2491,7 +2458,7 @@ end
 --Seal Swap
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
-	key = 'aux_seal_move', loc_txt = loc['aux_seal_move'],
+	key = 'aux_seal_move', 
 
 	config = {extra = {}},
 	--discovered = true,
@@ -2554,7 +2521,7 @@ if unstb_config.rank.rank_binary then
 --All for One
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
-	key = 'aux_conv_1', loc_txt = loc['aux_conv_1'],
+	key = 'aux_conv_1', 
 
 	config = {extra = {count = 3}},
 	--discovered = true,
@@ -2611,7 +2578,7 @@ if unstb_config.rank.rank_21 then
 --The Twenty-One
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
-	key = 'aux_21', loc_txt = loc['aux_21'],
+	key = 'aux_21', 
 
 	config = {extra = {count = 5}},
 	--discovered = true,
@@ -2684,7 +2651,7 @@ if check_enable_taglist({'edition_upgrade', 'enh_disenh'}) then
 --Monkey Paw
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
-	key = 'aux_upgrade', loc_txt = loc['aux_upgrade'],
+	key = 'aux_upgrade', 
 
 	config = {extra = {}},
 	--discovered = true,
@@ -2784,7 +2751,7 @@ if unstb_config.enh.enh_disenh then
 --Heal Seal Card
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
-	key = 'aux_heal', loc_txt = loc['aux_heal'],
+	key = 'aux_heal', 
 
 	config = {extra = {count = 1, seal = 'unstb_heal'}},
 	--discovered = true,
@@ -2852,7 +2819,7 @@ SMODS.Consumable{
 --Heal Hand
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
-	key = 'aux_heal_hand', loc_txt = loc['aux_heal_hand'],
+	key = 'aux_heal_hand', 
 
 	config = {extra = {}},
 	--discovered = true,
@@ -2932,7 +2899,7 @@ end
 --Lottery
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
-	key = 'aux_lottery', loc_txt = loc['aux_lottery'],
+	key = 'aux_lottery', 
 
 	config = {extra = {odds_win = 4, prize = 20}},
 	--discovered = true,
@@ -2985,7 +2952,7 @@ SMODS.Consumable{
 --Blank
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
-	key = 'aux_blank', loc_txt = loc['aux_blank'],
+	key = 'aux_blank', 
 
 	config = {extra = {}},
 	--discovered = true,
@@ -3022,7 +2989,7 @@ SMODS.Consumable{
 --Dark Matter
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
-	key = 'aux_dark_matter', loc_txt = loc['aux_dark_matter'],
+	key = 'aux_dark_matter', 
 
 	config = {extra = {slot = 1}},
 	--discovered = true,
@@ -3036,11 +3003,6 @@ SMODS.Consumable{
 	
 		return {key = key, vars = {card.ability.extra.slot}}
 	end,
-	
-	process_loc_text = function(self)
-        SMODS.Consumable.process_loc_text(self)
-        SMODS.process_loc_text(G.localization.descriptions.Auxiliary, self.key..'_n', loc.aux_dark_matter_n)
-    end,
 
 	can_use = function(self, card)
 		return G.jokers.config.card_limit > 0
@@ -3077,7 +3039,7 @@ SMODS.Consumable{
 --Random
 SMODS.Consumable{
 	set = 'Auxiliary', atlas = 'auxiliary',
-	key = 'aux_random', loc_txt = loc['aux_random'],
+	key = 'aux_random', 
 
 	config = {extra = {count = 2}},
 	--discovered = true,
@@ -3150,9 +3112,9 @@ if unstb_config.enh.enh_custom then
 --The Time
 SMODS.Consumable{
 	set = 'Tarot', atlas = 'tarot',
-	key = 'trt_time', loc_txt = loc['trt_time'],
+	key = 'trt_time', 
 	set_card_type_badge = function(self, card, badges)
-        badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
+        badges[1] = create_badge(localize("k_tarot_exclaim"), get_type_colour(self or card.config, card), nil, 1.2)
     end,
 
 	config = {extra = {count = 2}},
@@ -3186,9 +3148,9 @@ SMODS.Consumable{
 --The Acorn
 SMODS.Consumable{
 	set = 'Tarot', atlas = 'tarot',
-	key = 'trt_acorn', loc_txt = loc['trt_acorn'],
+	key = 'trt_acorn', 
 	set_card_type_badge = function(self, card, badges)
-        badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
+        badges[1] = create_badge(localize("k_tarot_exclaim"), get_type_colour(self or card.config, card), nil, 1.2)
     end,
 
 	config = {extra = {count = 1}},
@@ -3222,9 +3184,9 @@ SMODS.Consumable{
 --The Greed
 SMODS.Consumable{
 	set = 'Tarot', atlas = 'tarot',
-	key = 'trt_greed', loc_txt = loc['trt_greed'],
+	key = 'trt_greed', 
 	set_card_type_badge = function(self, card, badges)
-        badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
+        badges[1] = create_badge(localize("k_tarot_exclaim"), get_type_colour(self or card.config, card), nil, 1.2)
     end,
 
 	config = {extra = {count = 2}},
@@ -3277,9 +3239,9 @@ if check_enable_taglist({'rank_binary', 'rank_decimal'}) then
 
 SMODS.Consumable{
 	set = 'Tarot', atlas = 'tarot',
-	key = 'trt_half', loc_txt = loc['trt_half'],
+	key = 'trt_half', 
 	set_card_type_badge = function(self, card, badges)
-        badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
+        badges[1] = create_badge(localize("k_tarot_exclaim"), get_type_colour(self or card.config, card), nil, 1.2)
     end,
 
 	config = {extra = {count = 2}},
@@ -3388,9 +3350,9 @@ if unstb_config.rank.rank_decimal then
 
 SMODS.Consumable{
 	set = 'Tarot', atlas = 'tarot',
-	key = 'trt_knowledge', loc_txt = loc['trt_knowledge'],
+	key = 'trt_knowledge', 
 	set_card_type_badge = function(self, card, badges)
-        badges[1] = create_badge(loc.dictionary.tarot_exclaim, get_type_colour(self or card.config, card), nil, 1.2)
+        badges[1] = create_badge(localize("k_tarot_exclaim"), get_type_colour(self or card.config, card), nil, 1.2)
     end,
 
 	config = {extra = {count = 1}},
@@ -3450,7 +3412,7 @@ if unstb_config.enh.enh_disenh then
 --Elixir of Life
 SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
-	key = 'spc_elixir', loc_txt = loc['spc_elixir'],
+	key = 'spc_elixir', 
 
 	config = {extra = {}},
 	--discovered = true,
@@ -3537,7 +3499,7 @@ if unstb_config.gameplay.seal_suit then
 --Vessel
 SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
-	key = 'spc_vessel', loc_txt = loc['spc_vessel'],
+	key = 'spc_vessel', 
 
 	config = {extra = {count = 1}},
 	--discovered = true,
@@ -3610,7 +3572,7 @@ SMODS.Consumable{
 --Conferment
 SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
-	key = 'spc_conferment', loc_txt = loc['spc_conferment'],
+	key = 'spc_conferment', 
 
 	config = {extra = {count = 2, cost = 8}},
 	--discovered = true,
@@ -3683,7 +3645,7 @@ if unstb_config.rank.rank_binary then
 --Amnesia
 SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
-	key = 'spc_amnesia', loc_txt = loc['spc_amnesia'],
+	key = 'spc_amnesia', 
 
 	config = {extra = {count = 3}},
 	--discovered = true,
@@ -3760,7 +3722,7 @@ if unstb_config.rank.rank_21 then
 --Altar
 SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
-	key = 'spc_altar', loc_txt = loc['spc_altar'],
+	key = 'spc_altar', 
 
 	config = {extra = {destroy_count = 3, create_count = 2}},
 	--discovered = true,
@@ -3855,7 +3817,7 @@ if check_enable_taglist({'edition_upgrade', 'enh_disenh'}) then
 --Devil's Contract
 SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
-	key = 'spc_contract', loc_txt = loc['spc_contract'],
+	key = 'spc_contract', 
 
 	config = {extra = {upgrade_count = 1, disenc_count = 3}},
 	--discovered = true,
@@ -3938,7 +3900,7 @@ if unstb_config.gameplay.new_spectrals then
 --Poltergeist
 SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
-	key = 'spc_poltergeist', loc_txt = loc['spc_poltergeist'],
+	key = 'spc_poltergeist', 
 
 	config = {extra = {}},
 	--discovered = true,
@@ -4025,7 +3987,7 @@ SMODS.Consumable{
 --Projection
 SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
-	key = 'spc_projection', loc_txt = loc['spc_projection'],
+	key = 'spc_projection', 
 
 	config = {extra = {odds_break = 4}},
 	--discovered = true,
@@ -4155,7 +4117,7 @@ end
 --Siphon
 SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
-	key = 'spc_siphon', loc_txt = loc['spc_siphon'],
+	key = 'spc_siphon', 
 
 	config = {extra = {count = 4}},
 	--discovered = true,
@@ -4235,7 +4197,7 @@ if unstb_config.gameplay.c_aux then
 SMODS.Voucher({
 	object_type = "Voucher",
 	key = "aux1",
-	loc_txt = loc['v_aux1'],
+	
 	atlas = "voucher",
 	pos = { x = 0, y = 0 },
 	unlocked = true,
@@ -4253,7 +4215,7 @@ SMODS.Voucher({
 SMODS.Voucher({
 	object_type = "Voucher",
 	key = "aux2",
-	loc_txt = loc['v_aux2'],
+	
 	atlas = "voucher",
 	pos = { x = 1, y = 0 },
 	unlocked = true,
@@ -8458,10 +8420,6 @@ create_joker({
 	
 		return { key = key, vars = {} }
 	end,
-	process_loc_text = function(self)
-        SMODS.Joker.process_loc_text(self)
-        SMODS.process_loc_text(G.localization.descriptions.Joker, self.key..'_ex', loc.j2048_ex)
-    end,
 	
     blueprint = false, eternal = true, perishable = true,
 	
@@ -8619,7 +8577,7 @@ create_joker({
 if unstb_config.gameplay.c_aux then
 
 SMODS.Back{ -- Utility Deck
-	key = "utility", loc_txt = loc.deck_util,
+	key = "utility", 
 	pos = {x = 0, y = 0},
 	
 	unlocked = true,
@@ -8651,7 +8609,7 @@ end
 if check_enable_taglist({'rank_binary', 'rank_decimal'}) then
 
 SMODS.Back{ -- Lowkey Deck
-	key = "lowkey", loc_txt = loc.deck_lowkey,
+	key = "lowkey", 
 	pos = {x = 1, y = 0},
 	
 	unlocked = true,

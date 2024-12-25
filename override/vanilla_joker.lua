@@ -29,13 +29,6 @@ SMODS.Joker:take_ownership('fibonacci', {
 		return { key = key, vars = {card.ability.extra.mult} }
 	end,
 	
-	process_loc_text = function(self)
-        SMODS.Joker.process_loc_text(self)
-        SMODS.process_loc_text(G.localization.descriptions.Joker, self.key..'_ex', unstb_global.loc.fibonacci_ex)
-    end,
-    loc_txt = unstb_global.loc.fibonacci
-	,
-	
 	calculate = function(self, card, context)
 		
 		if context.individual and context.cardarea == G.play then
@@ -96,13 +89,6 @@ SMODS.Joker:take_ownership('odd_todd', {
 		return { key = key, vars = {card.ability.extra.chips} }
 	end,
 	
-	process_loc_text = function(self)
-        SMODS.Joker.process_loc_text(self)
-        SMODS.process_loc_text(G.localization.descriptions.Joker, self.key..'_ex', unstb_global.loc.odd_todd_ex)
-    end,
-    loc_txt = unstb_global.loc.odd_todd
-	,
-	
 	calculate = function(self, card, context)
 		
 		if context.individual and context.cardarea == G.play then
@@ -135,13 +121,6 @@ SMODS.Joker:take_ownership('even_steven', {
 	
 		return { key = key, vars = {card.ability.extra.mult} }
 	end,
-	
-	process_loc_text = function(self)
-        SMODS.Joker.process_loc_text(self)
-        SMODS.process_loc_text(G.localization.descriptions.Joker, self.key..'_ex', unstb_global.loc.even_steven_ex)
-    end,
-    loc_txt = unstb_global.loc.even_steven
-	,
 	
 	calculate = function(self, card, context)
 		
