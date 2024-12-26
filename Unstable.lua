@@ -967,7 +967,7 @@ SMODS.Enhancement {
 	pos = {x=1, y = 0},
 	
 	
-	config = {extra = { bonus_chip = 0, chip_gain_rate = 3, current_odd = 0, odd_destroy = 25, destroy_rate = 1}},
+	config = {extra = { bonus_chip = 0, chip_gain_rate = 4, current_odd = 0, odd_destroy = 25, destroy_rate = 1}},
 	
 	loc_vars = function(self, info_queue, card)
 		
@@ -3135,10 +3135,17 @@ SMODS.Consumable{
 	end,
 
 	use = function(self, card)
+		
 		event({trigger = 'after', delay = 0.4, func = function()
             play_sound('tarot1')
 			card:juice_up(0.3, 0.5)
             return true end })
+			
+			--Special Interaction: If it is a Vintage Card already, reset the breakdown chance
+			if G.hand.highlighted[1].config.center.key == 'm_unstb_vintage' then
+				G.hand.highlighted[1].ability.extra.current_odd = 0
+			end
+			
 			conversionTarot(G.hand.highlighted, 'm_unstb_vintage')
 	end,
 
