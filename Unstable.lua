@@ -683,6 +683,75 @@ local function edition_upgrade(card)
 	end
 end
 
+--General Helper function for rank increment / decrement
+
+--Insert "prev" property into SMODS.Ranks
+function init_prev_rank_data()
+	print("Initialize Previous Rank Data")
+	for _, rank in pairs(SMODS.Ranks) do
+		
+		--Initialize
+		if not rank.prev then
+			rank.prev = {}
+		end
+		
+		next_rank_list = rank.next
+		
+		for i=1, #next_rank_list do
+			local next_rank = SMODS.Ranks[next_rank_list[i]]
+			local prev = next_rank.prev or {}
+			table.insert(prev, rank.key)
+			next_rank.prev = prev
+		end
+	end
+end
+
+--Utility function to get the next rank by specified step, walked using the same algorithm as SMODS Implementation of Strength Tarot
+--Negative Step is also ok
+function get_next_x_rank(rank, step)
+	local currentRank = SMODS.Ranks[rank]
+	
+	if not currentRank then 
+		return 'unstb_???' --Fallback, if the rank is invalid then returning ??? rank card
+	end
+	
+	local behavior
+	local new_rank
+	
+	local mul = (step > 0 and 1) or -1
+	
+	--Based on SMODS Current implementation of Strength
+	for i=mul, step, mul do
+		behavior = currentRank.strength_effect or { fixed = 1, ignore = false, random = false }
+		if behavior.ignore or not next(currentRank.next) then
+			return rank
+		elseif behavior.random then
+			-- TODO doesn't respect in_pool
+			if mul>0 then
+				new_rank = pseudorandom_element(currentRank.next, pseudoseed('nextrank'))
+			else
+				new_rank = pseudorandom_element(currentRank.prev, pseudoseed('prevrank'))
+			end
+			
+		else
+			if mul>0 then
+				local ii = (behavior.fixed and currentRank.next[behavior.fixed]) and behavior.fixed or 1
+				new_rank = currentRank.next[ii]
+			else
+				local ii = (behavior.fixed and currentRank.prev[behavior.fixed]) and behavior.fixed or 1
+				new_rank = currentRank.prev and currentRank.prev[ii] or currentRank.key
+			end
+			
+		end
+		
+		currentRank = SMODS.Ranks[new_rank]
+		--print(SMODS.Ranks[new_rank].key)
+	end
+	
+	return new_rank or rank 
+
+end
+
 --Face Seal
 
 if unstb_config.gameplay.seal_suit then
@@ -8717,6 +8786,15 @@ end
 --Suits, supports for Suit Seals, a lot of suit-based Joker, and modded suits support for Smeared
 filesystem.load(unstb.path..'/override/suits.lua')()
 
+--Hook for the game's splash screen, to initialize any data that is sensitive to the mod's order (mainly rank stuff)
+
+local ref_gamesplashscreen = Game.splash_screen
+
+function Game:splash_screen()
+ 	ref_gamesplashscreen(self)
+	
+	init_prev_rank_data()
+end
 
 ----------------------------------------------
 ------------MOD CODE END----------------------
