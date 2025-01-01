@@ -6,7 +6,7 @@
     "description": "Mod with a lot of new but vanilla-style mechanics. Contains new Jokers, consumables, and other stuff!",
     "prefix": "unstb",
     "author": ["Kirbio, RamChops Games"],
-    "main_file": "main.lua",
+    "main_file": "Unstable.lua",
     "priority": 777,
     "badge_colour": "41c300",
     "dependencies": [
