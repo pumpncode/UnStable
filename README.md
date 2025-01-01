@@ -18,6 +18,6 @@ https://kirbio.github.io/UnStableModSite/
 
 Please note that this mod is designed and balanced to be played as a standalone mod.
 It is possible to play it with other mods, however.
-If you are playing it with other mods, please also get the UnStableEX expansion as well for cross-mod compatibility.
+If you are playing it with other mods, please also get the [UnStableEX](https://github.com/kirbio/UnStableEX) expansion as well for cross-mod compatibility.
 
 Enjoy!
