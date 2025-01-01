@@ -1,16 +1,3 @@
---- STEAMODDED HEADER
---- MOD_NAME: UnStable
---- MOD_ID: UNSTB
---- MOD_AUTHOR: [Kirbio, RamChops Games]
---- MOD_DESCRIPTION: Mod with a lot of new but vanilla-style mechanics. Contains new Jokers, consumables, and other stuff!
---- DEPENDENCIES: [Steamodded>=1.0.0~ALPHA-1217d]
---- BADGE_COLOR: 41c300
---- PREFIX: unstb
---- PRIORITY: 777
---- VERSION: 1.0.0
-----------------------------------------------
-------------MOD CODE -------------------------
-
 local unstb = SMODS.current_mod
 local filesystem = NFS or love.filesystem
 local path = unstb.path
@@ -1516,7 +1503,7 @@ SMODS.Enhancement {
             SMODS.eval_this(card, {chip_mod = card.ability.extra.chips, message = localize{type='variable',key='a_chips',vars={card.ability.extra.chips}}} )
 			
 			if #context.scoring_hand > 1 then
-				local target = context.scoring_hand[math.random(#context.scoring_hand)]
+				local target = pseudorandom_element(context.scoring_hand, pseudoseed('radioactive_conv'..G.SEED))
 				
 				--Exclude slop card because it interacts horribly with this
 				if target.config.center ~= G.P_CENTERS.m_unstb_radioactive and target.config.center.key ~= 'm_unstb_slop' and pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_conv then
@@ -6100,7 +6087,7 @@ create_joker({
 	
 		if context.discard and not context.other_card.debuff and not context.blueprint then
 			if card.ability.extra.is_activate and context.other_card.config.center == G.P_CENTERS.m_unstb_slop then
-				ease_dollars(math.random(card.ability.extra.max_payout), true)
+				ease_dollars(pseudorandom('nfj'..G.SEED, 0, card.ability.extra.max_payout), true)
 				
 				return {
 					--play_sound('whoosh1', math.random()*0.1 + 0.6,0.3),
@@ -8795,6 +8782,3 @@ function Game:splash_screen()
 	
 	init_prev_rank_data()
 end
-
-----------------------------------------------
-------------MOD CODE END----------------------
