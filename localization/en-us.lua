@@ -1176,6 +1176,7 @@ return {
 					"{C:mult}+#1#{} Mult",
 					"{X:mult,C:white}X#2#{} Mult",
 					"{C:green}#3# in #4#{} chance this",
+					"card is destroyed",
 					"at end of round",
 				},
 			},
