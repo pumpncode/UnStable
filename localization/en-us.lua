@@ -547,7 +547,7 @@ return {
 			["c_unstb_aux_plus_two"] = {
 				["name"] = "+2",
 				["text"] = {
-					"Creates a {C:attention}#1#{} card in",
+					"Creates {C:attention}#1#{} cards in",
 					"your hand with a random",
 					"{C:attention}rank{} and the same {C:attention}suit{}",
 					"as the selected card",
@@ -556,7 +556,7 @@ return {
 			["c_unstb_aux_plus_four_wild"] = {
 				["name"] = "Wild +4",
 				["text"] = {
-					"Creates a {C:attention}#1#{} card in",
+					"Creates {C:attention}#1#{} cards in",
 					"your hand with a random",
 					"{C:attention}suit{} and the same {C:attention}rank{}",
 					"as the selected card",
