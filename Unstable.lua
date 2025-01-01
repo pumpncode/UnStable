@@ -647,6 +647,8 @@ local function blackJack_evalrank(hand, bustAmount)
 				rank = rank + (SMODS.Ranks[currentCard.base.value].nominal or 0) --Supports modded ranks as well, just in case
 			else
 				aceCount = aceCount + 1
+				
+				rank = rank + 11
 			end
 			
 		end
@@ -656,10 +658,8 @@ local function blackJack_evalrank(hand, bustAmount)
 	while( aceCount > 0 )
 	do
 	   
-		if rank <= bustAmount-11 then
-			rank = rank + 11
-		else
-			rank = rank + 1
+		if rank > bustAmount then
+			rank = rank - 10
 		end
 		
 		aceCount = aceCount - 1
