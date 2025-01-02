@@ -1240,7 +1240,21 @@ SMODS.Enhancement {
 			SMODS.eval_this(card, {chip_mod = scoredAmount, message = localize{type='variable',key='a_chips',vars={scoredAmount}}} )
 			
 			--Store the current scoring hand, for after_play
-			card.ability.extra.prevhand = context.scoring_hand
+			--Had to check to not include itself and other Slop Cards so it won't have cyclic references
+			if not card.ability.extra.prevhand and context.scoring_hand then
+				local hand = {}
+				
+				for i=1, #context.scoring_hand do
+					if context.scoring_hand[i] ~= card and not context.scoring_hand[i].config.center.replace_base_card then
+						hand[#hand+1] = {suit = context.scoring_hand[i].base.suit, rank = context.scoring_hand[i].base.value}
+					end
+				end
+				
+				card.ability.extra.prevhand = hand
+				
+				--print(inspectDepth(card.ability.extra.prevhand))
+			end
+			
         end
     end,
 	
@@ -1255,17 +1269,10 @@ SMODS.Enhancement {
 			local prompt_joker = SMODS.find_card('j_unstb_prompt')
 			
 			if next(prompt_joker) then
-				local eligible_hand = {}
 				
-				for i=1, #card.ability.extra.prevhand do
-					if not card.ability.extra.prevhand[i].config.center.replace_base_card then
-						eligible_hand[#eligible_hand+1] = card.ability.extra.prevhand[i]
-					end
-				end
-				
-				if #eligible_hand>0 then
-					card.ability.extra.suit = pseudorandom_element(eligible_hand, pseudoseed('slop_card')..G.SEED).base.suit
-					card.ability.extra.rank = pseudorandom_element(eligible_hand, pseudoseed('slop_card')..G.SEED).base.value
+				if #card.ability.extra.prevhand>0 then
+					card.ability.extra.suit = pseudorandom_element(card.ability.extra.prevhand, pseudoseed('slop_card')..G.SEED).suit
+					card.ability.extra.rank = pseudorandom_element(card.ability.extra.prevhand, pseudoseed('slop_card')..G.SEED).rank
 					
 					--Bounce the Joker a lil bit for the feedback effect
 					big_juice(prompt_joker[1])
@@ -2872,6 +2879,9 @@ SMODS.Consumable{
 	--Can spawn only when more than 10 cards the deck is Disenhanced
 	in_pool = function(self, args)
 	
+		--For some reason, not checking this crash Cryptid on start up
+		if not G.playing_cards then return false end
+	
 		local count = 0
 		
 		for k, v in ipairs(G.playing_cards) do
@@ -2949,6 +2959,9 @@ SMODS.Consumable{
 	
 	--Can spawn only when more than 1/4 of deck is Disenhanced
 	in_pool = function(self, args)
+	
+		--For some reason, not checking this crash Cryptid on start up
+		if not G.playing_cards then return false end
 	
 		local count = 0
 		
@@ -3555,6 +3568,9 @@ SMODS.Consumable{
 	--Can spawn only when more than 1/3 of deck is Disenhanced
 	in_pool = function(self, args)
 	
+		--For some reason, not checking this crash Cryptid on start up
+		if not G.playing_cards then return false end
+	
 		local count = 0
 		
 		for k, v in ipairs(G.playing_cards) do
@@ -4045,6 +4061,9 @@ SMODS.Consumable{
 	--Can spawn only if there is more than one joker, and at least one with edition
 	in_pool = function(self, args)
 	
+		--For some reason, not checking this crash Cryptid on start up
+		if not G.jokers then return false end
+	
 		if #G.jokers.cards > 1 then
 			for i=1, #G.jokers.cards do
 				if G.jokers.cards[i].edition then
@@ -4158,6 +4177,9 @@ SMODS.Consumable{
 	--Can spawn only if there is at least more than 1 Joker with distinct edition
 	in_pool = function(self, args)
 	
+		--For some reason, not checking this crash Cryptid on start up
+		if not G.jokers then return false end
+	
 		local prev_edition = nil
 	
 		if #G.jokers.cards > 1 then
@@ -4248,6 +4270,9 @@ SMODS.Consumable{
 	
 	--Can spawn only if there is one joker or more with edition
 	in_pool = function(self, args)
+	
+		--For some reason, not checking this crash Cryptid on start up
+		if not G.jokers then return false end
 	
 		if #G.jokers.cards >= 1 then
 			for i=1, #G.jokers.cards do
