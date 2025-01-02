@@ -11,11 +11,20 @@ pattern = "elseif self.ability.name == 'Blueprint' then"
 position = "before"
 payload = '''
 elseif self.config.center.key == 'j_unstb_plagiarism' then
-    self.ability.blueprint_compat_ui = self.ability.blueprint_compat_ui or ''; self.ability.blueprint_compat_check = nil
+    self.ability.blueprint_compat_ui_l = self.ability.blueprint_compat_ui_l or '';
+	self.ability.blueprint_compat_check_l = nil
+	
+	self.ability.blueprint_compat_ui_r = self.ability.blueprint_compat_ui_r or '';
+	self.ability.blueprint_compat_check_r = nil
+	
     main_end = (self.area and self.area == G.jokers) and {
-        {n=G.UIT.C, config={align = "bm", minh = 0.4}, nodes={
-            {n=G.UIT.C, config={ref_table = self, align = "m", colour = G.C.JOKER_GREY, r = 0.05, padding = 0.06, func = 'blueprint_compat'}, nodes={
-                {n=G.UIT.T, config={ref_table = self.ability, ref_value = 'blueprint_compat_ui',colour = G.C.UI.TEXT_LIGHT, scale = 0.32*0.8}},
+        {n=G.UIT.C, config={align = "bm", minh = 0.4, padding = 0.06}, nodes={
+            {n=G.UIT.R, config={ref_table = self, align = "m", colour = G.C.JOKER_GREY, r = 0.05, padding = 0.06, func = 'blueprint_compat_dside_l'}, nodes={
+                {n=G.UIT.T, config={ref_table = self.ability, ref_value = 'blueprint_compat_ui_l',colour = G.C.UI.TEXT_LIGHT, scale = 0.32*0.8}},
+            }},
+			
+			{n=G.UIT.R, config={ref_table = self, align = "m", colour = G.C.JOKER_GREY, r = 0.05, padding = 0.06, func = 'blueprint_compat_dside_r'}, nodes={
+                {n=G.UIT.T, config={ref_table = self.ability, ref_value = 'blueprint_compat_ui_r',colour = G.C.UI.TEXT_LIGHT, scale = 0.32*0.8}},
             }}
         }}
     } or nil
@@ -30,21 +39,26 @@ pattern = "if self.ability.name == 'Blueprint' or self.ability.name == 'Brainsto
 position = "before"
 payload = '''
 if self.config.center.key == 'j_unstb_plagiarism' then
-	local other_joker = nil
-    for i = 1, #G.jokers.cards do
-            if G.jokers.cards[i] == self then
-				if self.ability.extra.dir == 0 then
-					other_joker = G.jokers.cards[i-1]
-				else
-					other_joker = G.jokers.cards[i+1]
-				end
-			end
-        end
+	local other_joker_l = nil
+	local other_joker_r = nil
+    
+	for i = 1, #G.jokers.cards do
+		if G.jokers.cards[i] == self then
+			other_joker_l = G.jokers.cards[i-1]
+			other_joker_r = G.jokers.cards[i+1]
+		end
+	end
 	
-    if other_joker and other_joker ~= self and other_joker.config.center.blueprint_compat then
-        self.ability.blueprint_compat = 'compatible'
+    if other_joker_l and other_joker_l ~= self and other_joker_l.config.center.blueprint_compat then
+        self.ability.blueprint_compat_l = 'compatible'
     else
-        self.ability.blueprint_compat = 'incompatible'
+        self.ability.blueprint_compat_l = 'incompatible'
+    end
+	
+	if other_joker_r and other_joker_r ~= self and other_joker_r.config.center.blueprint_compat then
+        self.ability.blueprint_compat_r = 'compatible'
+    else
+        self.ability.blueprint_compat_r = 'incompatible'
     end
 end
 '''

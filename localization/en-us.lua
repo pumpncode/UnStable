@@ -34,6 +34,10 @@ return {
 			--Extra Flavour Badge Text
 			["k_tarot_exclaim"] = "Tarot!?",
 			
+			["k_blueprint_l_compatible"] = "Left: compatible",
+			["k_blueprint_l_incompatible"] = "Left: incompatible",
+			["k_blueprint_r_compatible"] = "Right: compatible",
+			["k_blueprint_r_incompatible"] = "Right: incompatible",
 			
 			--Auxiliary Card stuff
 			--Category Name
@@ -293,10 +297,10 @@ return {
 			["c_unstb_spc_vessel"] = {
 				["name"] = "Vessel",
 				["text"] = {
-					"Select {C:attention}2{} cards,",
-					"destroy the {C:attention}left{} card",
+					"Select up to {C:attention}#1#{} cards,",
+					"destroy the {C:attention}leftmost{} card",
 					"and give the corresponding {C:red}Suit Seal{}",
-					"to the {C:attention}right{} card",
+					"to all {C:attention}remaining{} cards",
 					"{C:inactive}(Drag to rearrange){}",
 				},
 			},
@@ -1197,7 +1201,6 @@ return {
 					"{C:attention}Joker{} to the",
 					"left or right at random",
 					"{s:0.8}Direction changes each hand played",
-					"{C:inactive}(Currently {C:red}#1#{C:inactive})",
 				},
 			},
 			

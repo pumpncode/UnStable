@@ -1035,7 +1035,7 @@ SMODS.Enhancement {
 	pos = {x=1, y = 0},
 	
 	
-	config = {extra = { bonus_chip = 0, chip_gain_rate = 4, current_odd = 0, odd_destroy = 25, destroy_rate = 1}},
+	config = {extra = { bonus_chip = 0, chip_gain_rate = 10, current_odd = 0, odd_destroy = 15, destroy_rate = 1}},
 	
 	loc_vars = function(self, info_queue, card)
 		
@@ -3576,22 +3576,20 @@ SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
 	key = 'spc_vessel', 
 
-	config = {extra = {count = 1}},
+	config = {extra = {count = 4}},
 	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'suit_seal'}
-		return {vars = {}}
+		return {vars = {card.ability.extra.count}}
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted == 2) then
+		if G.hand and (#G.hand.highlighted > 1 and #G.hand.highlighted <= card.ability.extra.count) then
 		
 			local targetCard = G.hand.highlighted[1]
-			
-			if G.hand.highlighted[2].T.x < G.hand.highlighted[1].T.x then
-				targetCard = G.hand.highlighted[2]
-			end
+			--Sort to get the actual target card
+            for i=1, #G.hand.highlighted do if G.hand.highlighted[i].T.x < targetCard.T.x then targetCard = G.hand.highlighted[i] end end
 		
 			return not targetCard.config.center.no_suit and (unstb_global.SUIT_SEAL[targetCard.base.suit] or {}).seal_key
 		end
@@ -3604,21 +3602,21 @@ SMODS.Consumable{
 			card:juice_up(0.3, 0.5)
             return true end })
 		
-		--Figure out what is left card, what is right card
+		--Figure out what is left card, what is the left card
 		local targetCard = G.hand.highlighted[1]
-		local recieveCard = G.hand.highlighted[2]
-		
-		if G.hand.highlighted[2].T.x < G.hand.highlighted[1].T.x then
-			targetCard = G.hand.highlighted[2]
-			recieveCard = G.hand.highlighted[1]
-		end
+		--Sort to get the actual target card
+        for i=1, #G.hand.highlighted do if G.hand.highlighted[i].T.x < targetCard.T.x then targetCard = G.hand.highlighted[i] end end
 		
 		--Adds Suit Seal to the right card (or none, if there's no matching suit)
 		local suit_seal = (unstb_global.SUIT_SEAL[targetCard.base.suit] or {}).seal_key
 		
-		recieveCard:set_seal(suit_seal, nil, true)
+		for i=1, #G.hand.highlighted do
+			if G.hand.highlighted[i] ~= targetCard then
+				G.hand.highlighted[i]:set_seal(suit_seal, nil, true)
+			end
+		end		
 		
-		--Destroy the left card
+		--Destroy the leftmost card
 		local destroyed_cards = {targetCard}
 		
 		event({
@@ -3649,7 +3647,7 @@ SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
 	key = 'spc_conferment', 
 
-	config = {extra = {count = 2, cost = 8}},
+	config = {extra = {count = 4, cost = 8}},
 	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
@@ -3894,7 +3892,7 @@ SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
 	key = 'spc_contract', 
 
-	config = {extra = {upgrade_count = 1, disenc_count = 3}},
+	config = {extra = {upgrade_count = 2, disenc_count = 2}},
 	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
@@ -4570,7 +4568,7 @@ create_joker({
 	
     blueprint = false, eternal = true, perishable = true,
 	
-	vars = { {add_slot = 2}, {inflation = 2} },
+	vars = { {add_slot = 3}, {inflation = 1} },
 	
 	custom_vars = function(self, info_queue, card)
 		return { vars = {card.ability.extra.add_slot, card.ability.extra.inflation}}
@@ -5217,7 +5215,7 @@ create_joker({
 --Thesis Proposal
 create_joker({
     name = 'Thesis Proposal', id = 36,
-    rarity = 'Uncommon', cost = 6,
+    rarity = 'Common', cost = 6,
 	
 	gameplay_tag = {'rank_decimal'},
 	
@@ -7027,6 +7025,31 @@ create_joker({
     end
 })
 
+--A special function to check for blueprint compat for both sides
+G.FUNCS.blueprint_compat_dside_l = function(e)
+  if e.config.ref_table.ability.blueprint_compat_l ~= e.config.ref_table.ability.blueprint_compat_check_l then 
+    if e.config.ref_table.ability.blueprint_compat_l == 'compatible' then 
+        e.config.colour = mix_colours(G.C.GREEN, G.C.JOKER_GREY, 0.8)
+    elseif e.config.ref_table.ability.blueprint_compat_l == 'incompatible' then
+        e.config.colour = mix_colours(G.C.RED, G.C.JOKER_GREY, 0.8)
+    end
+    e.config.ref_table.ability.blueprint_compat_ui_l = ' '..localize('k_blueprint_l_'..e.config.ref_table.ability.blueprint_compat_l)..' '
+    e.config.ref_table.ability.blueprint_compat_check_l = e.config.ref_table.ability.blueprint_compat_l
+  end
+end
+
+G.FUNCS.blueprint_compat_dside_r = function(e)
+  if e.config.ref_table.ability.blueprint_compat_r ~= e.config.ref_table.ability.blueprint_compat_check_r then 
+    if e.config.ref_table.ability.blueprint_compat_r == 'compatible' then 
+        e.config.colour = mix_colours(G.C.GREEN, G.C.JOKER_GREY, 0.8)
+    elseif e.config.ref_table.ability.blueprint_compat_r == 'incompatible' then
+        e.config.colour = mix_colours(G.C.RED, G.C.JOKER_GREY, 0.8)
+    end
+    e.config.ref_table.ability.blueprint_compat_ui_r = ' '..localize('k_blueprint_r_'..e.config.ref_table.ability.blueprint_compat_r)..' '
+    e.config.ref_table.ability.blueprint_compat_check_r = e.config.ref_table.ability.blueprint_compat_r
+  end
+end
+
 --Plagiarism
 create_joker({
     name = 'Plagiarism', id = 46,
@@ -7053,8 +7076,8 @@ create_joker({
     calculate = function(self, card, context)
 		--Code based on Familiar's Crimsonotype
 		
-		--This bit of code runs after hand played, cannot copyable by other blueprint
-		if context.after and not context.blueprint and not context.repetition and not context.repetition_only then
+		--This bit of code runs before hand played, cannot copyable by other blueprint
+		if context.before and not context.blueprint and not context.repetition and not context.repetition_only then
 			card.ability.extra.dir = 0
 			
 			if pseudorandom('plagiarism'..G.SEED) > 0.5 then
@@ -7062,7 +7085,6 @@ create_joker({
 			end
 			
 			forced_message(card.ability.extra.dir==0 and 'Left' or 'Right', card, G.C.ORANGE, true)
-			
 			--print(card.config.center.key)
 		end
 		
@@ -7157,7 +7179,7 @@ create_joker({
     name = 'Jackhammer', id = 16,
     rarity = 'Uncommon', cost = 7,
 	
-	gameplay_tag = {'j_shitpost', 'j_powerful'},
+	gameplay_tag = {'j_powerful'},
 	
 	vars = {{retrigger_times = 5}, {is_activate = false}},
 	custom_vars = function(self, info_queue, card)
@@ -7214,8 +7236,6 @@ create_joker({
 create_joker({
     name = 'Jack of All Trades', id = 60,
     rarity = 'Rare', cost = 6,
-	
-	gameplay_tag = {'j_shitpost'},
 	
 	vars = {{chips = 15}, {mult = 2}, {xmult = 1.1}, {money = 1}},
 	custom_vars = function(self, info_queue, card)
@@ -7347,7 +7367,7 @@ create_joker({
     name = 'Queensland', id = 61,
     rarity = 'Rare', cost = 7,
 	
-	gameplay_tag = {'j_shitpost', 'enh_custom'},
+	gameplay_tag = {'enh_custom'},
 	
 	vars = {{count_max = 3}, {count = 0}},
 	custom_vars = function(self, info_queue, card)
