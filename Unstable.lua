@@ -2112,6 +2112,25 @@ SMODS.PokerHandPart:take_ownership('_straight', {
 	func = function(hand) return ustb_get_straight(hand) end
 })
 
+--Generic consumable selection check utility function
+--Written this way for Cryptid compatibility
+local function get_consumable_use_hand_count(card, hand)
+	local selected_cards = {}
+	for i = 1, #hand do
+		if hand[i] ~= card then selected_cards[#selected_cards+1] = hand[i] end
+	end
+	return #selected_cards
+end
+
+--Returns selected hands excluding itself (in case of Cryptid merged consumable cards)
+local function get_selected_cards(card, hand)
+	local selected_cards = {}
+	for i = 1, #hand do
+		if hand[i] ~= card then selected_cards[#selected_cards+1] = hand[i] end
+	end
+	return selected_cards
+end
+
 --set_consumeable_usage hook to keep track of UnStable's own consumable count
 local set_consumeable_usage_ref = set_consumeable_usage
 
@@ -2298,7 +2317,7 @@ for i = 1, #suit_seal_list do
 		end,
 
 		can_use = function(self, card)
-			if G.hand and (#G.hand.highlighted == card.ability.extra.count) then
+			if G.hand and (get_consumable_use_hand_count(card, G.hand.highlighted) >= 1 and get_consumable_use_hand_count(card, G.hand.highlighted) <= card.ability.extra.count) then
 				return true
 			end
 			return false
@@ -2345,7 +2364,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted == card.ability.extra.count) then
+		if G.hand and (get_consumable_use_hand_count(card, G.hand.highlighted) >= 1 and get_consumable_use_hand_count(card, G.hand.highlighted) <= card.ability.extra.count) then
 			return true
 		end
 		return false
@@ -2392,7 +2411,8 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted == 1) and not G.hand.highlighted[1].config.center.no_suit then
+		local selected_hands = get_selected_cards(card, G.hand.highlighted)
+		if G.hand and (#selected_hands == 1) and not selected_hands[1].config.center.no_suit then
 			return true
 		end
 		return false
@@ -2439,7 +2459,8 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted == 1) and not G.hand.highlighted[1].config.center.no_rank then
+		local selected_hands = get_selected_cards(card, G.hand.highlighted)
+		if G.hand and (#selected_hands == 1) and not selected_hands[1].config.center.no_rank then
 			return true
 		end
 		return false
@@ -2543,7 +2564,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted == 2) then
+		if G.hand and (get_consumable_use_hand_count(card, G.hand.highlighted) == 2) then
 			return true
 		end
 		return false
@@ -2606,7 +2627,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted >= 1) and (#G.hand.highlighted <= card.ability.extra.count) then
+		if G.hand and (get_consumable_use_hand_count(card, G.hand.highlighted) >= 1) and (get_consumable_use_hand_count(card, G.hand.highlighted) <= card.ability.extra.count) then
 			return true
 		end
 		return false
@@ -2663,7 +2684,8 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted >= 1) and (#G.hand.highlighted <= card.ability.extra.count) and blackJack_evalrank(G.hand.highlighted, 21)>=21 then
+		local selected_hands = get_selected_cards(card, G.hand.highlighted)
+		if G.hand and (#selected_hands >= 1) and (#selected_hands <= card.ability.extra.count) and blackJack_evalrank(selected_hands, 21)>=21 then
 			return true
 		end
 		return false
@@ -2740,7 +2762,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted == 1) then
+		if G.hand and (get_consumable_use_hand_count(card, G.hand.highlighted) == 1) then
 			return true
 		end
 		return false
@@ -2837,7 +2859,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted == card.ability.extra.count) then
+		if G.hand and (get_consumable_use_hand_count(card, G.hand.highlighted) == card.ability.extra.count) then
 			return true
 		end
 		return false
@@ -3209,7 +3231,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted >= 1) and (#G.hand.highlighted <= card.ability.extra.count) then
+		if G.hand and (get_consumable_use_hand_count(card, G.hand.highlighted) >= 1) and (get_consumable_use_hand_count(card, G.hand.highlighted) <= card.ability.extra.count) then
 			return true
 		end
 		return false
@@ -3252,7 +3274,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted >= 1) and (#G.hand.highlighted <= card.ability.extra.count) then
+		if G.hand and (get_consumable_use_hand_count(card, G.hand.highlighted) >= 1) and (get_consumable_use_hand_count(card, G.hand.highlighted) <= card.ability.extra.count) then
 			return true
 		end
 		return false
@@ -3288,7 +3310,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted >= 1) and (#G.hand.highlighted <= card.ability.extra.count) then
+		if G.hand and (get_consumable_use_hand_count(card, G.hand.highlighted) >= 1) and (get_consumable_use_hand_count(card, G.hand.highlighted) <= card.ability.extra.count) then
 			return true
 		end
 		return false
@@ -3341,7 +3363,8 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted == 1) and not G.hand.highlighted[1].config.center.replace_base_card and tarot_half_rankList[G.hand.highlighted[1].base.value] then
+		local selected_hands = get_selected_cards(card, G.hand.highlighted)
+		if G.hand and (#selected_hands == 1) and not selected_hands[1].config.center.replace_base_card and tarot_half_rankList[selected_hands[1].base.value] then
 			return true
 		end
 		return false
@@ -3452,7 +3475,8 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted == 1) and not G.hand.highlighted[1].config.center.replace_base_card then
+		local selected_hands = get_selected_cards(card, G.hand.highlighted)
+		if G.hand and (#selected_hands == 1) and not selected_hands[1].config.center.replace_base_card then
 			return true
 		end
 		return false
@@ -3601,11 +3625,13 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and (#G.hand.highlighted > 1 and #G.hand.highlighted <= card.ability.extra.count) then
+		local selected_hands = get_selected_cards(card, G.hand.highlighted)
+	
+		if G.hand and (#selected_hands > 1 and #selected_hands <= card.ability.extra.count) then
 		
-			local targetCard = G.hand.highlighted[1]
+			local targetCard = selected_hands[1]
 			--Sort to get the actual target card
-            for i=1, #G.hand.highlighted do if G.hand.highlighted[i].T.x < targetCard.T.x then targetCard = G.hand.highlighted[i] end end
+            for i=1, #selected_hands do if selected_hands[i].T.x < targetCard.T.x then targetCard = selected_hands[i] end end
 		
 			return not targetCard.config.center.no_suit and (unstb_global.SUIT_SEAL[targetCard.base.suit] or {}).seal_key
 		end
