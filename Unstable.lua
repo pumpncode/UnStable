@@ -4116,7 +4116,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and #G.jokers.cards > 1 and G.jokers.highlighted[1] then
+		if G.hand and #G.jokers.cards > 1 and #G.jokers.highlighted ==1 and G.jokers.highlighted[1] then
 		
 			--Check if there is at least one of the selected jokers have edition and is not the same
 			local joker = G.jokers.highlighted[1]
@@ -4249,7 +4249,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand and #G.jokers.cards >= 1 and G.jokers.highlighted[1] then
+		if G.hand and #G.jokers.cards >= 1 and #G.jokers.highlighted ==1 and G.jokers.highlighted[1] then
 			return G.jokers.highlighted[1].edition and not unstb_global.siphon_blacklist[G.jokers.highlighted[1].edition.key]
 		end
 		return false
