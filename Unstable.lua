@@ -432,6 +432,17 @@ SMODS.Sound({key = 'poison', path = 'poison.ogg'})
 
 --Utility
 
+--
+local function table_has_value(list, value)
+	for i, v in ipairs(list) do
+		if v==value then
+			return true
+		end
+	end
+	
+	return false
+end
+
 --Auto event scheduler, based on Bunco
 local function event(config)
     local e = Event(config)
@@ -8734,7 +8745,7 @@ SMODS.Back{ -- Utility Deck
     end,
 
     apply = function(self)
-		G.GAME.auxiliary_rate = self.config.aux_chance
+		G.GAME.auxiliary_rate = (G.GAME.auxiliary_rate or 0) + self.config.aux_chance
          event({
 				func = function()
 					for i = 1, self.config.aux_amount do
@@ -8753,6 +8764,19 @@ SMODS.Back{ -- Utility Deck
 end
 
 if check_enable_taglist({'rank_binary', 'rank_decimal'}) then
+
+local lowkey_rankList = {'2', '3', '4', '5', 'unstb_0', 'unstb_0.5', 'unstb_1', 'unstb_r2', 'unstb_e', 'unstb_Pi'}
+		
+unstb.lowkey_blacklisted = {}
+
+--Populate the Lowkey Deck rank blacklist, called at the Splash Screen to support modded ranks as well
+function init_lowkey_blacklist()
+	for k, v in pairs(SMODS.Ranks) do
+		if not table_has_value(lowkey_rankList, k) then
+			unstb.lowkey_blacklisted[k] = true
+		end
+	end
+end
 
 SMODS.Back{ -- Lowkey Deck
 	key = "lowkey", 
@@ -8804,36 +8828,8 @@ SMODS.Back{ -- Lowkey Deck
 		
 		G.GAME.starting_params.extra_cards = extra_cards
 		
-		--Based on Royal Deck from Ortalab. Has a bit of visual glitch at the start, though.
-		event({
-            func = function()
-                local keep_rank = {'2', '3', '4', '5', 'unstb_0', 'unstb_0.5', 'unstb_1', 'unstb_r2', 'unstb_e', 'unstb_Pi'}
-				
-				local rank_status = {}
-				
-				for i=1, #keep_rank do
-					rank_status[ keep_rank[i] ] = true
-				end
-				
-                for k, v in pairs(G.playing_cards) do
-                    if not rank_status[v.base.value] then 
-                        v.to_remove = true
-                    end
-                end
-				
-                local i = 1
-                while i <= #G.playing_cards do
-                    if G.playing_cards[i].to_remove then
-                        G.playing_cards[i]:remove()
-                    else
-                        i = i + 1
-                    end
-                end
-				
-                G.GAME.starting_deck_size = #G.playing_cards
-                return true
-            end
-        })
+		G.GAME.starting_params.blacklisted_ranks = unstb.lowkey_blacklisted
+		
     end,
 
     atlas = 'unstb_deck'
@@ -8842,6 +8838,217 @@ end
 
 
 --Compatibility / Tweaks / Rework Stuff
+
+--CardSleeves Support
+if CardSleeves then
+
+--Sleeves
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "sleeves",
+  path = "sleeves.png",
+  px = 73,
+  py = 95
+}
+
+--Utility Sleeve
+CardSleeves.Sleeve({
+	name = "Utility Sleeve",
+	key="utility",
+	atlas="sleeves",
+	pos = { x = 0, y = 0 },
+	unlocked = true,
+	loc_vars = function(self)
+		local key
+		
+		if self.get_current_deck_key() ~= "b_unstb_utility" then
+			key = self.key
+			self.config = { voucher = 'v_unstb_aux1', aux_chance = 1}
+		else
+			key = self.key .. "_alt"
+			self.config = { voucher = 'v_unstb_aux2', aux_chance = 1}
+		end
+		return { key = key }
+	end,
+	apply = function(self)
+		--Call main apply function from CardSleeve first to apply vouchers
+		CardSleeves.Sleeve.apply(self)
+		
+		G.GAME.auxiliary_rate = (G.GAME.auxiliary_rate or 0) + self.config.aux_chance
+		
+		event({
+			func = function()
+			
+				if self.get_current_deck_key() ~= "b_unstb_utility" then
+					local card = create_card('Auxiliary', G.consumeables, nil, nil, nil, nil, 'c_unstb_aux_random', 'utildeck')
+					card:add_to_deck()
+					G.consumeables:emplace(card)
+				else
+					local card = create_card('Joker', G.jokers, nil, nil, nil, nil, 'j_unstb_free_trial', nil)
+					card:set_edition({negative = true}, true)
+					card:add_to_deck()
+					G.jokers:emplace(card)
+				end
+				
+				return true
+			end
+			})
+	end
+})
+
+--Lowkey Sleeve
+CardSleeves.Sleeve({
+	name = "Lowkey Sleeve",
+	key="lowkey",
+	atlas="sleeves",
+	pos = { x = 0, y = 0 },
+	unlocked = true,
+	loc_vars = function(self)
+		local key
+		
+		if self.get_current_deck_key() ~= "b_unstb_lowkey" then
+			key = self.key
+			self.config = { remove_ranks = true }
+		else
+			key = self.key .. "_alt"
+			self.config = { prevent_ranks = true }
+		end
+		return { key = key }
+	end,
+	apply = function(self)
+		--Call main apply function from CardSleeve first to apply vouchers
+		CardSleeves.Sleeve.apply(self)
+			
+		--Regular sleeve effects
+		
+		if self.config.remove_ranks then
+			--Enable all the pool flags
+			setPoolRankFlagEnable('unstb_0', true);
+			setPoolRankFlagEnable('unstb_0.5', true);
+			setPoolRankFlagEnable('unstb_1', true);
+			setPoolRankFlagEnable('unstb_r2', true);
+			setPoolRankFlagEnable('unstb_e', true);
+			setPoolRankFlagEnable('unstb_Pi', true);
+		
+			--Notice: used card_key version and not standard key
+			local added_rank = {'unstb_0', 'unstb_0.5', 'unstb_1', 'unstb_R', 'unstb_E', 'unstb_P'}
+					
+			local all_suit = {}
+			
+			for k, v in pairs(SMODS.Suits) do
+				--If has in_pool, check in_pool
+				if type(v) == 'table' and type(v.in_pool) == 'function' and v.in_pool then
+					if v:in_pool({initial_deck = true}) then
+						all_suit[#all_suit+1] = v.card_key
+					end
+				else --Otherwise, added by default
+					all_suit[#all_suit+1] = v.card_key
+				end
+				
+			end
+			
+			--print(inspect(all_suit))
+			
+			local extra_cards = {}
+			
+			for i=1, #all_suit do
+				for j=1, #added_rank do
+					extra_cards[#extra_cards+1] = {s = all_suit[i], r = added_rank[j]}
+				end
+			end
+			
+			G.GAME.starting_params.extra_cards = extra_cards
+			
+			G.GAME.starting_params.blacklisted_ranks = unstb.lowkey_blacklisted
+		end
+		
+		--Code based on Abandoned Sleeve from CardSleeve itself, for special effect
+		if self.config.prevent_ranks and self.allowed_card_centers == nil then
+            self.allowed_card_centers = {}
+            self.skip_trigger_effect = true
+			
+            for _, card_center in pairs(G.P_CARDS) do
+                local card_instance = Card(0, 0, 0, 0, card_center, G.P_CENTERS.c_base)
+
+                if not unstb.lowkey_blacklisted[card_instance.base.value] then
+                    self.allowed_card_centers[#self.allowed_card_centers+1] = card_center
+                end
+                card_instance:remove()
+            end
+			
+            -- Make it loops around to 0 immediately after using strength on 5
+            self.get_rank_after_5 = function() return "unstb_0" end
+            self.skip_trigger_effect = false
+        end
+	end,
+	trigger_effect = function(self, args)
+	
+		--Code based on Abandoned Sleeve from CardSleeve itself
+        if not self.config.prevent_ranks then
+            return
+        end
+        if self.skip_trigger_effect then
+            return
+        end
+        if self.allowed_card_centers == nil then
+            self:apply()
+        end
+
+        -- handle Strength, Ouija, Grim, Familiar
+        local card = args.context.card
+        local is_playing_card = card and (card.ability.set == "Default" or card.ability.set == "Enhanced") and card.config.card_key
+        if args.context.before_use_consumable and card then
+            if card.ability.name == 'Strength' then
+                self.in_strength = true
+            elseif card.ability.name == "Ouija" then
+                self.in_ouija = true
+			elseif card.ability.name == "Grim" then
+                self.in_grim = true
+			elseif card.ability.name == "Familiar" then
+                self.in_familiar = true
+            end
+			
+        elseif args.context.after_use_consumable then
+            self.in_strength = nil
+            self.in_ouija = nil
+			self.ouija_rank = nil
+			
+			self.in_grim = nil
+			self.in_familiar = nil
+        elseif (args.context.create_card or args.context.modify_playing_card) and card and is_playing_card then
+            if unstb.lowkey_blacklisted[card.base.value] then
+                local initial = G.GAME.blind == nil or args.context.create_card
+				
+                if self.in_strength then
+                    local base_key = SMODS.Suits[card.base.suit].card_key .. "_" .. self.get_rank_after_5()
+                    card:set_base(G.P_CARDS[base_key], initial)
+				elseif self.in_grim then --Grim will always create 1 (because Ace)
+                    local base_key = SMODS.Suits[card.base.suit].card_key .. "_unstb_1"
+                    card:set_base(G.P_CARDS[base_key], initial)
+                elseif self.in_ouija then
+                    if self.ouija_rank == nil then
+                        local random_base = pseudorandom_element(self.allowed_card_centers, pseudoseed("slv"))
+                        local card_instance = Card(0, 0, 0, 0, random_base, G.P_CENTERS.c_base)
+                        self.ouija_rank = SMODS.Ranks[card_instance.base.value]
+                        card_instance:remove()
+                    end
+                    local base_key = SMODS.Suits[card.base.suit].card_key .. "_" .. self.ouija_rank.card_key
+                    card:set_base(G.P_CARDS[base_key], initial)
+                else
+                    local random_base = pseudorandom_element(self.allowed_card_centers, pseudoseed("slv"))
+                    card:set_base(random_base, initial)
+					
+					if self.in_familiar and unstb_config.gameplay.seal_suit then --For Familiar, adds face seal to the created card (if the mechanic is enabled)
+						card:set_seal('unstb_face', true, true)
+					end
+                end
+            end
+        end
+    end,
+})
+
+end
+
 
 --Deck Preview UI supports for hiding modded ranks
 filesystem.load(unstb.path..'/override/ui.lua')()
@@ -8864,4 +9071,5 @@ function Game:splash_screen()
  	ref_gamesplashscreen(self)
 	
 	init_prev_rank_data()
+	init_lowkey_blacklist()
 end

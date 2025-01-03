@@ -105,6 +105,48 @@ return {
 			
 		},
 		
+		["Sleeve"] = {
+		
+			["sleeve_unstb_utility"] = {
+				["name"] = "Utility Sleeve",
+				["text"] = {
+					"Start run with the",
+					"{C:auxiliary}Hardware Store{} voucher",
+					"and {C:attention}1{} copy of {C:auxiliary}The Question{},",
+					"{C:auxiliary}Auxiliary Cards{} can appear",
+					"in the {C:attention}shop{} more often",
+				},
+			},
+			
+			["sleeve_unstb_utility_alt"] = {
+				["name"] = "Utility Sleeve",
+				["text"] = {
+					"Start run with the",
+					"{C:auxiliary}Heavy Duty Tools{} voucher",
+					"and a {C:dark_edition}Negative{} {C:attenttion}Free Trial{}",
+				},
+			},
+			
+			["sleeve_unstb_lowkey"] = {
+				["name"] = "Lowkey Sleeve",
+				["text"] = {
+					"Start run with only",
+					"{C:attention}rank 0-5{} cards",
+					"and all {C:attention}decimal",
+					"{C:attention}ranks{} in between",
+				},
+			},
+			
+			["sleeve_unstb_lowkey_alt"] = {
+				["name"] = "Lowkey Sleeve",
+				["text"] = {
+					"Card with rank higher than",
+					"{C:attention}5{} cannot appear in the run",
+				},
+			},
+			
+		},
+		
 		["Other"] = {
 			
 			--Playing Card Ability Text
