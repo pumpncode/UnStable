@@ -54,7 +54,7 @@ pattern = "specific_vars.nominal_chips then \n(.*)"
 position = "at"
 payload = """
 specific_vars.nominal_chips or (specific_vars.value == 'unstb_0' or specific_vars.value == 'unstb_???') then
-if specific_vars.value == 'unstb_0' or specific_vars.value == 'unstb_???' then
+if (specific_vars.value == 'unstb_0' or specific_vars.value == 'unstb_???') and not specific_vars.nominal_chips then
 	localize{type = 'other', key = 'no_chip', nodes = desc_nodes, vars = {}}
 else
 	localize{type = 'other', key = 'card_chips', nodes = desc_nodes, vars = {specific_vars.nominal_chips}}

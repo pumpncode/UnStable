@@ -141,3 +141,43 @@ SMODS.Joker:take_ownership('even_steven', {
 		
     end
 }, true)
+
+--Hack
+--Operates from a table, other mods can register more number in this table if needed
+unstb_global.hack = {}
+
+--Register ranks that triggers Hack
+function unstb_global.register_hack(rank_list)
+	for i = 1, #rank_list do
+		unstb_global.hack[rank_list[i]] = true
+	end
+end
+
+unstb_global.register_hack({'unstb_0', 'unstb_1', '2', '3', '4', '5'})
+
+SMODS.Joker:take_ownership('hack', {
+
+	config = { extra = 1 },
+	loc_vars = function(self, info_queue, card)
+		
+		local key = self.key
+		if getPoolRankFlagEnable('unstb_0') or getPoolRankFlagEnable('unstb_1') then
+			key = self.key..'_ex'
+		end
+	
+		return { key = key, vars = {card.ability.extra} }
+	end,
+	
+	calculate = function(self, card, context)
+		if context.cardarea == G.play and context.repetition and not context.repetition_only then
+		  if unstb_global.hack[context.other_card.base.value] then
+				return {
+				  message = 'Again!',
+				  repetitions = card.ability.extra,
+				  card = context.blueprint_card or card
+				}
+		  end
+		end
+	end,
+	
+}, true)

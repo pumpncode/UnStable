@@ -1515,6 +1515,16 @@ return {
 					"{C:inactive}(10, 8, 6, 4, 2, 0){}",
 				},
 			},
+			
+			["j_hack_ex"] = {
+				["name"] = "Hack",
+				["text"] = {
+					"Retrigger",
+					"each played",
+					"{C:attention}0{}, {C:attention}1{}, {C:attention}2{},",
+					"{C:attention}3{}, {C:attention}4{}, or {C:attention}5{}",
+				},
+			},
 		},
 		
 	},

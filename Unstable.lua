@@ -7800,7 +7800,7 @@ create_joker({
 	
 	vars = {{target_hand = 'High Card'}, {xmult_bad = 0.5}, {xmult_good = 5}},
 	custom_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.xmult_good, card.ability.extra.xmult_bad, card.ability.extra.target_hand}}
+		return {vars = {card.ability.extra.xmult_good, card.ability.extra.xmult_bad, localize(card.ability.extra.target_hand, 'poker_hands')}}
     end,
 	
     blueprint = true, eternal = true, perishable = true,
