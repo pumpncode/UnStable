@@ -8859,6 +8859,8 @@ SMODS.Atlas {
   py = 95
 }
 
+if unstb_config.gameplay.c_aux then
+
 --Utility Sleeve
 CardSleeves.Sleeve({
 	name = "Utility Sleeve",
@@ -8903,6 +8905,10 @@ CardSleeves.Sleeve({
 			})
 	end
 })
+
+end
+
+if check_enable_taglist({'rank_binary', 'rank_decimal'}) then
 
 --Lowkey Sleeve
 CardSleeves.Sleeve({
@@ -9057,6 +9063,8 @@ CardSleeves.Sleeve({
 
 end
 
+end
+
 
 --Deck Preview UI supports for hiding modded ranks
 filesystem.load(unstb.path..'/override/ui.lua')()
@@ -9079,5 +9087,8 @@ function Game:splash_screen()
  	ref_gamesplashscreen(self)
 	
 	init_prev_rank_data()
-	init_lowkey_blacklist()
+	
+	if init_lowkey_blacklist then
+		init_lowkey_blacklist()
+	end
 end
