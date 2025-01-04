@@ -1128,7 +1128,7 @@ SMODS.Enhancement {
 		
 		if context.cardarea == G.hand and not context.repetition then
 			--Hacky way to make it grant money from hand
-			if not card.debuff then
+			if not card.debuff and card.ability.extra.gold>0 then
 				ret.dollars = card.ability.extra.gold
 			end
 		end
@@ -1199,7 +1199,7 @@ SMODS.Enhancement {
 		if not isCollection and card.ability and card.ability.extra then
 			local suit = (card.base and card.base.suit) or 'Spades'
 			
-			local pos  = {x = (self.suit_map[suit] or -1) +1, y = 0}
+			local pos  = get_coordinates( (self.suit_map[suit] or -1) +1 )
 				
 			card.children.center:set_sprite_pos(pos)
 		end
@@ -1239,7 +1239,7 @@ SMODS.Enhancement {
 				card.ability.extra.chips = SMODS.Ranks[card.ability.extra.rank].nominal
 				
 				local suit = (card.base and card.base.suit) or 'Spades'
-				local pos  = {x = (self.suit_map[suit] or -1)+1, y = 0}	
+				local pos  = get_coordinates( (self.suit_map[suit] or -1) +1 )
 				card.children.center:set_sprite_pos(pos)
 			end
 		end
@@ -1306,7 +1306,7 @@ SMODS.Enhancement {
 			card:set_base(G.P_CARDS[targetCard])
 			
 			local suit = (card.base and card.base.suit) or 'Spades'
-			local pos  = {x = self.suit_map[suit]+1 or 0, y = 0}	
+			local pos  = get_coordinates( (self.suit_map[suit] or -1) +1 )	
 			card.children.center:set_sprite_pos(pos)
 			
 		return true end })
@@ -1371,7 +1371,7 @@ SMODS.Enhancement {
 			
 			card.ability.extra.suit = suit
 				
-			local pos  = {x = (self.suit_map[suit] or -1)+2 or 1, y = 0}
+			local pos  = get_coordinates( (self.suit_map[suit] or -1) +2 )
 				
 			card.children.center:set_sprite_pos(pos)
 		end
@@ -1384,7 +1384,7 @@ SMODS.Enhancement {
 		
 			if not isCollection then
 				card.ability.extra.suit = card.base.suit
-				card.children.center:set_sprite_pos({x = (self.suit_map[card.base.suit] or -1)+2, y = 0})
+				card.children.center:set_sprite_pos( get_coordinates( (self.suit_map[card.base.suit] or -1) +2 ) )
 			else 
 				card.ability.extra.suit = "(Corresponding Suit)"
 			end
@@ -4345,6 +4345,14 @@ SMODS.Voucher({
 			end,
 		})
 	end,
+	unredeem = function(self)
+	event({
+		func = function()
+			G.GAME.auxiliary_rate = (G.GAME.auxiliary_rate or 2) - 2
+			return true
+		end,
+	})
+	end
 })
   
 SMODS.Voucher({
@@ -8845,8 +8853,8 @@ if CardSleeves then
 --Sleeves
 SMODS.Atlas {
   -- Key for code to find it with
-  key = "sleeves",
-  path = "sleeves.png",
+  key = "sleeve",
+  path = "sleeve.png",
   px = 73,
   py = 95
 }
@@ -8855,7 +8863,7 @@ SMODS.Atlas {
 CardSleeves.Sleeve({
 	name = "Utility Sleeve",
 	key="utility",
-	atlas="sleeves",
+	atlas="sleeve",
 	pos = { x = 0, y = 0 },
 	unlocked = true,
 	loc_vars = function(self)
@@ -8900,8 +8908,8 @@ CardSleeves.Sleeve({
 CardSleeves.Sleeve({
 	name = "Lowkey Sleeve",
 	key="lowkey",
-	atlas="sleeves",
-	pos = { x = 0, y = 0 },
+	atlas="sleeve",
+	pos = { x = 1, y = 0 },
 	unlocked = true,
 	loc_vars = function(self)
 		local key

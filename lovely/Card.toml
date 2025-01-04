@@ -40,7 +40,7 @@ position = "before"
 match_indent = true
 payload = """
 local isCollection = (card and card.area and card.area.config.collection) or false
-if not isCollection and (_c.set == 'Default' or _c.set == 'Enhanced') and card and card.ability and type(card.ability) == 'table' and SMODS.Ranks[card.base.value].is_decimal and not card.config.center.no_rank and not card.debuff then
+if not isCollection and (_c.set == 'Default' or _c.set == 'Enhanced') and card and card.base and card.base.value and SMODS.Ranks[card.base.value].is_decimal and not card.config.center.no_rank and not card.debuff then
 	local rank_act = SMODS.Ranks[card.base.value].rank_act or {'0', '0', '0'}
     localize{type = 'other', key = 'decimal_rank_ability', nodes = desc_nodes, vars = {rank_act[1], rank_act[2], rank_act[3]}}
 end"""
