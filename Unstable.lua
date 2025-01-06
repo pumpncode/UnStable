@@ -1006,8 +1006,8 @@ SMODS.Enhancement {
     end,
 
 	
-	calculate = function(self, card, context, ret)
-        if context.cardarea == G.play and not context.repetition then
+	calculate = function(self, card, context)
+        if context.cardarea == G.play and context.main_scoring then
 			local rulesJoker = SMODS.find_card('j_unstb_rules_errata')
 		
 			if next(rulesJoker) then
@@ -1028,11 +1028,16 @@ SMODS.Enhancement {
 			end
         end
 		
-		if context.cardarea == G.hand and not context.repetition then
+		if context.cardarea == G.hand and context.main_scoring and not context.repetition then
+			print("trigger acorn hand effect")
+		
 			card.ability.extra.totalchips = (card.base.nominal + (card.ability.perma_bonus or 0)) * 2
 			
 			if not card.debuff then
-				ret.unstb_h_chips = card.ability.extra.totalchips
+				--ret.unstb_h_chips = card.ability.extra.totalchips
+				return {
+					unstb_h_chips = card.ability.extra.totalchips
+				}
 			end
 			
 		end

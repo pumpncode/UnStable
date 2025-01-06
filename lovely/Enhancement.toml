@@ -19,19 +19,37 @@ end'''
 # h_chips implementation, originally from TWEWJ
 # For some reason, on newer version of lovely, there is h_chips inside that file even if all mods are turned off
 # So I changed the name to avoid it
+# Note: as of bettercalc this one breaks completely
+# [[patches]]
+# [patches.pattern]
+# target = "functions/state_events.lua"
+# pattern = '''if effects[ii].h_mult then'''
+# position = "before"
+# match_indent = true
+# payload = '''
+# if effects[ii].unstb_h_chips then
+# 	mod_percent = true
+#	hand_chips = mod_chips(hand_chips + effects[ii].unstb_h_chips)
+#	update_hand_text({delay = 0}, {chips = hand_chips})
+#	card_eval_status_text(G.hand.cards[i], 'chips', effects[ii].unstb_h_chips, percent)
+#end
+#'''
+
+# new h_chips implementation
 [[patches]]
 [patches.pattern]
-target = "functions/state_events.lua"
-pattern = '''if effects[ii].h_mult then'''
+target = "functions/common_events.lua"
+pattern = '''elseif eval_type == 'x_chips' then '''
 position = "before"
 match_indent = true
 payload = '''
-if effects[ii].unstb_h_chips then
-	mod_percent = true
-	hand_chips = mod_chips(hand_chips + effects[ii].unstb_h_chips)
-	update_hand_text({delay = 0}, {chips = hand_chips})
-	card_eval_status_text(G.hand.cards[i], 'chips', effects[ii].unstb_h_chips, percent)
-end
+elseif eval_type == 'unstb_h_chips' then 
+		print("Trigger H Chips")
+        sound = 'chips1'
+        amt = amt
+        colour = G.C.CHIPS
+        text = localize{type='variable',key='a_chips',vars={amt}}
+        delay = 0.6
 '''
 
 # Enhancement Discard Overrides
