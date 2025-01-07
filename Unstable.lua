@@ -898,7 +898,7 @@ SMODS.Seal({
         return {vars = {}}
     end,
     calculate = function(self, card, context)
-		if context.cardarea == G.play and not context.repetition then
+		if context.cardarea == G.play and context.main_scoring then
 		
 			local valid_cards = {}
 			for i = 1, #G.hand.cards do
@@ -1028,15 +1028,13 @@ SMODS.Enhancement {
 			end
         end
 		
-		if context.cardarea == G.hand and context.main_scoring and not context.repetition then
-			print("trigger acorn hand effect")
-		
+		if context.cardarea == G.hand and context.main_scoring then
 			card.ability.extra.totalchips = (card.base.nominal + (card.ability.perma_bonus or 0)) * 2
 			
 			if not card.debuff then
 				--ret.unstb_h_chips = card.ability.extra.totalchips
 				return {
-					unstb_h_chips = card.ability.extra.totalchips
+					h_chips = card.ability.extra.totalchips
 				}
 			end
 			
@@ -1076,8 +1074,8 @@ SMODS.Enhancement {
 	
 
 	
-	calculate = function(self, card, context, ret)
-        if context.cardarea == G.play and not context.repetition then
+	calculate = function(self, card, context)
+        if context.cardarea == G.play and context.main_scoring then
 			card.ability.perma_bonus = (card.ability.perma_bonus or 0) + card.ability.extra.chip_gain_rate
 			card.ability.extra.current_odd = (card.ability.extra.current_odd or 0) + card.ability.extra.destroy_rate
 			
@@ -1086,9 +1084,6 @@ SMODS.Enhancement {
     end,
 	
 	after_play = function(self, card, context)
-	
-		--print('Trigger afterplay')
-	
 		local isDestroy = pseudorandom('vintage'..G.SEED) < card.ability.extra.current_odd * G.GAME.probabilities.normal / card.ability.extra.odd_destroy
 		
 		if isDestroy then
@@ -1121,26 +1116,26 @@ SMODS.Enhancement {
         }
     end,
 	
-	
-	
-	calculate = function(self, card, context, ret)
-        if context.cardarea == G.play and not context.repetition then
+	calculate = function(self, card, context)
+        if context.cardarea == G.play and context.main_scoring then
            card.ability.extra.gold = (card.ability.extra.gold or 0) + card.ability.extra.gold_rate
-		   --card.ability.h_dollars = card.ability.extra.gold
-		   
 		   forced_message("Upgrade!", card, G.C.GOLD, true)	 
         end
 		
-		if context.cardarea == G.hand and not context.repetition then
-			--Hacky way to make it grant money from hand
+		if context.cardarea == G.hand and context.main_scoring then
 			if not card.debuff and card.ability.extra.gold>0 then
-				ret.dollars = card.ability.extra.gold
+				--ret.dollars = card.ability.extra.gold
+				return {
+					dollars = card.ability.extra.gold
+				}
 			end
 		end
 		
     end,
 	
 	after_play = function(self, card, context) 
+		print("Trigger afterplay")
+	
 		local isDestroy = pseudorandom('promo'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_destroy
 		
 		if isDestroy then
@@ -1250,8 +1245,8 @@ SMODS.Enhancement {
 		end
     end,
 	
-	calculate = function(self, card, context, ret)
-        if context.cardarea == G.play and not context.repetition then
+	calculate = function(self, card, context)
+        if context.cardarea == G.play and context.main_scoring then
 			local scoredAmount = card.ability.extra.chips + card.ability.perma_bonus
 			SMODS.eval_this(card, {chip_mod = scoredAmount, message = localize{type='variable',key='a_chips',vars={scoredAmount}}} )
 			
@@ -1398,10 +1393,7 @@ SMODS.Enhancement {
 	
 	calculate = function(self, card, context)
 
-        if context.cardarea == G.play and not context.repetition then
-		
-			
-		
+        if context.cardarea == G.play and context.main_scoring then
 			local has_suit = false
 			
 			if context.scoring_hand then
@@ -1499,6 +1491,12 @@ end
 
 if unstb_config.enh.enh_disenh then
 
+--Global blacklist for card enhancements that cannot be converted by radioactive card
+unstb_global.radioactive_blacklist = {
+m_unstb_radioactive = true,
+m_unstb_slop = true,
+}
+
 --Radioactive
 SMODS.Enhancement {
 	key = "radioactive",
@@ -1534,31 +1532,45 @@ SMODS.Enhancement {
     end,
 	
 	calculate = function(self, card, context)
-        if context.cardarea == G.play and not context.repetition then
+        if context.cardarea == G.play and context.main_scoring then
             SMODS.eval_this(card, {chip_mod = card.ability.extra.chips, message = localize{type='variable',key='a_chips',vars={card.ability.extra.chips}}} )
 			
 			if #context.scoring_hand > 1 then
-				local target = pseudorandom_element(context.scoring_hand, pseudoseed('radioactive_conv'..G.SEED))
+			
+				--polling the eligible hand first
 				
-				--Exclude slop card because it interacts horribly with this
-				if target.config.center ~= G.P_CENTERS.m_unstb_radioactive and target.config.center.key ~= 'm_unstb_slop' and pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_conv then
-					--Flipping Animation
-					event({trigger = 'after', delay = 0.1, func = function() target:flip(); play_sound('card1', 1); target:juice_up(0.3, 0.3); return true end })
-					
-					--Changing Card Property
-					
-					event({trigger = 'after', delay = 0.05,  func = function()
-					
-						target:set_disenhancement(G.P_CENTERS.m_unstb_radioactive)
+				local eligible_hand = {}
+				
+				for i=1, #context.scoring_hand do
+					--Exclude slop card because it interacts horribly with this
+					if not unstb_global.radioactive_blacklist[context.scoring_hand[i].config.center.key] and not context.scoring_hand[i].to_convert then
+						eligible_hand[#eligible_hand+1] = context.scoring_hand[i]
+					end
+				end
+			
+				--Update: no longer show "Safe!" if the entire hand is not convertable
+				if #eligible_hand > 0 then
+					local target = pseudorandom_element(eligible_hand, pseudoseed('radioactive_conv'..G.SEED))
+					if pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_conv then
+						target.to_convert = true
+						--Flipping Animation
+						event({trigger = 'after', delay = 0.1, func = function() target:flip(); play_sound('card1', 1); target:juice_up(0.3, 0.3); return true end })
 						
-						return true end })
-					
-					--Unflipping Animation
-					event({trigger = 'after', delay = 0.1, func = function() target:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); target:juice_up(0.3, 0.3); return true end })
+						--Changing Card Property
+						
+						event({trigger = 'after', delay = 0.05,  func = function()
+						
+							target:set_disenhancement(G.P_CENTERS.m_unstb_radioactive)
+							
+							return true end })
+						
+						--Unflipping Animation
+						event({trigger = 'after', delay = 0.1, func = function() target:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); target:juice_up(0.3, 0.3); target.to_convert = nil; return true end })
 
-					forced_message("Decayed!", target, G.C.RED, true)
-				else
-					forced_message("Safe!", card, G.C.GREEN, true)
+						forced_message("Decayed!", target, G.C.RED, true)
+					else
+						forced_message("Safe!", card, G.C.GREEN, true)
+					end
 				end
 				
 			end
@@ -1566,7 +1578,7 @@ SMODS.Enhancement {
 			
         end
 		
-		if context.cardarea == G.hand and not card.healed and not context.repetition then
+		if context.cardarea == G.hand and not card.healed and context.main_scoring then
 			--Xmult handling ability is built-in, so this one just checks for odds and alter it respectively.
 			if pseudorandom('radioactive'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_mult then
 				card.ability.h_x_mult = card.ability.extra.mult_good
@@ -1603,17 +1615,13 @@ SMODS.Enhancement {
         }
     end,
 	
-	
+	calculate = function(self, card, context)
 
-	
-	calculate = function(self, card, context, ret)
-
-		if context.cardarea == G.play and not context.repetition then
+		if context.cardarea == G.play and context.main_scoring then
 			SMODS.eval_this(card, {Xmult_mod = card.ability.extra.xmult, message = localize{type='variable',key='a_xmult',vars={card.ability.extra.xmult}}} )
 		end
 
-		if context.discard then
-		
+		if context.discard and context.other_card == card then
 			local is_neutralized = next(SMODS.find_card('j_unstb_vaccination_card'))
 		
 			--check if it is activated
@@ -1628,7 +1636,7 @@ SMODS.Enhancement {
 				--populate valid cards
 				local valid_cards = {}
 				for k, v in ipairs(G.playing_cards) do
-					if v.config.center ~= G.P_CENTERS.m_unstb_biohazard and not hand_card[v] then --Excludes all cards with replace_base_card enhancements
+					if v.config.center ~= G.P_CENTERS.m_unstb_biohazard and not hand_card[v] then --Exclude biohazard cards
 						valid_cards[#valid_cards+1] = v
 					end
 				end
@@ -1642,13 +1650,14 @@ SMODS.Enhancement {
 			
 		end
 		
-		if context.cardarea == G.hand and not card.healed and not context.repetition then
+		if context.cardarea == G.hand and not card.healed and context.main_scoring then
 		
 			local is_neutralized = next(SMODS.find_card('j_unstb_vaccination_card'))
 		
-			--Hacky way to make it grant money from hand
 			if not card.debuff and not is_neutralized then
-				ret.dollars = -card.ability.extra.h_money
+				return {
+					dollars = -card.ability.extra.h_money
+				}
 			end
 		end
     end,
@@ -1687,17 +1696,15 @@ SMODS.Enhancement {
         }
     end,
 	
-	
-	
-	--Override genere_ui so it does not display any chips
+	--Override generate_ui so it does not display any chips
 	generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
             SMODS.Enhancement.super.generate_ui(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
     end,
 
 	
-	calculate = function(self, card, context, ret)
+	calculate = function(self, card, context)
 
-		if context.cardarea == G.play and not context.repetition then
+		if context.cardarea == G.play and context.main_scoring then
 			local totalChip = card.base.nominal + (card.ability.perma_bonus or 0) --Counted bonus chips too, go crying
 			SMODS.eval_this(card, {chip_mod = -totalChip})
 			forced_message('-'..totalChip, card, G.C.RED, true) --Tried to sent color, but it got override with chips color	fsr	
@@ -1705,8 +1712,14 @@ SMODS.Enhancement {
     end,
 	
 	discard_override = function(self, card, args) --Discard overridden function, injected by Lovely
+		card.ability.discarded = nil
+		
 		draw_card(G.hand, G.deck, args.delay, 'down', false, card)
-		G.deck:shuffle('poison'..G.GAME.round_resets.ante)
+		
+		--Wrap shuffle in the event instead, so it should work now hopefully???
+		event({trigger = 'after', func = function()
+			G.deck:shuffle('poison'..G.GAME.round_resets.ante)
+		return true end})
 	end,
 	
 	--This cannot spawn naturally at all
