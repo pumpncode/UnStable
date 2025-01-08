@@ -8526,7 +8526,7 @@ create_joker({
 --Schrodinger Cat
 create_joker({
     name = 'Schrodinger Cat', id = 73,
-    rarity = 'Rare', cost = 8,
+    rarity = 'Uncommon', cost = 8,
 	
 	vars = {{odds = 3}},
 	custom_vars = function(self, info_queue, card)
