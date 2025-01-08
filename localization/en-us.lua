@@ -9,7 +9,7 @@ return {
 			["unstb_config_header_mech_setting"] = "Mechanics Settings",
 			
 			["unstb_config_header_rank"] = "Rank",
-			["unstb_config_rank21"] = "Rank 21",
+			["unstb_config_rank21"] = "High-Numbered Ranks",
 			["unstb_config_rank_bi"] = "Rank 0 and 1",
 			["unstb_config_rank_decimal"] = "Decimal Ranks",
 		
@@ -51,6 +51,11 @@ return {
 			["k_booster_group_p_unstb_aux_2"] = "Expansion Pack",
 			["k_booster_group_p_unstb_aux_mega"] = "Expansion Pack",
 			["k_booster_group_p_unstb_aux_jumbo"] = "Expansion Pack",
+			
+			["k_booster_group_p_unstb_prem_1"] = "Premium Standard Pack",
+			["k_booster_group_p_unstb_prem_2"] = "Premium Standard Pack",
+			["k_booster_group_p_unstb_prem_mega"] = "Premium Standard Pack",
+			["k_booster_group_p_unstb_prem_jumbo"] = "Premium Standard Pack",
 		},
 		["ranks"] = {
 		
@@ -64,6 +69,12 @@ return {
 			["unstb_r2"] = "Root 2",
 			["unstb_e"] = "e",
 			["unstb_Pi"] = "Pi",
+			
+			["unstb_11"] = "11",
+			["unstb_12"] = "12",
+			["unstb_13"] = "13",
+			["unstb_25"] = "25",
+			["unstb_161"] = "161",
 			
 		},
 		["labels"] = {
@@ -321,6 +332,43 @@ return {
 					"Choose {C:attention}#1#{} of up to",
 					"{C:attention}#2#{C:auxiliary} Auxiliary{} cards to",
 					"add to your consumable area",
+				},
+			},
+			
+			["p_unstb_prem_1"] = {
+				["group_name"] = "Premium Standard Pack",
+				["name"] = "Premium Standard Pack",
+				["text"] = {
+					"Choose {C:attention}#1#{} of up to",
+                    "{C:attention}#2#{C:attention} Enhanced Playing{} cards with",
+                    "{C:attention}special rank{} to add to your deck"
+				},
+			},
+			["p_unstb_prem_2"] = {
+				["group_name"] = "Premium Standard Pack",
+				["name"] = "Premium Standard Pack",
+				["text"] = {
+					"Choose {C:attention}#1#{} of up to",
+                    "{C:attention}#2#{C:attention} Enhanced Playing{} cards with",
+                    "{C:attention}special rank{} to add to your deck"
+				},
+			},
+			["p_unstb_prem_mega"] = {
+				["group_name"] = "Premium Standard Pack",
+				["name"] = "Mega Premium Standard Pack",
+				["text"] = {
+					"Choose {C:attention}#1#{} of up to",
+                    "{C:attention}#2#{C:attention} Enhanced Playing{} cards with",
+                    "{C:attention}special rank{} to add to your deck"
+				},
+			},
+			["p_unstb_prem_jumbo"] = {
+				["group_name"] = "Premium Standard Pack",
+				["name"] = "Jumbo Premium Standard Pack",
+				["text"] = {
+					"Choose {C:attention}#1#{} of up to",
+                    "{C:attention}#2#{C:attention} Enhanced Playing{} cards with",
+                    "{C:attention}special rank{} to add to your deck"
 				},
 			},
 		},

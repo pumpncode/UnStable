@@ -399,6 +399,17 @@ SMODS.Atlas {
 
 SMODS.Atlas {
   -- Key for code to find it with
+  key = "rank_ex2",
+  -- The name of the file, for the code to pull the atlas from
+  path = "rank_ex2.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
+SMODS.Atlas {
+  -- Key for code to find it with
   key = "rank_ex_hc",
   -- The name of the file, for the code to pull the atlas from
   path = "rank_ex_hc.png",
@@ -407,6 +418,18 @@ SMODS.Atlas {
   -- Height of each sprite in 1x size
   py = 95
 }
+
+SMODS.Atlas {
+  -- Key for code to find it with
+  key = "rank_ex2_hc",
+  -- The name of the file, for the code to pull the atlas from
+  path = "rank_ex2_hc.png",
+  -- Width of each sprite in 1x size
+  px = 71,
+  -- Height of each sprite in 1x size
+  py = 95
+}
+
 
 --Music
 
@@ -1964,6 +1987,88 @@ SMODS.Rank {
 	in_pool = unstb_rankCheck,
 }
 
+-- "Premium Pack" Ranks
+SMODS.Rank {
+	hc_atlas = 'rank_ex2_hc',
+    lc_atlas = 'rank_ex2',
+
+	hidden = true,
+	
+    key = '11',
+    card_key = '11',
+    pos = { x = 0 },
+    nominal = 11,
+    next = { 'unstb_12' },
+    shorthand = '11',
+	
+	in_pool = unstb_rankCheck,
+}
+
+SMODS.Rank {
+	hc_atlas = 'rank_ex2_hc',
+    lc_atlas = 'rank_ex2',
+
+	hidden = true,
+	
+    key = '12',
+    card_key = '12',
+    pos = { x = 1 },
+    nominal = 12,
+    next = { 'unstb_13' },
+    shorthand = '12',
+	
+	in_pool = unstb_rankCheck,
+}
+
+SMODS.Rank {
+	hc_atlas = 'rank_ex2_hc',
+    lc_atlas = 'rank_ex2',
+
+	hidden = true,
+	
+    key = '13',
+    card_key = '13',
+    pos = { x = 2 },
+    nominal = 13,
+    next = { 'Ace' },
+    shorthand = '13',
+	
+	in_pool = unstb_rankCheck,
+}
+
+SMODS.Rank {
+	hc_atlas = 'rank_ex2_hc',
+    lc_atlas = 'rank_ex2',
+
+	hidden = true,
+	
+    key = '25',
+    card_key = '25',
+    pos = { x = 3 },
+    nominal = 25,
+    next = { 'unstb_???' },
+    shorthand = '25',
+	
+	in_pool = unstb_rankCheck,
+}
+
+SMODS.Rank {
+	hc_atlas = 'rank_ex2_hc',
+    lc_atlas = 'rank_ex2',
+
+	hidden = true,
+	
+    key = '161',
+    card_key = '161',
+    pos = { x = 4 },
+    nominal = 161,
+    next = { 'unstb_???' },
+    shorthand = '161',
+	
+	in_pool = unstb_rankCheck,
+}
+--
+
 SMODS.Ranks['2'].strength_effect = {
             fixed = 2,
             random = false,
@@ -1986,6 +2091,80 @@ SMODS.Ranks['Ace'].strength_effect = {
             ignore = false
         }
 SMODS.Ranks['Ace'].next = {'unstb_r2', '2', 'unstb_e'}
+
+--Vanilla Rank Alteration for Set 2
+SMODS.Ranks['10'].strength_effect = {
+            fixed = 2,
+            random = false,
+            ignore = false
+        }
+SMODS.Ranks['10'].next = {'Jack', 'unstb_11'}
+
+--Booster Pack for Premium Card
+
+local premium_booster_rate = {0.75, 0.75, 0.5, 0.1}
+local premium_booster_cost = {4, 4, 6, 8}
+
+for i = 1, 4 do
+    SMODS.Booster{
+        key = 'prem_'..(i <= 2 and i or i == 3 and 'jumbo' or 'mega'), 
+		cost = premium_booster_cost[i],
+
+        config = {extra = i <= 2 and 3 or 5, choose =  i <= 3 and 1 or 2},
+        draw_hand = false,
+
+        create_card = function(self, card)
+            local card = create_card("Base", G.pack_cards, nil, nil, nil, true, nil, 'prem')
+			local edition_rate = 3
+			local edition = poll_edition('premium_edition'..G.GAME.round_resets.ante, edition_rate, true)
+			
+			local rank_set = {"unstb_0", "unstb_0.5", "unstb_1", "unstb_r2", "unstb_e", "unstb_Pi", "unstb_11", "unstb_12", "unstb_13", "unstb_21", "unstb_25", "unstb_161"}
+			
+			SMODS.change_base(card, nil, pseudorandom_element(rank_set, pseudoseed('premium_rank'..G.GAME.round_resets.ante)))
+			
+			--Pooling Enhancements
+			local cen_pool = {}
+			for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+				if not v.replace_base_card and not v.disenhancement then 
+					cen_pool[#cen_pool+1] = v
+				end
+			end
+			
+			local enh = pseudorandom_element(cen_pool, pseudoseed('premium_enhance'))
+
+			card:set_ability(enh)
+			
+			card:set_edition(edition)
+			card:set_seal(SMODS.poll_seal({mod = 10}))
+			
+			return card
+            -- return {set = 'Polymino', area = G.pack_cards, skip_materialize = nil, soulable = nil, key_append = 'vir'}
+        end,
+
+        ease_background_colour = function(self) ease_background_colour{new_colour = HEX('62a1b4'), special_colour = HEX('fce1b6'), contrast = 2} end,
+	    particles = function(self)
+            G.booster_pack_sparkles = Particles(1, 1, 0,0, {
+                timer = 0.015,
+                scale = 0.3,
+                initialize = true,
+                lifespan = 3,
+                speed = 0.2,
+                padding = -1,
+                attach = G.ROOM_ATTACH,
+                colours = {G.C.BLACK, G.C.GOLD},
+                fill = true
+            })
+            G.booster_pack_sparkles.fade_alpha = 1
+            G.booster_pack_sparkles:fade(1, 0)
+        end,
+
+        pos = get_coordinates(i+3),
+        atlas = 'booster',
+		
+		weight = premium_booster_rate[i],
+    }
+end
+
 
 -- Poker Hand Rewrite to support new ranks probably?
 -- Currently unused: Straights use SMODS Implementation perfectly fine
@@ -2199,10 +2378,12 @@ SMODS.UndiscoveredSprite{
 --Booster Pack for Auxiliary Cards
 
 local aux_booster_rate = {0.75, 0.75, 0.5, 0.1}
+local aux_booster_cost = {4, 4, 6, 8}
 
 for i = 1, 4 do
     SMODS.Booster{
-        key = 'aux_'..(i <= 2 and i or i == 3 and 'jumbo' or 'mega'), 
+        key = 'aux_'..(i <= 2 and i or i == 3 and 'jumbo' or 'mega'),
+		cost = aux_booster_cost[i],
 
         config = {extra = i <= 2 and 3 or 5, choose =  i <= 3 and 1 or 2},
         draw_hand = false,

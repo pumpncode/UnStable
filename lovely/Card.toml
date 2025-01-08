@@ -27,6 +27,12 @@ payload = '''
 	elseif nominal < 0.4 then
 		nominal = 0.31 + nominal*0.1
 	end
+	
+	--Hardcode this so it's sorted properly
+	if self.base.value == 'unstb_161' then
+		nominal = 30
+	end
+	
 	return 10*(nominal)*rank_mult + self.base.suit_nominal*mult + (self.base.suit_nominal_original or 0)*0.0001*mult + 10*self.base.face_nominal*rank_mult + 0.000001*self.unique_val'''
 
 
@@ -58,5 +64,23 @@ if (specific_vars.value == 'unstb_0' or specific_vars.value == 'unstb_???') and 
 	localize{type = 'other', key = 'no_chip', nodes = desc_nodes, vars = {}}
 else
 	localize{type = 'other', key = 'card_chips', nodes = desc_nodes, vars = {specific_vars.nominal_chips}}
+end
+"""
+
+# Ranks unlocks from Booster Pack
+# function generate_card_ui()
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = "elseif card.ability.set == 'Enhanced' or card.ability.set == 'Default' then "
+position = "after"
+match_indent = true
+payload = """
+if G.STATE == G.STATES.STANDARD_PACK or G.STATE == G.STATES.SMODS_BOOSTER_OPENED then
+	local rank = card.base.value
+	--Check if it's UnStable rank, if so then flips the flag
+	if rank:find('unstb_') then
+		setPoolRankFlagEnable(rank, true);
+	end
 end
 """
