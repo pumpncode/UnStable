@@ -2105,6 +2105,9 @@ SMODS.Ranks['10'].next = {'Jack', 'unstb_11'}
 local premium_booster_rate = {0.75, 0.75, 0.5, 0.1}
 local premium_booster_cost = {4, 4, 6, 8}
 
+--Needs all three ranks setting to be on to start appearing
+if check_enable_taglist({'rank_binary', 'rank_decimal', 'rank_21'}) then
+
 for i = 1, 4 do
     SMODS.Booster{
         key = 'prem_'..(i <= 2 and i or i == 3 and 'jumbo' or 'mega'), 
@@ -2163,6 +2166,8 @@ for i = 1, 4 do
 		
 		weight = premium_booster_rate[i],
     }
+end
+
 end
 
 
