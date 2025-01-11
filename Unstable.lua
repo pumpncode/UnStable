@@ -2125,6 +2125,11 @@ for i = 1, 4 do
 			
 			local rank_set = {"unstb_0", "unstb_0.5", "unstb_1", "unstb_r2", "unstb_e", "unstb_Pi", "unstb_11", "unstb_12", "unstb_13", "unstb_21", "unstb_25", "unstb_161"}
 			
+			--Lowkey Deck / Sleeve combo mode, prevent high rank from being spawned
+			if G.GAME.prevent_high_rank then
+				rank_set = {"unstb_0", "unstb_0.5", "unstb_1", "unstb_r2", "unstb_e", "unstb_Pi"}
+			end
+			
 			SMODS.change_base(card, nil, pseudorandom_element(rank_set, pseudoseed('premium_rank'..G.GAME.round_resets.ante)))
 			
 			--Pooling Enhancements
@@ -9182,6 +9187,11 @@ CardSleeves.Sleeve({
 			G.GAME.starting_params.blacklisted_ranks = unstb.lowkey_blacklisted
 		end
 		
+		--Set the game flags to prevent high rank, this affact premium booster
+		if self.config.prevent_ranks then
+			G.GAME.prevent_high_rank = true
+		end
+		
 		--Code based on Abandoned Sleeve from CardSleeve itself, for special effect
 		if self.config.prevent_ranks and self.allowed_card_centers == nil then
             self.allowed_card_centers = {}
@@ -9215,9 +9225,9 @@ CardSleeves.Sleeve({
         end
 
         -- handle Strength, Ouija, Grim, Familiar
-        local card = args.context.card
+        local card = args.context and args.context.card
         local is_playing_card = card and (card.ability.set == "Default" or card.ability.set == "Enhanced") and card.config.card_key
-        if args.context.before_use_consumable and card then
+        if args.context and args.context.before_use_consumable and card then
             if card.ability.name == 'Strength' then
                 self.in_strength = true
             elseif card.ability.name == "Ouija" then
@@ -9228,14 +9238,14 @@ CardSleeves.Sleeve({
                 self.in_familiar = true
             end
 			
-        elseif args.context.after_use_consumable then
+        elseif args.context and args.context.after_use_consumable then
             self.in_strength = nil
             self.in_ouija = nil
 			self.ouija_rank = nil
 			
 			self.in_grim = nil
 			self.in_familiar = nil
-        elseif (args.context.create_card or args.context.modify_playing_card) and card and is_playing_card then
+        elseif args.context and (args.context.create_card or args.context.modify_playing_card) and card and is_playing_card then
             if unstb.lowkey_blacklisted[card.base.value] then
                 local initial = G.GAME.blind == nil or args.context.create_card
 				
