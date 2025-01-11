@@ -601,8 +601,10 @@ local function create_joker(joker)
         --discovered = true, --false,
 
         blueprint_compat = joker.blueprint or false,
-        eternal_compat = joker.eternal or true,
-		perishable_compat = joker.perishable or true,
+        
+		eternal_compat = (joker.eternal == nil) or joker.eternal,
+		
+		perishable_compat = (joker.perishable == nil) or joker.eternal,
 
         
         process_loc_text = joker.process_loc_text,
@@ -4884,7 +4886,7 @@ create_joker({
 --Portal
 create_joker({
     name = 'Portal', id = 39,
-    rarity = 'Rare', cost = 7,
+    rarity = 'Uncommon', cost = 7,
 	
     blueprint = true, eternal = true, perishable = true,
 	
