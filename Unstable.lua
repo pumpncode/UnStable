@@ -2133,11 +2133,6 @@ SMODS.Ranks['Ace'].strength_effect = {
 SMODS.Ranks['Ace'].next = {'unstb_r2', '2', 'unstb_e'}
 
 --Vanilla Rank Alteration for Set 2
-SMODS.Ranks['10'].strength_effect = {
-            fixed = 2,
-            random = false,
-            ignore = false
-        }
 SMODS.Ranks['10'].next = {'Jack', 'unstb_11'}
 
 --Add preliminary prev property into vanilla rank list, so the default behavior will always point to this one
