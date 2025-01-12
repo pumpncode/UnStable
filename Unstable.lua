@@ -722,10 +722,12 @@ end
 
 --Insert "prev" property into SMODS.Ranks
 function init_prev_rank_data()
-	print("Initialize Previous Rank Data")
+	print("Initialize Remaining Previous Rank Data")
 	for _, rank in pairs(SMODS.Ranks) do
 		
 		--Initialize
+		--In case the rank table does not have prev existed
+		--Base rank and UNSTB one has them defined manually by default
 		if not rank.prev then
 			rank.prev = {}
 		end
@@ -735,8 +737,11 @@ function init_prev_rank_data()
 		for i=1, #next_rank_list do
 			local next_rank = SMODS.Ranks[next_rank_list[i]]
 			local prev = next_rank.prev or {}
-			table.insert(prev, rank.key)
-			next_rank.prev = prev
+			
+			if not table_has_value(prev, rank.key) then
+				table.insert(prev, rank.key)
+				next_rank.prev = prev
+			end
 		end
 	end
 end
@@ -757,7 +762,13 @@ function get_next_x_rank(rank, step)
 	
 	--Based on SMODS Current implementation of Strength
 	for i=mul, step, mul do
-		behavior = currentRank.strength_effect or { fixed = 1, ignore = false, random = false }
+	
+		if mul > 0 then
+			behavior = currentRank.strength_effect or { fixed = 1, ignore = false, random = false }
+		else
+			behavior = currentRank.decrease_effect or { fixed = 1, ignore = false, random = false }
+		end
+		
 		if behavior.ignore or not next(currentRank.next) then
 			return rank
 		elseif behavior.random then
@@ -1840,12 +1851,16 @@ SMODS.Rank {
     card_key = '0',
     pos = { x = 6 },
     nominal = 0,
+	
 	strength_effect = {
             fixed = 2,
             random = false,
             ignore = false
         },
     next = { 'unstb_0.5', 'unstb_1', 'unstb_r2' },
+	
+    prev = { 'unstb_???' },
+	
     shorthand = '0',
 	
 	straight_edge = true,
@@ -1864,7 +1879,11 @@ SMODS.Rank {
     card_key = '0.5',
     pos = { x = 2 },
     nominal = 0.5,
+	
     next = {'unstb_1', 'unstb_r2', '2', 'unstb_e' },
+	
+	prev = { 'unstb_0' },
+	
     shorthand = '0.5',
 	
 	is_decimal = true,
@@ -1890,6 +1909,9 @@ SMODS.Rank {
             ignore = false
         },
     next = {'unstb_r2', '2', 'unstb_e' },
+	
+	prev = { 'unstb_0' },
+	
     shorthand = '1',
 	
 	in_pool = unstb_rankCheck,
@@ -1906,7 +1928,10 @@ SMODS.Rank {
     card_key = 'R',
     pos = { x = 7 },
     nominal = 1.41,
+	
     next = {'2', 'unstb_e', '3', 'unstb_Pi' },
+	prev = { 'unstb_1' },
+	
     shorthand = '/2',
 	
 	is_decimal = true,
@@ -1926,7 +1951,10 @@ SMODS.Rank {
     card_key = 'E',
     pos = { x = 3 },
     nominal = 2.72,
+	
     next = { '3', 'unstb_Pi', '4' },
+	prev = { '2' },
+	
     shorthand = 'e',
 	
 	is_decimal = true,
@@ -1946,7 +1974,10 @@ SMODS.Rank {
     card_key = 'P',
     pos = { x = 4 },
     nominal = 3.14,
+	
     next = { '4', '5' },
+	prev = { '3' },
+	
     shorthand = 'Pi',
 	
 	is_decimal = true,
@@ -1967,6 +1998,7 @@ SMODS.Rank {
     pos = { x = 1 },
     nominal = 0,
     next = { 'unstb_???' },
+	prev = { 'unstb_???' },
     shorthand = '?',
 	
 	in_pool = unstb_rankCheck,
@@ -1984,6 +2016,7 @@ SMODS.Rank {
     pos = { x = 0 }, -- x position on the card atlas
     nominal = 21,  -- the number of chips this card scores
     next = { 'unstb_???' }, -- the next rank directly above it, used for Strength Tarot
+	prev = { 'unstb_???' }, -- UNSTB addition: the previous rank directly below it
     shorthand = '21', -- used for deck preview
 	
 	in_pool = unstb_rankCheck,
@@ -2001,6 +2034,7 @@ SMODS.Rank {
     pos = { x = 0 },
     nominal = 11,
     next = { 'unstb_12' },
+	prev = {'10'},
     shorthand = '11',
 	
 	in_pool = unstb_rankCheck,
@@ -2017,6 +2051,7 @@ SMODS.Rank {
     pos = { x = 1 },
     nominal = 12,
     next = { 'unstb_13' },
+	prev = {'unstb_11'},
     shorthand = '12',
 	
 	in_pool = unstb_rankCheck,
@@ -2033,6 +2068,7 @@ SMODS.Rank {
     pos = { x = 2 },
     nominal = 13,
     next = { 'Ace' },
+	prev = {'unstb_12'},
     shorthand = '13',
 	
 	in_pool = unstb_rankCheck,
@@ -2049,6 +2085,7 @@ SMODS.Rank {
     pos = { x = 3 },
     nominal = 25,
     next = { 'unstb_???' },
+	prev = { 'unstb_???' },
     shorthand = '25',
 	
 	in_pool = unstb_rankCheck,
@@ -2065,6 +2102,7 @@ SMODS.Rank {
     pos = { x = 4 },
     nominal = 161,
     next = { 'unstb_???' },
+	prev = { 'unstb_???' },
     shorthand = '161',
 	
 	in_pool = unstb_rankCheck,
@@ -2101,6 +2139,14 @@ SMODS.Ranks['10'].strength_effect = {
             ignore = false
         }
 SMODS.Ranks['10'].next = {'Jack', 'unstb_11'}
+
+--Add preliminary prev property into vanilla rank list, so the default behavior will always point to this one
+local vanilla_rank_list = {'2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace'}
+
+for i=#vanilla_rank_list, 2, -1 do
+	SMODS.Ranks[vanilla_rank_list[i]].prev = {vanilla_rank_list[i-1]}
+end
+SMODS.Ranks['2'].prev = {'Ace'}
 
 --Booster Pack for Premium Card
 
@@ -8984,14 +9030,15 @@ end
 
 if check_enable_taglist({'rank_binary', 'rank_decimal'}) then
 
-local lowkey_rankList = {'2', '3', '4', '5', 'unstb_0', 'unstb_0.5', 'unstb_1', 'unstb_r2', 'unstb_e', 'unstb_Pi'}
+unstb.lowkey_rankList = {'2', '3', '4', '5', 'unstb_0', 'unstb_0.5', 'unstb_1', 'unstb_r2', 'unstb_e', 'unstb_Pi'}
 		
 unstb.lowkey_blacklisted = {}
+unstb.lowkey_ranklist = {}
 
 --Populate the Lowkey Deck rank blacklist, called at the Splash Screen to support modded ranks as well
 function init_lowkey_blacklist()
 	for k, v in pairs(SMODS.Ranks) do
-		if not table_has_value(lowkey_rankList, k) then
+		if not table_has_value(unstb.lowkey_rankList, k) then
 			unstb.lowkey_blacklisted[k] = true
 		end
 	end
@@ -9245,7 +9292,7 @@ CardSleeves.Sleeve({
 			
 			self.in_grim = nil
 			self.in_familiar = nil
-        elseif args.context and (args.context.create_card or args.context.modify_playing_card) and card and is_playing_card then
+        elseif G.GAME and G.GAME.blind and args.context and (args.context.create_card or args.context.modify_playing_card) and card and is_playing_card then
             if unstb.lowkey_blacklisted[card.base.value] then
                 local initial = G.GAME.blind == nil or args.context.create_card
 				
@@ -9265,8 +9312,9 @@ CardSleeves.Sleeve({
                     local base_key = SMODS.Suits[card.base.suit].card_key .. "_" .. self.ouija_rank.card_key
                     card:set_base(G.P_CARDS[base_key], initial)
                 else
-                    local random_base = pseudorandom_element(self.allowed_card_centers, pseudoseed("slv"))
-                    card:set_base(random_base, initial)
+                    local new_rank = pseudorandom_element(unstb.lowkey_rankList, pseudoseed("slv"))
+					--Use smods change_base so we can still keep the suit
+					SMODS.change_base(card, nil, new_rank)
 					
 					if self.in_familiar and unstb_config.gameplay.seal_suit then --For Familiar, adds face seal to the created card (if the mechanic is enabled)
 						card:set_seal('unstb_face', true, true)
