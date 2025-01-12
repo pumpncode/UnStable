@@ -604,7 +604,7 @@ local function create_joker(joker)
         
 		eternal_compat = (joker.eternal == nil) or joker.eternal,
 		
-		perishable_compat = (joker.perishable == nil) or joker.eternal,
+		perishable_compat = (joker.perishable == nil) or joker.perishable,
 
         
         process_loc_text = joker.process_loc_text,
