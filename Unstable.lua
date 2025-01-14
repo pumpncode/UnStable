@@ -2520,7 +2520,7 @@ function G.UIDEF.card_focus_ui(card)
 	local card_width = card.T.w + (card.ability.consumeable and -0.1 or card.ability.set == 'Voucher' and -0.16 or 0)
 	local base_attach = base_background:get_UIE_by_ID('ATTACH_TO_ME')
 	
-	if ((card.area == G.pack_cards and G.pack_cards)) and card.ability.consumeable then
+	if ((card.area == G.pack_cards and G.pack_cards)) and card.ability.consumeable and card.ability.set == "Auxiliary" then
     base_attach.children.use = G.UIDEF.card_focus_button{
       card = card, parent = base_attach, type = 'select',
       func = 'can_take_card', button = 'use_card', card_width = card_width
