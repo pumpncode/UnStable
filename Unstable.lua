@@ -8326,7 +8326,8 @@ create_joker({
 				
 				--forced_message('+'..card.ability.extra.repetition_rate, card, G.C.ORANGE, true)
 				return {
-					message = '+'..card.ability.extra.repetition_rate
+					message = '+'..card.ability.extra.repetition_rate,
+					card = card
 				}
 			end
 			
