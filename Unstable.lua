@@ -9390,13 +9390,8 @@ function Game:splash_screen()
 	local set_consumeable_usage_ref = set_consumeable_usage
 
 	function set_consumeable_usage(card) 
-
-		print("consumable increase hook")
-
 		if card.config.center_key and card.ability.consumeable then
 			if card.config.center.set == 'Auxiliary' then
-			
-				print("increase")
 				--Initialize it if not, basically what basegame does but have to put here bc it runs before basegame's
 				G.GAME.consumeable_usage_total = G.GAME.consumeable_usage_total or {tarot = 0, planet = 0, spectral = 0, tarot_planet = 0, all = 0}
 				
