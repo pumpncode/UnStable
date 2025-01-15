@@ -3132,6 +3132,8 @@ SMODS.Consumable{
 
 	config = {extra = {count = 1, seal = 'unstb_heal'}},
 	--discovered = true,
+	
+	weight = 10, --Large chance to appear when it is needed
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'unstb_heal_seal'}
@@ -3209,6 +3211,8 @@ SMODS.Consumable{
 		
 		return {vars = {card.ability.extra.count}}
 	end,
+	
+	weight = 10, --Large chance to appear when it is needed
 
 	can_use = function(self, card)
 		--Usable only in-game
@@ -3365,7 +3369,7 @@ SMODS.Consumable{
 	pos = get_coordinates(0),
 	
 	in_pool = function(self, args)
-        return (G.GAME.aux_blank_count or 0) < 4
+        return (G.GAME.aux_blank_count or 0) < 2
     end,
 }
 
@@ -3415,7 +3419,7 @@ SMODS.Consumable{
 	
 	--Can spawn only when redeemed Blank Auxiliary Card enough time
 	in_pool = function(self, args)
-        return (G.GAME.aux_blank_count or 0) >= 4
+        return (G.GAME.aux_blank_count or 0) >= 2
     end,
 }
 
@@ -3866,6 +3870,8 @@ SMODS.Consumable{
             ease_dollars(-math.ceil(G.GAME.dollars*0.5), true)
         end
 	end,
+	
+	weight = 10, --Large chance to appear when it is needed
 
 	pos = get_coordinates(0),
 	
@@ -4972,7 +4978,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = { {mult = 2} },
+	vars = { {mult = 5} },
 	
 	custom_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'suit_seal'}
@@ -5011,7 +5017,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = { {mult = 6} },
+	vars = { {mult = 10} },
 	
 	custom_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'suit_seal'}
@@ -6127,7 +6133,7 @@ create_joker({
 	
     calculate = function(self, card, context)
 		--Keep track of scoring hand
-		if context.after and context.scoring_name ~= nil and context.scoring_hand and not context.blueprint then
+		--[[if context.after and context.scoring_name ~= nil and context.scoring_hand and not context.blueprint then
 			card.ability.extra.scoring_name = context.scoring_name
 			card.ability.extra.scoring_hand = context.scoring_hand
 		end
@@ -6159,6 +6165,19 @@ create_joker({
 						}
 					)
 			end
+		end]]
+		
+		if context.after and next(context.poker_hands['Flush Five']) then
+			event({	 trigger = 'after', delay = 0.5, func = function()
+								card:juice_up(0.3, 0.3)
+				
+								add_tag(Tag('tag_negative'))
+								play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
+								play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
+								
+								return true end
+						}
+					)
 		end
 	end
 })
@@ -6172,7 +6191,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = {{ count = 8 }, {current_count = 0}},
+	vars = {{ count = 5 }, {current_count = 0}},
 	
 	custom_vars = function(self, info_queue, card)
         info_queue[#info_queue+1] = G.P_TAGS.tag_double
@@ -6524,7 +6543,7 @@ create_joker({
 	
     blueprint = true, eternal = false, perishable = false,
 	
-	vars = { {chips = 50}, {chips_rate = 10}, {slop_scored = 0}, {slop_cycle = 5}, {chance_destroy = 8}},
+	vars = { {chips = 50}, {chips_rate = 10}, {slop_scored = 0}, {slop_cycle = 3}, {chance_destroy = 8}},
 	
 	custom_vars = function(self, info_queue, card)
         
@@ -6619,7 +6638,7 @@ create_joker({
 	
     blueprint = true, eternal = false, perishable = false,
 	
-	vars = { {xmult = 2}, {xmult_rate = 0.02}, {slop_scored = 0}, {slop_cycle = 5}, {chance_destroy = 8}},
+	vars = { {xmult = 2}, {xmult_rate = 0.02}, {slop_scored = 0}, {slop_cycle = 3}, {chance_destroy = 8}},
 	
 	custom_vars = function(self, info_queue, card)
         
@@ -6972,7 +6991,7 @@ create_joker({
 	
 	gameplay_tag = {'enh_disenh'},
 	
-	vars = {{discard_size = 3}},
+	vars = {{discard_size = 4}},
 	
     custom_vars = function(self, info_queue, card)
 	
@@ -7017,7 +7036,7 @@ create_joker({
 	
 	gameplay_tag = {'enh_disenh'},
 	
-	vars = {{adds_hand = 3}, {odds = 2}},
+	vars = {{adds_hand = 4}, {odds = 4}},
 	
     custom_vars = function(self, info_queue, card)
 	
@@ -7708,7 +7727,7 @@ create_joker({
 	
 	gameplay_tag = {'enh_custom'},
 	
-	vars = {{count_max = 3}, {count = 0}},
+	vars = {{count_max = 5}, {count = 0}},
 	custom_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {set = 'Other', key = 'resource_tooltip'}
 		return {vars = {card.ability.extra.count_max, card.ability.extra.count_max - card.ability.extra.count}}
@@ -7770,7 +7789,7 @@ create_joker({
 	
 	gameplay_tag = {'j_powerful'},
 	
-	vars = {{odds_destroy = 8}},
+	vars = {{odds_destroy = 4}},
 	custom_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = G.P_TAGS.tag_double
 		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_destroy}}
@@ -8404,7 +8423,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = {{ odds = 12 }, {odds_rate = 1}, {odds_current = 1}},
+	vars = {{ odds = 8 }, {odds_rate = 1}, {odds_current = 1}},
 	
 	custom_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.odds_current * (G.GAME and G.GAME.probabilities.normal  or 1), card.ability.extra.odds, card.ability.extra.odds_rate * (G.GAME and G.GAME.probabilities.normal or 1), G.GAME and G.GAME.probabilities.normal  or 1}}
@@ -8921,7 +8940,7 @@ create_joker({
 	
 	gameplay_tag = {'j_powerful'},
 	
-	vars = {{odds_en = 4}, {odds_ed = 8}, {odds_s = 12}},
+	vars = {{odds_en = 2}, {odds_ed = 4}, {odds_s = 8}},
 	
     custom_vars = function(self, info_queue, card)
         local vars
