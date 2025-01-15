@@ -186,6 +186,11 @@ local function check_enable_taglist(taglist)
     return isAdded
 end
 
+--Talisman Compatibility
+to_big = to_big or function(num)
+    return num
+end
+
 -- Index-based coordinates generation
 
 local function get_coordinates(position, width)
@@ -8723,7 +8728,7 @@ create_joker({
 local ref_ease_dollars = ease_dollars
 function ease_dollars(mod, instant)
 
-	if mod < 0 then
+	if to_big(mod) < to_big(0) then
 	
 		local iccard_list = SMODS.find_card('j_unstb_ic_card')
 	
