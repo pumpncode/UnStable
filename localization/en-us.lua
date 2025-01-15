@@ -943,7 +943,7 @@ return {
 				["text"] = {
 					"This Joker gains {C:chips}Chips{} equal to {C:attention}total rank{}",
 					"of the played hand if it is under {C:attention}#1#{}.",
-					"Doubles gained chips if the {C:attention}total rank{} is exactly {C:attention}#1#{}.",
+					"{C:red}Doubles all chips{} if the {C:attention}total rank{} is exactly {C:attention}#1#{}.",
 					"Resets if the total rank is more than {C:attention}#1#{}.",
 					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
 				},
@@ -975,7 +975,7 @@ return {
 					"Adds one random {C:attention}Enhanced Card{}",
 					"with {C:attention}decimal rank{} to deck if",
 					"played hand does not have a {C:attention}face{} card",
-					"{C:inactive}(Once per round. Currently {C:red}#1#/#2#{C:inactive})",
+					"{C:inactive}({C:red}#1#{C:inactive} times per round, {C:red}#2# left{C:inactive})",
 				},
 			},
 			
@@ -992,8 +992,9 @@ return {
 			["j_unstb_thesis_proposal"] = {
 				["name"] = "Thesis Proposal",
 				["text"] = {
-					"Retrigger all played cards",
-					"with {C:attention}decimal ranks{}",
+					"Retrigger all",
+					"{C:attention}decimal rank{} cards",
+					"{C:attention}#1#{} additional times",
 				},
 			},
 			
@@ -1067,8 +1068,8 @@ return {
 			["j_unstb_quintuplets"] = {
 				["name"] = "Quintuplets",
 				["text"] = {
-					"If the winning hand is a {C:attention}Flush Five{}",
-					"containing all {C:attention}Enhanced cards{},",
+					"If played hand",
+					"contains {C:attention}Five of a Kind{},",
 					"create a {C:dark_edition}Negative Tag{}",
 				},
 			},
@@ -1163,8 +1164,8 @@ return {
 				["name"] = "Vintage Joker",
 				["text"] = {
 					"Scored {C:attention}Vintage Cards{} have",
-					"{C:green}#1# in #2#{} chance to reduce",
-					"their destroy chance by half",
+					"{C:green}#1# in #2#{} chance to reset",
+					"their destroy chance",
 				},
 			},
 			
@@ -1547,18 +1548,9 @@ return {
 			["j_unstb_j2048"] = {
 				["name"] = "2048",
 				["text"] = {
-					"If played hand contains a {C:attention}Pair{} with",
-					"rank of power of two {C:attention}(2, 4, 8){},",
-					"destroy the left one and give all chips to the other",
-					"{C:inactive}(Drag to rearrange){}",
-				},
-			},
-			["j_unstb_j2048_ex"] = {
-				["name"] = "2048",
-				["text"] = {
-					"If played hand contains a {C:attention}Pair{} with",
-					"rank of power of two {C:attention}(0, 1, 2, 4, 8){},",
-					"destroy the left one and give all chips to the other",
+					"If played hand contains a {C:attention}Pair{}",
+					"destroy the left one and",
+					"give all chips to the other",
 					"{C:inactive}(Drag to rearrange){}",
 				},
 			},

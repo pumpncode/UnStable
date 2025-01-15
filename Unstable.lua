@@ -1057,8 +1057,10 @@ SMODS.Enhancement {
 				event({trigger = 'after',  func = function()
 				big_juice(rulesJoker[1])
 				return true end })
-				
-				SMODS.eval_this(card, {mult_mod = card.base.nominal * 0.5, message = localize{type='variable',key='a_mult',vars={card.base.nominal * 0.5}}} )		
+
+				return {
+					mult = card.base.nominal * 0.5,
+				}
 			
 			else
 				event({trigger = 'after', delay = 0.05,  func = function()
@@ -1289,8 +1291,6 @@ SMODS.Enhancement {
 	calculate = function(self, card, context)
         if context.cardarea == G.play and context.main_scoring then
 			local scoredAmount = card.ability.extra.chips + card.ability.perma_bonus
-			SMODS.eval_this(card, {chip_mod = scoredAmount, message = localize{type='variable',key='a_chips',vars={scoredAmount}}} )
-			
 			--Store the current scoring hand, for after_play
 			--Had to check to not include itself and other Slop Cards so it won't have cyclic references
 			if not card.ability.extra.prevhand and context.scoring_hand then
@@ -1306,6 +1306,10 @@ SMODS.Enhancement {
 				
 				--print(inspectDepth(card.ability.extra.prevhand))
 			end
+			
+			return {
+				chips = scoredAmount,
+			}
 			
         end
     end,
@@ -1452,9 +1456,12 @@ SMODS.Enhancement {
 				play_sound('multhit1')
 				return true end })]]
 				
-				SMODS.eval_this(card, {Xmult_mod = card.ability.extra.xmult, message = localize{type='variable',key='a_xmult',vars={card.ability.extra.xmult}}} )
-				
 				card.ability.extra.to_destroy = true
+				
+				return {
+				xmult = card.ability.extra.xmult,
+				}
+				
 			else
 				event({trigger = 'after', delay = 0.05,  func = function()
 				play_sound('tarot2', 1, 0.4);
@@ -1574,8 +1581,6 @@ SMODS.Enhancement {
 	
 	calculate = function(self, card, context)
         if context.cardarea == G.play and context.main_scoring then
-            SMODS.eval_this(card, {chip_mod = card.ability.extra.chips, message = localize{type='variable',key='a_chips',vars={card.ability.extra.chips}}} )
-			
 			if #context.scoring_hand > 1 then
 			
 				--polling the eligible hand first
@@ -1616,6 +1621,10 @@ SMODS.Enhancement {
 				
 			end
 			
+			return {
+				chips = card.ability.extra.chips
+			}
+			
 			
         end
 		
@@ -1648,7 +1657,7 @@ SMODS.Enhancement {
 	
 	disenhancement = true,
 	
-	config = {extra = { xmult = 0.9, h_money = 1, odds_conv = 2}},
+	config = {extra = { xmult = 0.9, h_money = 1, odds_conv = 3}},
 	
 	loc_vars = function(self)
         return {
@@ -1659,7 +1668,9 @@ SMODS.Enhancement {
 	calculate = function(self, card, context)
 
 		if context.cardarea == G.play and context.main_scoring then
-			SMODS.eval_this(card, {Xmult_mod = card.ability.extra.xmult, message = localize{type='variable',key='a_xmult',vars={card.ability.extra.xmult}}} )
+			return {
+				xmult = card.ability.extra.xmult,
+			}
 		end
 
 		if context.discard and context.other_card == card then
@@ -1747,8 +1758,10 @@ SMODS.Enhancement {
 
 		if context.cardarea == G.play and context.main_scoring then
 			local totalChip = card.base.nominal + (card.ability.perma_bonus or 0) --Counted bonus chips too, go crying
-			SMODS.eval_this(card, {chip_mod = -totalChip})
-			forced_message('-'..totalChip, card, G.C.RED, true) --Tried to sent color, but it got override with chips color	fsr	
+			return {
+				chips = -totalChip,
+				colour = G.C.RED 
+			}
 		end
     end,
 	
@@ -2397,23 +2410,6 @@ local function get_selected_cards(card, hand)
 	return selected_cards
 end
 
---set_consumeable_usage hook to keep track of UnStable's own consumable count
-local set_consumeable_usage_ref = set_consumeable_usage
-
-function set_consumeable_usage(card) 
-
-	if card.config.center_key and card.ability.consumeable then
-		if card.config.center.set == 'Auxiliary' then
-			--Initialize it if not, basically what basegame does but have to put here bc it runs before basegame's
-			G.GAME.consumeable_usage_total = G.GAME.consumeable_usage_total or {tarot = 0, planet = 0, spectral = 0, tarot_planet = 0, all = 0}
-			
-			G.GAME.consumeable_usage_total.auxiliary = (G.GAME.consumeable_usage_total.auxiliary or 0) + 1  
-		end
-	end
-
-	return set_consumeable_usage_ref(card)
-end
-
 --Auxiliary Card
 
 if unstb_config.gameplay.c_aux then
@@ -2435,7 +2431,7 @@ SMODS.UndiscoveredSprite{
 
 --Booster Pack for Auxiliary Cards
 
-local aux_booster_rate = {0.75, 0.75, 0.5, 0.1}
+local aux_booster_rate = {1, 1, 1, 0.25}
 local aux_booster_cost = {4, 4, 6, 8}
 
 for i = 1, 4 do
@@ -4130,7 +4126,7 @@ SMODS.Consumable{
 	set = 'Spectral', atlas = 'spectral',
 	key = 'spc_altar', 
 
-	config = {extra = {destroy_count = 3, create_count = 2}},
+	config = {extra = {destroy_count = 4, create_count = 3}},
 	--discovered = true,
 
 	loc_vars = function(self, info_queue, card)
@@ -4659,7 +4655,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = { {odds_spawn = 8} },
+	vars = { {odds_spawn = 4} },
 	
 	custom_vars = function(self, info_queue, card)
 		local suit  = card and card.ability.extra and card.ability.extra.suit or 'Spades'
@@ -4717,7 +4713,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = {{mult_rate = 5}, {held_amount = 2}, {mult_current = 0}},
+	vars = {{mult_rate = 10}, {held_amount = 2}, {mult_current = 0}},
 	
 	custom_vars = function(self, info_queue, card)
         
@@ -4753,7 +4749,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = { {chip_rate = 10}, {chips = 0} },
+	vars = { {chip_rate = 15}, {chips = 0} },
 	
 	custom_vars = function(self, info_queue, card)
         
@@ -4857,7 +4853,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = { {odds_poly = 12} },
+	vars = { {odds_poly = 8} },
 	
 	custom_vars = function(self, info_queue, card)
         info_queue[#info_queue+1] = G.P_CENTERS['m_wild']
@@ -4918,7 +4914,7 @@ create_joker({
 	
     blueprint = false, eternal = true, perishable = true,
 	
-	vars = { {add_slot = 3}, {inflation = 1} },
+	vars = { {add_slot = 4}, {inflation = 2} },
 	
 	custom_vars = function(self, info_queue, card)
 		return { vars = {card.ability.extra.add_slot, card.ability.extra.inflation}}
@@ -5185,7 +5181,7 @@ create_joker({
 					return true end
 					})
 					
-					SMODS.eval_this(G.consumeables.cards[i], {Xmult_mod = card.ability.extra.xmult, message = localize{type='variable',key='a_xmult',vars={card.ability.extra.xmult}}} )
+					SMODS.calculate_effect({xmult = card.ability.extra.xmult}, G.consumeables.cards[i])
 				end
 			end
 			
@@ -5251,7 +5247,7 @@ create_joker({
 	
 	gameplay_tag = {'c_aux'},
 	
-	vars = {{odds = 6}},
+	vars = {{odds = 4}},
 	
     custom_vars = function(self, info_queue, card)
 	
@@ -5318,7 +5314,7 @@ create_joker({
 					card = card
 				}
 			elseif totalRank == card.ability.extra.maxRank then
-				card.ability.extra.chips = card.ability.extra.chips + totalRank * 2
+				card.ability.extra.chips = (card.ability.extra.chips + totalRank) * 2
 				
 				local popup_msg = 'Black Jack!'
 				if card.ability.extra.maxRank ~= 21 then
@@ -5442,7 +5438,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = { {times_max = 1}},
+	vars = { {times_max = 5}},
 	
 	custom_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.times_current, card.ability.extra.times_max}}
@@ -5571,7 +5567,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = {{ repetitions = 1 }},
+	vars = {{ repetitions = 2 }},
 	
     calculate = function(self, card, context)
 		if context.cardarea == G.play and context.repetition and not context.repetition_only then
@@ -5605,7 +5601,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = { {odds_poly = 8} },
+	vars = { {odds_poly = 6} },
 	
 	custom_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = G.P_CENTERS['e_polychrome']
@@ -5981,7 +5977,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = {{mult_rate = '2'}, {mult = '0'}},
+	vars = {{mult_rate = '4'}, {mult = '0'}},
 	
 	custom_vars = function(self, info_queue, card)
         
@@ -6126,7 +6122,7 @@ create_joker({
 --Quintuplets
 create_joker({
     name = 'Quintuplets', id = 2,
-    rarity = 'Rare', cost = 8,
+    rarity = 'Uncommon', cost = 6,
 	
     blueprint = true, eternal = true, perishable = true,
 	
@@ -6172,9 +6168,9 @@ create_joker({
 			end
 		end]]
 		
-		if context.after and next(context.poker_hands['Flush Five']) then
+		if context.after and next(context.poker_hands['Five of a Kind']) then
 			event({	 trigger = 'after', delay = 0.5, func = function()
-								card:juice_up(0.3, 0.3)
+								(context.blueprint_card or card):juice_up(0.3, 0.3)
 				
 								add_tag(Tag('tag_negative'))
 								play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
@@ -6370,7 +6366,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = {{count = '1'}},
+	vars = {{count = '3'}},
 	
 	custom_vars = function(self, info_queue, card)
         
@@ -6751,7 +6747,7 @@ create_joker({
 		if context.individual and context.cardarea == G.play then
 			if context.other_card.config.center == G.P_CENTERS.m_unstb_vintage then
 				if pseudorandom('vintagejoker'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.chance_fix then
-					context.other_card.ability.extra.current_odd = math.ceil(context.other_card.ability.extra.current_odd * 0.5)
+					context.other_card.ability.extra.current_odd = 0 --math.ceil(context.other_card.ability.extra.current_odd * 0.5)
 					
 					event({trigger = 'after',  func = function()
 								play_sound('tarot2', 1, 0.6);
@@ -6946,7 +6942,7 @@ create_joker({
 	
 	gameplay_tag = {'enh_disenh'},
 	
-	vars = {{add_slot = 3}},
+	vars = {{add_slot = 4}},
 	
     custom_vars = function(self, info_queue, card)
 	
@@ -7093,7 +7089,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = {{mult_rate = '4'}, {mult = '0'}},
+	vars = {{mult_rate = '6'}, {mult = '0'}},
 	
 	custom_vars = function(self, info_queue, card)
         
@@ -7224,7 +7220,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = {{xmult_rate = '0.25'}, {xmult = '1'}},
+	vars = {{xmult_rate = '0.5'}, {xmult = '1'}},
 	
 	custom_vars = function(self, info_queue, card)
         
@@ -7298,14 +7294,10 @@ create_joker({
 		
 		--Main context
 		if context.joker_main then
-		
-			--Add mult first
-			SMODS.eval_this(card, {mult_mod = card.ability.extra.mult, message = localize{type='variable',key='a_mult',vars={card.ability.extra.mult}}} )
-		
-			--Then Xmult
 			return {
-				Xmult_mod = card.ability.extra.xmult,
-				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.xmult } }
+				mult = card.ability.extra.mult,
+				xmult = card.ability.extra.xmult,
+				--message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.xmult } }
 			}
 		end
 		
@@ -7598,9 +7590,9 @@ create_joker({
 --Jack of All Trades
 create_joker({
     name = 'Jack of All Trades', id = 60,
-    rarity = 'Rare', cost = 6,
+    rarity = 'Uncommon', cost = 6,
 	
-	vars = {{chips = 15}, {mult = 2}, {xmult = 1.1}, {money = 1}},
+	vars = {{chips = 20}, {mult = 3}, {xmult = 1.25}, {money = 1}},
 	custom_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.chips, card.ability.extra.mult, card.ability.extra.xmult, card.ability.extra.money}}
     end,
@@ -8480,7 +8472,7 @@ create_joker({
 --Salmon Run
 create_joker({
     name = 'Salmon Run', id = 10,
-    rarity = 'Rare', cost = 7,
+    rarity = 'Uncommon', cost = 7,
 	
 	vars = {{odds = 7}},
 	custom_vars = function(self, info_queue, card)
@@ -8523,7 +8515,7 @@ create_joker({
 --Cool S
 create_joker({
     name = 'Cool S', id = 66,
-    rarity = 'Uncommon', cost = 8,
+    rarity = 'Common', cost = 8,
 	
 	vars = {},
 	custom_vars = function(self, info_queue, card)
@@ -8636,6 +8628,12 @@ create_joker({
 									--Copy Card
 									G.playing_card = (G.playing_card and G.playing_card + 1) or 1
 									local _card = copy_card(context.removed[i], nil, nil, G.playing_card)
+									
+									--Special interaction: if it is a vintage card, resets the odds
+									if _card.config.center.key == 'm_unstb_vintage' then
+										_card.ability.extra.current_odd = 0
+									end
+									
 									_card:start_materialize({G.C.SECONDARY_SET.Enhanced})
 									_card:add_to_deck()
 									G.deck:emplace(_card)
@@ -8694,7 +8692,7 @@ create_joker({
 --Raffle
 create_joker({
     name = 'Raffle', id = 50,
-    rarity = 'Uncommon', cost = 8,
+    rarity = 'Common', cost = 8,
 	
 	vars = {{odds = 20}, {prize = 20}, {current_odds = 0}},
 	custom_vars = function(self, info_queue, card)
@@ -8859,7 +8857,7 @@ create_joker({
 
 
 
-local rank_2048 = { unstb_0 = true, unstb_1 = true, ['2'] = true, ['4'] = true, ['8'] = true}
+--local rank_2048 = { unstb_0 = true, unstb_1 = true, ['2'] = true, ['4'] = true, ['8'] = true}
 
 --2048
 create_joker({
@@ -8872,12 +8870,12 @@ create_joker({
 	
 	custom_vars = function(self, info_queue, card)
 		
-		local key = self.key
+		--[[local key = self.key
 		if getPoolRankFlagEnable('unstb_0') or getPoolRankFlagEnable('unstb_1') then
 			key = self.key..'_ex'
-		end
+		end]]
 	
-		return { key = key, vars = {} }
+		return { vars = {} }
 	end,
 	
     blueprint = false, eternal = true, perishable = true,
@@ -8893,30 +8891,30 @@ create_joker({
 				
 				--print(rank_2048[c.base.value])
 				
-				if rank_2048[c.base.value] then
-					if card_list[key] then
-						--print('found the card list: '..c.base.value)
+				
+				if card_list[key] then
+					--print('found the card list: '..c.base.value)
+				
+					local prev_card = card_list[key]
+					card_to_destroy[#card_to_destroy+1] = prev_card
 					
-						local prev_card = card_list[key]
-						card_to_destroy[#card_to_destroy+1] = prev_card
-						
-						--Transfer chips
-						local bonusChip = prev_card.ability.perma_bonus or 0
-						local baseChip = SMODS.Ranks[prev_card.base.value].nominal
-						
-						--Delay the chip adding, so it does not get evaluated
-						event({delay = 0.1, func = function()
-						c.ability.perma_bonus = (c.ability.perma_bonus or 0) + baseChip + bonusChip
-						return true end
-						})
-						
-						--Erase the slot, if there's the next one then it counts as a new pair
-						card_list[key] = nil
-					else
-						--print('adding to card list: '..c.base.value)
-						card_list[key] = c
-					end
+					--Transfer chips
+					local bonusChip = prev_card.ability.perma_bonus or 0
+					local baseChip = SMODS.Ranks[prev_card.base.value].nominal
+					
+					--Delay the chip adding, so it does not get evaluated
+					event({delay = 0.1, func = function()
+					c.ability.perma_bonus = (c.ability.perma_bonus or 0) + baseChip + bonusChip
+					return true end
+					})
+					
+					--Erase the slot, if there's the next one then it counts as a new pair
+					card_list[key] = nil
+				else
+					--print('adding to card list: '..c.base.value)
+					card_list[key] = c
 				end
+				
 			end
 			
 			--print('done')
@@ -9386,6 +9384,28 @@ local ref_gamesplashscreen = Game.splash_screen
 
 function Game:splash_screen()
  	ref_gamesplashscreen(self)
+	
+	--set_consumeable_usage hook to keep track of UnStable's own consumable count
+	--Certain mod like Aurinko made this hook doesn't work fsr
+	local set_consumeable_usage_ref = set_consumeable_usage
+
+	function set_consumeable_usage(card) 
+
+		print("consumable increase hook")
+
+		if card.config.center_key and card.ability.consumeable then
+			if card.config.center.set == 'Auxiliary' then
+			
+				print("increase")
+				--Initialize it if not, basically what basegame does but have to put here bc it runs before basegame's
+				G.GAME.consumeable_usage_total = G.GAME.consumeable_usage_total or {tarot = 0, planet = 0, spectral = 0, tarot_planet = 0, all = 0}
+				
+				G.GAME.consumeable_usage_total.auxiliary = (G.GAME.consumeable_usage_total.auxiliary or 0) + 1  
+			end
+		end
+
+		return set_consumeable_usage_ref(card)
+	end
 	
 	init_prev_rank_data()
 	
