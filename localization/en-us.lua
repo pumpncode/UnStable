@@ -1281,6 +1281,7 @@ return {
 				["text"] = {
 					"Gain {C:mult}+#1#{} Mult when buying a Joker",
 					"with {C:attention}\"Joker\"{} in its name",
+					"directly from the shop",
 					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult){}",
 				},
 			},
