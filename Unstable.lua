@@ -2148,6 +2148,14 @@ for i=#vanilla_rank_list, 2, -1 do
 end
 SMODS.Ranks['2'].prev = {'Ace'}
 
+--Add a custom in_pool for high vanilla ranks, so they can be hidden from appearing in Lowkey Combo Decks HUD
+
+for i=#vanilla_rank_list, 5, -1 do
+	SMODS.Ranks[vanilla_rank_list[i]].in_pool = function()
+		return not G.GAME.prevent_high_rank
+	end
+end
+
 --Booster Pack for Premium Card
 
 local premium_booster_rate = {0.75, 0.75, 0.5, 0.1}
