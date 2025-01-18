@@ -9355,10 +9355,6 @@ end
 
 end
 
-
---Deck Preview UI supports for hiding modded ranks
-filesystem.load(unstb.path..'/override/ui.lua')()
-
 --Reworked Vanilla Joker to support new features
 if unstb_config.joker.vanilla then
 
