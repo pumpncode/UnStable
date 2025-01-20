@@ -1581,7 +1581,7 @@ return {
 				["name"] = "Fibonacci",
 				["text"] = {
 					"Each played {C:attention}0{}, {C:attention}1{}, {C:attention}Ace{},",
-					"{C:attention}2{}, {C:attention}3{}, {C:attention}5{}, {C:attention}8{}, or {C:attention}21{}",
+					"{C:attention}2{}, {C:attention}3{}, {C:attention}5{}, {C:attention}8{}, {C:attention}13{}, or {C:attention}21{}",
 					"{C:mult}+#1#{} Mult when scored",
 				},
 			},
@@ -1592,7 +1592,7 @@ return {
 					"Played cards with",
 					"{C:attention}odd{} rank give",
 					"{C:chips}+#1#{} Chips when scored",
-					"{C:inactive}(21, A, 9, 7, 5, 3, 1){}",
+					"{C:inactive}(161, 21, 13, 11, A, 9, 7, 5, 3, 1){}",
 				},
 			},
 			
@@ -1602,7 +1602,7 @@ return {
 					"Played cards with",
 					"{C:attention}even{} rank give",
 					"{C:mult}+#1#{} Mult when scored",
-					"{C:inactive}(10, 8, 6, 4, 2, 0){}",
+					"{C:inactive}(12, 10, 8, 6, 4, 2, 0){}",
 				},
 			},
 			
