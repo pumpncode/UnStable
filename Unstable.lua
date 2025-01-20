@@ -6214,7 +6214,7 @@ create_joker({
 	
     calculate = function(self, card, context)
 	
-		if context.cardarea == G.play and not context.repetition then
+		if context.individual and context.cardarea == G.play and not context.repetition then
 			if context.other_card.edition  then
 				card.ability.extra.current_count = card.ability.extra.current_count + 1
 			end
