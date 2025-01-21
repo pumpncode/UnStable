@@ -170,7 +170,7 @@ SMODS.Joker:take_ownership('hack', {
 	
 	calculate = function(self, card, context)
 		if context.cardarea == G.play and context.repetition and not context.repetition_only then
-		  if unstb_global.hack[context.other_card.base.value] then
+		  if not context.other_card.config.center.no_rank and unstb_global.hack[context.other_card.base.value] then
 				return {
 				  message = 'Again!',
 				  repetitions = card.ability.extra,

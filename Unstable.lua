@@ -5,6 +5,7 @@ local unstb_config = unstb.config
 
 --Global Table
 unstb_global = {}
+unstb_global.config = unstb.config
 
 -- Debug message
 local function print(message)
@@ -9364,6 +9365,11 @@ end
 
 --Suits, supports for Suit Seals, a lot of suit-based Joker, and modded suits support for Smeared
 filesystem.load(unstb.path..'/override/suits.lua')()
+
+--JokerDisplay (Partial) Support
+if JokerDisplay then
+	SMODS.load_file("/override/jokerdisplay.lua")()
+end
 
 --Hook for the game's splash screen, to initialize any data that is sensitive to the mod's order (mainly rank stuff)
 
