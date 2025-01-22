@@ -156,6 +156,9 @@ end
 
 unstb.extra_tabs = unstb_config_tab
 
+--Just so the gear icon shows up
+unstb.config_tab = true
+
 --Map config value with a single string keyword
 local config_value = {
     ["rank_21"] = unstb_config.rank.rank_21,
@@ -5577,7 +5580,7 @@ create_joker({
 	vars = {{ repetitions = 1 }},
 	
     calculate = function(self, card, context)
-		if context.cardarea == G.play and context.repetition and not context.repetition_only then
+		if context.individual and context.cardarea == G.play and context.repetition and not context.repetition_only then
 		  if is_decimal(context.other_card) then
 				return {
 				  message = 'Again!',
@@ -6268,7 +6271,7 @@ create_joker({
 	vars = {{ repetitions = 1 }},
 	
     calculate = function(self, card, context)
-		if context.cardarea == G.play and context.repetition and not context.repetition_only then
+		if context.individual and context.cardarea == G.play and context.repetition and not context.repetition_only then
 		  if context.other_card.edition  then
 			return {
 			  message = 'Again!',
@@ -7852,21 +7855,20 @@ create_joker({
 					upgrade_count = upgrade_count+1
 					edition_upgrade(current_card)
 				end
-				
-				if upgrade_count > 0 then
-					--forced_message("Upgrade!", context.blueprint_card or card, G.C.SECONDARY_SET.Enhanced, true)
-					return {
-						message = 'Upgrade!',
-						colour = G.C.SECONDARY_SET.Enhanced,
-						card = context.blueprint_card or card,
-					}
-				end
-				
+			end
+			
+			if upgrade_count > 0 then
+				--forced_message("Upgrade!", context.blueprint_card or card, G.C.SECONDARY_SET.Enhanced, true)
+				return {
+					message = 'Upgrade!',
+					colour = G.C.SECONDARY_SET.Enhanced,
+					card = context.blueprint_card or card,
+				}
 			end
 		
 		end
 		
-		if context.cardarea == G.play and context.other_card.base.value == 'King' and context.repetition and not context.repetition_only then
+		if context.individual and context.cardarea == G.play and context.other_card.base.value == 'King' and context.repetition and not context.repetition_only then
 			if pseudorandom('prssj2'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_retrigger then
 				return {
 				  message = 'Again!',
@@ -8336,7 +8338,7 @@ create_joker({
     end,
 	
     calculate = function(self, card, context)
-		if context.cardarea == G.play and context.repetition and not context.repetition_only then
+		if context.individual and context.cardarea == G.play and context.repetition and not context.repetition_only then
 		  if context.other_card.seal  then
 			return {
 			  message = 'Again!',
@@ -8393,7 +8395,7 @@ create_joker({
     end,
 	
     calculate = function(self, card, context)
-		if context.cardarea == G.play and context.repetition and not context.repetition_only then
+		if context.individual and context.cardarea == G.play and context.repetition and not context.repetition_only then
 		  if context.other_card.config.center == G.P_CENTERS.m_glass  then
 			return {
 			  message = 'Again!',
@@ -9371,7 +9373,7 @@ if JokerDisplay then
 	SMODS.load_file("/override/jokerdisplay.lua")()
 end
 
---Test, manually load localizations and populate necessary info needed for the mod
+--Manually load localizations and populate necessary info needed for the mod
 
 --Global table entry to handle trigger for name-related stuff
 unstb_global.name_joker = {}
@@ -9411,6 +9413,7 @@ function unstb_process_english_loc()
 		return {}
 	end
 
+	print("Start initializing localization-independent info")
 	--Basegame Jokers
 	local temp_loc = assert(loadstring(love.filesystem.read('localization/en-us.lua')))()
 	populateList(temp_loc)
@@ -9430,6 +9433,7 @@ function unstb_process_english_loc()
 	local loc_table = G.localization.descriptions.Joker
 	populateList(G.localization)
 	
+	print("Finished initializing localization-independent info")
 	
 end
 
