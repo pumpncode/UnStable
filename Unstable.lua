@@ -7351,7 +7351,7 @@ create_joker({
 		--Shop
 		if context.buying_card and context.card ~= card then
 			--get name
-			local jokerName = string.lower(localize{type = 'name_text', key = context.card.config.center.key, set = 'Joker'})
+			local jokerName = string.lower(unstb_global.name_joker[context.card.config.center.key] or "error")
 			
 			if string.match(jokerName, "joker") then
 				--print("Joker Stair Triggered!")
@@ -8018,7 +8018,7 @@ create_joker({
     calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
 			if not context.other_card.config.center.no_suit then
-				local suit_name = string.lower(localize(context.other_card.base.suit, 'suits_singular'))
+				local suit_name = string.lower(unstb_global.name_suit[context.other_card.base.suit] or "error")
 				
 				local vowel = suit_name:gsub("[^aeiou]","")
 				local consonant = suit_name:gsub("[^bcdfghjklmnpqrstvwxyz]","") --To be safe, list alphabet only, no symbol, space, or numbers
@@ -8059,7 +8059,7 @@ create_joker({
 	
 		if context.other_joker then
 			--get name
-			local jokerName = string.lower(localize{type = 'name_text', key = context.other_joker.config.center.key, set = 'Joker'})
+			local jokerName = string.lower(unstb_global.name_card[context.other_joker.config.center.key] or "error")
 			
 			--trigger on only joker with "Card" in the name
 			if string.match(jokerName, "card") then
@@ -9371,6 +9371,68 @@ if JokerDisplay then
 	SMODS.load_file("/override/jokerdisplay.lua")()
 end
 
+--Test, manually load localizations and populate necessary info needed for the mod
+
+--Global table entry to handle trigger for name-related stuff
+unstb_global.name_joker = {}
+unstb_global.name_card = {}
+unstb_global.name_suit = {}
+
+function unstb_process_english_loc()
+	local function populateList(temp_loc)
+		if not temp_loc or not temp_loc.descriptions then return end
+	
+		local jokers = temp_loc.descriptions.Joker or {}
+		for k,v in pairs(jokers) do
+			if not unstb_global.name_joker[k] and not unstb_global.name_card[k] then
+				if string.match(string.lower(v.name), "joker") then
+					unstb_global.name_joker[k] = v.name
+				end
+				
+				if string.match(string.lower(v.name), "card") then
+					unstb_global.name_card[k] = v.name
+				end
+			end
+		end
+		
+		--Added suit loc if exists
+		local suit = (temp_loc.misc and temp_loc.misc.suits_singular) or {}
+		
+		for k,v in pairs(suit) do
+			if not unstb_global.name_suit[k] then
+				unstb_global.name_suit[k] = v
+			end
+		end
+		
+	end
+	
+	local function loc_fallback()
+		--print("Called loc fallback")
+		return {}
+	end
+
+	--Basegame Jokers
+	local temp_loc = assert(loadstring(love.filesystem.read('localization/en-us.lua')))()
+	populateList(temp_loc)
+	
+	--Modded Jokers
+	for k, _ in pairs(SMODS.Mods) do
+		if SMODS.Mods[k].can_load and SMODS.Mods[k].path then
+			temp_loc = (SMODS.load_file('/localization/en-us.lua', k) or loc_fallback)()
+			if temp_loc then
+				populateList(temp_loc)
+			end
+		end
+	end
+	
+	--Fallback, handle the rest of the mod without proper localization (eg. uses loc_txt)
+	--these mods tend to not have proper localization so it should be fine to look at the game's raw table
+	local loc_table = G.localization.descriptions.Joker
+	populateList(G.localization)
+	
+	
+end
+
 --Hook for the game's splash screen, to initialize any data that is sensitive to the mod's order (mainly rank stuff)
 
 local ref_gamesplashscreen = Game.splash_screen
@@ -9383,4 +9445,6 @@ function Game:splash_screen()
 	if init_lowkey_blacklist then
 		init_lowkey_blacklist()
 	end
+	
+	unstb_process_english_loc()
 end
