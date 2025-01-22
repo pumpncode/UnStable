@@ -5580,7 +5580,7 @@ create_joker({
 	vars = {{ repetitions = 1 }},
 	
     calculate = function(self, card, context)
-		if context.individual and context.cardarea == G.play and context.repetition and not context.repetition_only then
+		if context.cardarea == G.play and context.repetition and not context.repetition_only then
 		  if is_decimal(context.other_card) then
 				return {
 				  message = 'Again!',
@@ -6271,7 +6271,7 @@ create_joker({
 	vars = {{ repetitions = 1 }},
 	
     calculate = function(self, card, context)
-		if context.individual and context.cardarea == G.play and context.repetition and not context.repetition_only then
+		if context.cardarea == G.play and context.repetition and not context.repetition_only then
 		  if context.other_card.edition  then
 			return {
 			  message = 'Again!',
@@ -7352,11 +7352,8 @@ create_joker({
 	
     calculate = function(self, card, context)
 		--Shop
-		if context.buying_card and context.card ~= card then
-			--get name
-			local jokerName = string.lower(unstb_global.name_joker[context.card.config.center.key] or "error")
-			
-			if string.match(jokerName, "joker") then
+		if context.buying_card and context.card ~= card then	
+			if unstb_global.name_joker[context.card.config.center.key] then
 				--print("Joker Stair Triggered!")
 				card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_rate
 				   event({
@@ -7851,7 +7848,7 @@ create_joker({
 			for i = 1, #context.scoring_hand do
 				local current_card = context.scoring_hand[i]
 				
-				if current_card.base.value == 'King' and pseudorandom('prssj1'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_upgrade then
+				if not current_card.debuff and current_card.base.value == 'King' and pseudorandom('prssj1'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_upgrade then
 					upgrade_count = upgrade_count+1
 					edition_upgrade(current_card)
 				end
@@ -7868,7 +7865,7 @@ create_joker({
 		
 		end
 		
-		if context.individual and context.cardarea == G.play and context.other_card.base.value == 'King' and context.repetition and not context.repetition_only then
+		if context.cardarea == G.play and context.repetition and not context.repetition_only and not context.other_card.debuff and context.other_card.base.value == 'King' then
 			if pseudorandom('prssj2'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_retrigger then
 				return {
 				  message = 'Again!',
@@ -8019,20 +8016,11 @@ create_joker({
 	
     calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
-			if not context.other_card.config.center.no_suit then
-				local suit_name = string.lower(unstb_global.name_suit[context.other_card.base.suit] or "error")
+			if not context.other_card.config.center.no_suit and unstb_global.name_suit[context.other_card.base.suit] then
+				local suit_info = unstb_global.name_suit[context.other_card.base.suit]
 				
-				local vowel = suit_name:gsub("[^aeiou]","")
-				local consonant = suit_name:gsub("[^bcdfghjklmnpqrstvwxyz]","") --To be safe, list alphabet only, no symbol, space, or numbers
-				
-				local totalChips = card.ability.extra.chips_rate * (string.len(consonant))
-				local totalMult = card.ability.extra.mult_rate * (string.len(vowel))
-				
-				--print(vowel)
-				--print(consonant)
-				
-				--print(totalChips)
-				--print(totalMult)
+				local totalChips = card.ability.extra.chips_rate * suit_info.count_consonant
+				local totalMult = card.ability.extra.mult_rate * suit_info.count_vowel
 				
 				return {
 				  chips = totalChips,
@@ -8060,11 +8048,8 @@ create_joker({
     calculate = function(self, card, context)
 	
 		if context.other_joker then
-			--get name
-			local jokerName = string.lower(unstb_global.name_card[context.other_joker.config.center.key] or "error")
-			
 			--trigger on only joker with "Card" in the name
-			if string.match(jokerName, "card") then
+			if unstb_global.name_card[context.other_joker.config.center.key] then
 				event({
                     func = function()
                         context.other_joker:juice_up(0.5, 0.5)
@@ -8338,7 +8323,7 @@ create_joker({
     end,
 	
     calculate = function(self, card, context)
-		if context.individual and context.cardarea == G.play and context.repetition and not context.repetition_only then
+		if context.cardarea == G.play and context.repetition and not context.repetition_only then
 		  if context.other_card.seal  then
 			return {
 			  message = 'Again!',
@@ -8395,7 +8380,7 @@ create_joker({
     end,
 	
     calculate = function(self, card, context)
-		if context.individual and context.cardarea == G.play and context.repetition and not context.repetition_only then
+		if context.cardarea == G.play and context.repetition and not context.repetition_only then
 		  if context.other_card.config.center == G.P_CENTERS.m_glass  then
 			return {
 			  message = 'Again!',
@@ -9397,12 +9382,21 @@ function unstb_process_english_loc()
 			end
 		end
 		
-		--Added suit loc if exists
+		--Process suit loc if exists
 		local suit = (temp_loc.misc and temp_loc.misc.suits_singular) or {}
 		
 		for k,v in pairs(suit) do
 			if not unstb_global.name_suit[k] then
-				unstb_global.name_suit[k] = v
+				local suit_name = string.lower(v)
+				
+				local vowel = suit_name:gsub("[^aeiou]","")
+				local consonant = suit_name:gsub("[^bcdfghjklmnpqrstvwxyz]","") --To be safe, list alphabet only, no symbol, space, or numbers
+				
+				unstb_global.name_suit[k] = {
+					name = v,
+					count_vowel = string.len(vowel),
+					count_consonant = string.len(consonant)
+				}
 			end
 		end
 		
@@ -9430,7 +9424,6 @@ function unstb_process_english_loc()
 	
 	--Fallback, handle the rest of the mod without proper localization (eg. uses loc_txt)
 	--these mods tend to not have proper localization so it should be fine to look at the game's raw table
-	local loc_table = G.localization.descriptions.Joker
 	populateList(G.localization)
 	
 	print("Finished initializing localization-independent info")
