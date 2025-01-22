@@ -1581,7 +1581,7 @@ return {
 				["name"] = "Fibonacci",
 				["text"] = {
 					"Each played {C:attention}0{}, {C:attention}1{}, {C:attention}Ace{},",
-					"{C:attention}2{}, {C:attention}3{}, {C:attention}5{}, {C:attention}8{}, {C:attention}13{}, or {C:attention}21{} give",
+					"{C:attention}2{}, {C:attention}3{}, {C:attention}5{}, {C:attention}8{}, {C:attention}13{}, or {C:attention}21{} gives",
 					"{C:mult}+#1#{} Mult when scored",
 				},
 			},
