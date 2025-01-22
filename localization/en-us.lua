@@ -456,7 +456,7 @@ return {
 					"with an {C:dark_edition}edition{}",
 					"Gives the {C:attention}Joker's {C:dark_edition}edition{} to",
 					"{C:attention}#1#{} random card in your hand",
-					"{C:inactive}({C:dark_edition}Negative{} excluded){}",
+					"{C:inactive}({C:dark_edition}Negative{} {C:inactive}excluded){}",
 				},
 			},
 		},
@@ -942,7 +942,7 @@ return {
 				["name"] = "Black Jack",
 				["text"] = {
 					"This Joker gains {C:chips}Chips{} equal to {C:attention}total rank{}",
-					"of the played hand if it is under {C:attention}#1#{}.",
+					"of the scored hand if it is under {C:attention}#1#{}.",
 					"Doubles gained chips if the {C:attention}total rank{} is exactly {C:attention}#1#{}.",
 					"Resets if the total rank is more than {C:attention}#1#{}.",
 					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
@@ -974,7 +974,7 @@ return {
 				["text"] = {
 					"Adds one random {C:attention}Enhanced Card{}",
 					"with {C:attention}decimal rank{} to deck if",
-					"played hand does not have a {C:attention}face{} card",
+					"scored hand does not have a {C:attention}face{} card",
 					"{C:inactive}(Once per round. Currently {C:red}#1#/#2#{C:inactive})",
 				},
 			},
@@ -1035,7 +1035,7 @@ return {
 			["j_unstb_social_experiment"] = {
 				["name"] = "Social Experiment",
 				["text"] = {
-					"For each played {C:attention}numbered card{},",
+					"For each scored {C:attention}numbered card{},",
 					"double its Chips, give it to the next card",
 					"and strip its {C:attention}rank{} to {C:attention}0{}",
 				},
@@ -1487,7 +1487,7 @@ return {
 			["j_unstb_cool_s"] = {
 				["name"] = "Cool S",
 				["text"] = {
-					"Played {C:attention}8s{} become",
+					"Scored {C:attention}8s{} become",
 					"a random {C:attention}Enhanced card{}",
 				},
 			},
@@ -1581,7 +1581,7 @@ return {
 				["name"] = "Fibonacci",
 				["text"] = {
 					"Each played {C:attention}0{}, {C:attention}1{}, {C:attention}Ace{},",
-					"{C:attention}2{}, {C:attention}3{}, {C:attention}5{}, {C:attention}8{}, {C:attention}13{}, or {C:attention}21{}",
+					"{C:attention}2{}, {C:attention}3{}, {C:attention}5{}, {C:attention}8{}, {C:attention}13{}, or {C:attention}21{} gives",
 					"{C:mult}+#1#{} Mult when scored",
 				},
 			},
