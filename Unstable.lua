@@ -33,6 +33,11 @@ function loc_colour(_c, default)
     return ref_loc_colour(_c, default)
 end
 
+--Description page formatting
+unstb.description_loc_vars = function()
+    return { background_colour = G.C.CLEAR, text_colour = G.C.WHITE, scale = 1.2 }
+end
+
 --Config Stuff
 
 function unstb.save_config(self)

@@ -1617,5 +1617,17 @@ return {
 			},
 		},
 		
+		["Mod"] = {
+			["UnStable"] = {
+				["name"] = "UnStable",
+				["text"] = {
+					"Mod with a lot of new but vanilla-style mechanics.",
+					"Contains new Jokers, consumables, and other stuff!",
+					" ",
+					"{C:blue}Brazilian Portuguese{} localization by {C:attention}PinkMaggit{}"
+				}
+			}
+		}
+		
 	},
 }
