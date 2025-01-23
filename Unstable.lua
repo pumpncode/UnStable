@@ -7443,7 +7443,6 @@ create_joker({
 			end
 			
 			forced_message(card.ability.extra.dir==0 and 'Left' or 'Right', card, G.C.ORANGE, true)
-			--print(card.config.center.key)
 		end
 		
 		local other_joker = nil
@@ -7457,6 +7456,8 @@ create_joker({
 			end
 		end
 		if other_joker and other_joker ~= self then
+		
+			--local newcontext = context
 			context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
 			context.blueprint_card = context.blueprint_card or card
 
@@ -7466,12 +7467,18 @@ create_joker({
 
 			local other_joker_ret, trig = other_joker:calculate_joker(context)
 			
+			--Context needs resetting afterwards, otherwise this value keeps persisting
+			context.blueprint = nil
+			
+			local eff_card = context.blueprint_card or card
+			context.blueprint_card = nil
+			
 			if other_joker_ret or trig then
 				if not other_joker_ret then
 					other_joker_ret = {}
 				end
 				
-				other_joker_ret.card = context.blueprint_card or card
+				other_joker_ret.card = eff_card
 				other_joker_ret.colour = G.C.GREEN
 				other_joker_ret.no_callback = true
 				
