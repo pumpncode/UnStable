@@ -7738,15 +7738,18 @@ create_joker({
 	
     calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
+			print(inspect(context))
 			if context.other_card.base.value == 'Queen' then
 				if card.ability.extra.count < card.ability.extra.count_max then
 					if not context.blueprint then
 						card.ability.extra.count = card.ability.extra.count + 1
 					end
 					
+					local other_card = context.other_card
+					
 					event({func = function()
 									local rank = pseudorandom_element(SMODS.Ranks, pseudoseed('queensland')..G.SEED).card_key
-									local suit = SMODS.Suits[context.other_card.base.suit].card_key
+									local suit = SMODS.Suits[other_card.base.suit].card_key
 									
 									local _card = Card(G.play.T.x + G.play.T.w/2, G.play.T.y, G.CARD_W, G.CARD_H, G.P_CARDS[suit..'_'..rank], G.P_CENTERS.m_unstb_resource, {playing_card = G.playing_card})
 									
@@ -9377,11 +9380,11 @@ function unstb_process_english_loc()
 		local jokers = temp_loc.descriptions.Joker or {}
 		for k,v in pairs(jokers) do
 			if not unstb_global.name_joker[k] and not unstb_global.name_card[k] then
-				if string.match(string.lower(v.name), "joker") then
+				if v.name and string.match(string.lower(v.name), "joker") then
 					unstb_global.name_joker[k] = v.name
 				end
 				
-				if string.match(string.lower(v.name), "card") then
+				if v.name and string.match(string.lower(v.name), "card") then
 					unstb_global.name_card[k] = v.name
 				end
 			end
@@ -9391,7 +9394,7 @@ function unstb_process_english_loc()
 		local suit = (temp_loc.misc and temp_loc.misc.suits_singular) or {}
 		
 		for k,v in pairs(suit) do
-			if not unstb_global.name_suit[k] then
+			if not unstb_global.name_suit[k] and v then
 				local suit_name = string.lower(v)
 				
 				local vowel = suit_name:gsub("[^aeiou]","")
