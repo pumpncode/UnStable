@@ -7738,7 +7738,6 @@ create_joker({
 	
     calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
-			print(inspect(context))
 			if context.other_card.base.value == 'Queen' then
 				if card.ability.extra.count < card.ability.extra.count_max then
 					if not context.blueprint then
