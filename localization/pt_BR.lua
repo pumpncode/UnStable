@@ -1394,7 +1394,7 @@ return {
 			["j_unstb_collector_album"] = {
 				["name"] = "Álbum de Coleção",
 				["text"] = {
-					"Curingas com {C:attention}\"Carta\"{}",
+					"Curingas com {C:attention}\"Carta\", \"Card\"{}",
 					"ou \"Cartão\" no seu nome dão",
 					"{C:chips}+#1#{} Fichas",
 				},
