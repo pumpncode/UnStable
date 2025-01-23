@@ -26,7 +26,7 @@ SMODS.Joker:take_ownership('fibonacci', {
 			key = self.key..'_ex'
 		end
 		
-		return { key = key, vars = {card.ability.extra.mult} }
+		return { key = key, vars = {card and card.ability.extra.mult or self.config.extra.mult} }
 	end,
 	
 	calculate = function(self, card, context)
@@ -86,7 +86,7 @@ SMODS.Joker:take_ownership('odd_todd', {
 			key = self.key..'_ex'
 		end
 	
-		return { key = key, vars = {card.ability.extra.chips} }
+		return { key = key, vars = {card and card.ability.extra.chips or self.config.extra.chips} }
 	end,
 	
 	calculate = function(self, card, context)
@@ -119,7 +119,7 @@ SMODS.Joker:take_ownership('even_steven', {
 			key = self.key..'_ex'
 		end
 	
-		return { key = key, vars = {card.ability.extra.mult} }
+		return { key = key, vars = {card and card.ability.extra.mult or self.config.extra.mult} }
 	end,
 	
 	calculate = function(self, card, context)
@@ -165,12 +165,12 @@ SMODS.Joker:take_ownership('hack', {
 			key = self.key..'_ex'
 		end
 	
-		return { key = key, vars = {card.ability.extra} }
+		return { key = key, vars = {card and card.ability.extra or self.config.extra} }
 	end,
 	
 	calculate = function(self, card, context)
 		if context.cardarea == G.play and context.repetition and not context.repetition_only then
-		  if unstb_global.hack[context.other_card.base.value] then
+		  if not context.other_card.config.center.no_rank and unstb_global.hack[context.other_card.base.value] then
 				return {
 				  message = 'Again!',
 				  repetitions = card.ability.extra,

@@ -5,6 +5,7 @@ local unstb_config = unstb.config
 
 --Global Table
 unstb_global = {}
+unstb_global.config = unstb.config
 
 -- Debug message
 local function print(message)
@@ -30,6 +31,11 @@ function loc_colour(_c, default)
     end
 
     return ref_loc_colour(_c, default)
+end
+
+--Description page formatting
+unstb.description_loc_vars = function()
+    return { background_colour = G.C.CLEAR, text_colour = G.C.WHITE, scale = 1.2 }
 end
 
 --Config Stuff
@@ -154,6 +160,9 @@ local unstb_config_tab = function()
 end
 
 unstb.extra_tabs = unstb_config_tab
+
+--Just so the gear icon shows up
+unstb.config_tab = true
 
 --Map config value with a single string keyword
 local config_value = {
@@ -2160,6 +2169,14 @@ for i=#vanilla_rank_list, 2, -1 do
 	SMODS.Ranks[vanilla_rank_list[i]].prev = {vanilla_rank_list[i-1]}
 end
 SMODS.Ranks['2'].prev = {'Ace'}
+
+--Add a custom in_pool for high vanilla ranks, so they can be hidden from appearing in Lowkey Combo Decks HUD
+
+for i=#vanilla_rank_list, 5, -1 do
+	SMODS.Ranks[vanilla_rank_list[i]].in_pool = function()
+		return not G.GAME.prevent_high_rank
+	end
+end
 
 --Booster Pack for Premium Card
 
@@ -6221,7 +6238,7 @@ create_joker({
 	
     calculate = function(self, card, context)
 	
-		if context.cardarea == G.play and not context.repetition then
+		if context.individual and context.cardarea == G.play and not context.repetition then
 			if context.other_card.edition  then
 				card.ability.extra.current_count = card.ability.extra.current_count + 1
 			end
@@ -7351,11 +7368,8 @@ create_joker({
 	
     calculate = function(self, card, context)
 		--Shop
-		if context.buying_card and context.card ~= card then
-			--get name
-			local jokerName = string.lower(localize{type = 'name_text', key = context.card.config.center.key, set = 'Joker'})
-			
-			if string.match(jokerName, "joker") then
+		if context.buying_card and context.card ~= card then	
+			if unstb_global.name_joker[context.card.config.center.key] then
 				--print("Joker Stair Triggered!")
 				card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_rate
 				   event({
@@ -7440,7 +7454,6 @@ create_joker({
 			end
 			
 			forced_message(card.ability.extra.dir==0 and 'Left' or 'Right', card, G.C.ORANGE, true)
-			--print(card.config.center.key)
 		end
 		
 		local other_joker = nil
@@ -7454,6 +7467,8 @@ create_joker({
 			end
 		end
 		if other_joker and other_joker ~= self then
+		
+			--local newcontext = context
 			context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
 			context.blueprint_card = context.blueprint_card or card
 
@@ -7463,12 +7478,18 @@ create_joker({
 
 			local other_joker_ret, trig = other_joker:calculate_joker(context)
 			
+			--Context needs resetting afterwards, otherwise this value keeps persisting
+			context.blueprint = nil
+			
+			local eff_card = context.blueprint_card or card
+			context.blueprint_card = nil
+			
 			if other_joker_ret or trig then
 				if not other_joker_ret then
 					other_joker_ret = {}
 				end
 				
-				other_joker_ret.card = context.blueprint_card or card
+				other_joker_ret.card = eff_card
 				other_joker_ret.colour = G.C.GREEN
 				other_joker_ret.no_callback = true
 				
@@ -7741,9 +7762,11 @@ create_joker({
 						card.ability.extra.count = card.ability.extra.count + 1
 					end
 					
+					local other_card = context.other_card
+					
 					event({func = function()
 									local rank = pseudorandom_element(SMODS.Ranks, pseudoseed('queensland')..G.SEED).card_key
-									local suit = SMODS.Suits[context.other_card.base.suit].card_key
+									local suit = SMODS.Suits[other_card.base.suit].card_key
 									
 									local _card = Card(G.play.T.x + G.play.T.w/2, G.play.T.y, G.CARD_W, G.CARD_H, G.P_CARDS[suit..'_'..rank], G.P_CENTERS.m_unstb_resource, {playing_card = G.playing_card})
 									
@@ -7850,25 +7873,24 @@ create_joker({
 			for i = 1, #context.scoring_hand do
 				local current_card = context.scoring_hand[i]
 				
-				if current_card.base.value == 'King' and pseudorandom('prssj1'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_upgrade then
+				if not current_card.debuff and current_card.base.value == 'King' and pseudorandom('prssj1'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_upgrade then
 					upgrade_count = upgrade_count+1
 					edition_upgrade(current_card)
 				end
-				
-				if upgrade_count > 0 then
-					--forced_message("Upgrade!", context.blueprint_card or card, G.C.SECONDARY_SET.Enhanced, true)
-					return {
-						message = 'Upgrade!',
-						colour = G.C.SECONDARY_SET.Enhanced,
-						card = context.blueprint_card or card,
-					}
-				end
-				
+			end
+			
+			if upgrade_count > 0 then
+				--forced_message("Upgrade!", context.blueprint_card or card, G.C.SECONDARY_SET.Enhanced, true)
+				return {
+					message = 'Upgrade!',
+					colour = G.C.SECONDARY_SET.Enhanced,
+					card = context.blueprint_card or card,
+				}
 			end
 		
 		end
 		
-		if context.cardarea == G.play and context.other_card.base.value == 'King' and context.repetition and not context.repetition_only then
+		if context.cardarea == G.play and context.repetition and not context.repetition_only and not context.other_card.debuff and context.other_card.base.value == 'King' then
 			if pseudorandom('prssj2'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_retrigger then
 				return {
 				  message = 'Again!',
@@ -8019,20 +8041,11 @@ create_joker({
 	
     calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
-			if not context.other_card.config.center.no_suit then
-				local suit_name = string.lower(localize(context.other_card.base.suit, 'suits_singular'))
+			if not context.other_card.config.center.no_suit and unstb_global.name_suit[context.other_card.base.suit] then
+				local suit_info = unstb_global.name_suit[context.other_card.base.suit]
 				
-				local vowel = suit_name:gsub("[^aeiou]","")
-				local consonant = suit_name:gsub("[^bcdfghjklmnpqrstvwxyz]","") --To be safe, list alphabet only, no symbol, space, or numbers
-				
-				local totalChips = card.ability.extra.chips_rate * (string.len(consonant))
-				local totalMult = card.ability.extra.mult_rate * (string.len(vowel))
-				
-				--print(vowel)
-				--print(consonant)
-				
-				--print(totalChips)
-				--print(totalMult)
+				local totalChips = card.ability.extra.chips_rate * suit_info.count_consonant
+				local totalMult = card.ability.extra.mult_rate * suit_info.count_vowel
 				
 				return {
 				  chips = totalChips,
@@ -8060,11 +8073,8 @@ create_joker({
     calculate = function(self, card, context)
 	
 		if context.other_joker then
-			--get name
-			local jokerName = string.lower(localize{type = 'name_text', key = context.other_joker.config.center.key, set = 'Joker'})
-			
 			--trigger on only joker with "Card" in the name
-			if string.match(jokerName, "card") then
+			if unstb_global.name_card[context.other_joker.config.center.key] then
 				event({
                     func = function()
                         context.other_joker:juice_up(0.5, 0.5)
@@ -9364,10 +9374,6 @@ end
 
 end
 
-
---Deck Preview UI supports for hiding modded ranks
-filesystem.load(unstb.path..'/override/ui.lua')()
-
 --Reworked Vanilla Joker to support new features
 if unstb_config.joker.vanilla then
 
@@ -9377,6 +9383,83 @@ end
 
 --Suits, supports for Suit Seals, a lot of suit-based Joker, and modded suits support for Smeared
 filesystem.load(unstb.path..'/override/suits.lua')()
+
+--JokerDisplay (Partial) Support
+if JokerDisplay then
+	SMODS.load_file("/override/jokerdisplay.lua")()
+end
+
+--Manually load localizations and populate necessary info needed for the mod
+
+--Global table entry to handle trigger for name-related stuff
+unstb_global.name_joker = {}
+unstb_global.name_card = {}
+unstb_global.name_suit = {}
+
+function unstb_process_english_loc()
+	local function populateList(temp_loc)
+		if not temp_loc or not temp_loc.descriptions then return end
+	
+		local jokers = temp_loc.descriptions.Joker or {}
+		for k,v in pairs(jokers) do
+			if not unstb_global.name_joker[k] and not unstb_global.name_card[k] then
+				if v.name and string.match(string.lower(v.name), "joker") then
+					unstb_global.name_joker[k] = v.name
+				end
+				
+				if v.name and string.match(string.lower(v.name), "card") then
+					unstb_global.name_card[k] = v.name
+				end
+			end
+		end
+		
+		--Process suit loc if exists
+		local suit = (temp_loc.misc and temp_loc.misc.suits_singular) or {}
+		
+		for k,v in pairs(suit) do
+			if not unstb_global.name_suit[k] and v then
+				local suit_name = string.lower(v)
+				
+				local vowel = suit_name:gsub("[^aeiou]","")
+				local consonant = suit_name:gsub("[^bcdfghjklmnpqrstvwxyz]","") --To be safe, list alphabet only, no symbol, space, or numbers
+				
+				unstb_global.name_suit[k] = {
+					name = v,
+					count_vowel = string.len(vowel),
+					count_consonant = string.len(consonant)
+				}
+			end
+		end
+		
+	end
+	
+	local function loc_fallback()
+		--print("Called loc fallback")
+		return {}
+	end
+
+	print("Start initializing localization-independent info")
+	--Basegame Jokers
+	local temp_loc = assert(loadstring(love.filesystem.read('localization/en-us.lua')))()
+	populateList(temp_loc)
+	
+	--Modded Jokers
+	for k, _ in pairs(SMODS.Mods) do
+		if SMODS.Mods[k].can_load and SMODS.Mods[k].path then
+			temp_loc = (SMODS.load_file('/localization/en-us.lua', k) or loc_fallback)()
+			if temp_loc then
+				populateList(temp_loc)
+			end
+		end
+	end
+	
+	--Fallback, handle the rest of the mod without proper localization (eg. uses loc_txt)
+	--these mods tend to not have proper localization so it should be fine to look at the game's raw table
+	populateList(G.localization)
+	
+	print("Finished initializing localization-independent info")
+	
+end
 
 --Hook for the game's splash screen, to initialize any data that is sensitive to the mod's order (mainly rank stuff)
 
@@ -9407,4 +9490,6 @@ function Game:splash_screen()
 	if init_lowkey_blacklist then
 		init_lowkey_blacklist()
 	end
+	
+	unstb_process_english_loc()
 end
