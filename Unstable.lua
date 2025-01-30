@@ -2463,12 +2463,11 @@ for i = 1, 4 do
             local card = create_card('Auxiliary', G.pack_cards, nil, nil, true, true, nil, 'aux')
 			local neg_chance = pseudorandom('aux_rng')
 			
-			if neg_chance < 0.4 and G.GAME.used_vouchers.v_unstb_aux2 then
+			if neg_chance < 0.4 and G.GAME.used_vouchers.v_unstb_aux2 and card.config.center.key ~= 'c_unstb_aux_dark_matter' then
 				 card:set_edition({negative = true}, true)
 			end
 			
 			return card
-            -- return {set = 'Polymino', area = G.pack_cards, skip_materialize = nil, soulable = nil, key_append = 'vir'}
         end,
 
         ease_background_colour = function(self)
@@ -2485,7 +2484,7 @@ for i = 1, 4 do
     }
 end
 
---Original Reserve Card Button Code from MoreFluff (which credits to John Cryptid and Betmma)
+--Original Reserve Card Button Code from MoreFluff (which credits to Cryptid and Betmma)
 G.FUNCS.can_take_card = function(e)
 	local card = e.config.ref_table
 	
@@ -3387,7 +3386,9 @@ SMODS.Consumable{
 	pos = get_coordinates(0),
 	
 	in_pool = function(self, args)
-        return (G.GAME.aux_blank_count or 0) < 2
+		if not G.GAME then return false end
+		
+        return (G.GAME.aux_blank_count or 0) < (G.GAME.aux_blank_max_count or 2)
     end,
 }
 
@@ -3421,6 +3422,9 @@ SMODS.Consumable{
             return true end })
 			
 		G.GAME.aux_blank_count = 0
+		
+		--Increase the count for the next Dark Matter
+		G.GAME.aux_blank_max_count = (G.GAME.aux_blank_max_count or 2)+1
 			
 		event({trigger = 'after', func = function()
 						if (card.edition or {}).key == 'e_negative' then
@@ -3437,7 +3441,9 @@ SMODS.Consumable{
 	
 	--Can spawn only when redeemed Blank Auxiliary Card enough time
 	in_pool = function(self, args)
-        return (G.GAME.aux_blank_count or 0) >= 2
+		if not G.GAME then return false end
+		
+        return (G.GAME.aux_blank_count or 0) >= (G.GAME.aux_blank_max_count or 2)
     end,
 }
 
@@ -4734,7 +4740,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = {{mult_rate = 10}, {held_amount = 2}, {mult_current = 0}},
+	vars = {{mult_rate = 15}, {held_amount = 2}, {mult_current = 0}},
 	
 	custom_vars = function(self, info_queue, card)
         
