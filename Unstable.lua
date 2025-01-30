@@ -3645,7 +3645,11 @@ local tarot_half_rankList = {['unstb_0'] = 'unstb_0',
 							['9'] = '4',
 							['10'] = '5',
 							['Ace'] = '5',
-							['unstb_21'] = '10',}
+							['unstb_11'] = '5',
+							['unstb_12'] = '6',
+							['unstb_13'] = '6',
+							['unstb_21'] = '10',
+							['unstb_25'] = '12',}
 							
 if check_enable_taglist({'rank_binary', 'rank_decimal'}) then
 
@@ -6346,7 +6350,7 @@ create_joker({
 				
 				local hand_name = context.scoring_name
 				
-				if G.GAME.hands[hand_name].level > 0 then
+				if to_big(G.GAME.hands[hand_name].level) > to_big(0) then
 					level_up_hand(card, hand_name, false, -1)
 				end
 			
