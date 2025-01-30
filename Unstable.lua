@@ -8110,11 +8110,11 @@ end
 --Throwing Hands
 create_joker({
     name = 'Throwing Hands', id = 8,
-    rarity = 'Rare', cost = 4,
+    rarity = 'Common', cost = 5,
 	
-	vars = {{target_hand = 'High Card'}, {xmult_bad = 0.5}, {xmult_good = 5}},
+	vars = {{target_hand = 'High Card'}, {odds_base = 2}, {odds_destroy = 3}, {xmult = 4}},
 	custom_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.xmult_good, card.ability.extra.xmult_bad, localize(card.ability.extra.target_hand, 'poker_hands')}}
+		return {vars = {card.ability.extra.xmult, card.ability.extra.odds_base * (G.GAME and G.GAME.probabilities.normal  or 1), card.ability.extra.odds_destroy, localize(card.ability.extra.target_hand, 'poker_hands')}}
     end,
 	
     blueprint = true, eternal = true, perishable = true,
@@ -8128,17 +8128,44 @@ create_joker({
     calculate = function(self, card, context)
 		
 		if context.joker_main and context.scoring_name ~= nil and context.scoring_hand then
+			local is_destroyed = false;
 		
-			local xmult = card.ability.extra.xmult_bad
-		
-			if context.scoring_name == card.ability.extra.target_hand then
-				xmult = card.ability.extra.xmult_good
+			if context.scoring_name ~= card.ability.extra.target_hand then
+				if pseudorandom('throwinghands'..G.SEED) < G.GAME.probabilities.normal * card.ability.extra.odds_base / card.ability.extra.odds_destroy then
+					is_destroyed = true
+				end
+			end
+			
+			if not is_destroyed then
+				return {
+					xmult = card.ability.extra.xmult,
+				}
+			else
+				if not context.blueprint then
+					event({func = function()
+							
+						play_sound('tarot1')
+						card.T.r = -0.2
+						card:juice_up(0.3, 0.4)
+						card.states.drag.is = true
+						card.children.center.pinch.x = true
+						
+						--Destroy Card
+						event({trigger = 'after', delay = 0.3,  func = function()
+							
+							G.jokers:remove_card(card)
+							card:remove()
+							card = nil
+							return true end })
+						
+						return true end })
+					return {
+					  message = 'Bye',
+					}
+				end
 			end
 		
-			return {
-				Xmult_mod = xmult,
-				message = localize { type = 'variable', key = 'a_xmult', vars = { xmult } }
-			}
+			
 		end
 		
 		if context.end_of_round and not (context.individual or context.repetition or context.blueprint) then

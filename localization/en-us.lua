@@ -1406,8 +1406,9 @@ return {
 			["j_unstb_throwing_hands"] = {
 				["name"] = "Throwing Hands",
 				["text"] = {
-					"{X:mult,C:white}X#1#{} Mult if poker hand is {C:attention}#3#{}",
-					"{X:mult,C:white}X#2#{} Mult otherwise",
+					"{X:mult,C:white}X#1#{} Mult",
+					"If the poker hand is not {C:attention}#4#{},",
+					"{C:green}#2# in #3#{} chance to {C:red}self destruct{}",
 					"{s:0.8}hand changes at end of round",
 				},
 			},
