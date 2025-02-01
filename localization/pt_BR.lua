@@ -318,7 +318,7 @@ return {
 			},
 			["p_unstb_aux_mega"] = {
 				["group_name"] = "Pacote de Expansão",
-				["name"] = "Mega Pacote de Expansão",
+				["name"] = "Pacote de Expansão Mega",
 				["text"] = {
 					"Escolha {C:attention}#1#{} de até",
 					"{C:attention}#2#{} cartas {C:auxiliary}Auxiliares{} para",
@@ -355,7 +355,7 @@ return {
 			},
 			["p_unstb_prem_mega"] = {
 				["group_name"] = "Pacote Padrão Premium",
-				["name"] = "Mega Pacote Padrão Premium",
+				["name"] = "Pacote Padrão Premium Mega",
 				["text"] = {
 					"Escolha {C:attention}#1#{} de até",
                     "{C:attention}#2# cartas de Jogo Aprimoradas{} com",
@@ -942,7 +942,7 @@ return {
 				["text"] = {
 					"Este Curinga ganha {C:chips}Fichas{} igual ao {C:attention}valor total{}",
 					"das classes da mão pontuada se for menor que {C:attention}#1#{}.",
-					"Dobra o valor ganho se o {C:attention}valor total{} for exatamente {C:attention}#1#{}.",
+					"{C:red}Dobra as Fichas acumuladas{} se o {C:attention}valor total{} for exatamente {C:attention}#1#{}.",
 					"Reseta se o valor total for maior que {C:attention}#1#{}.",
 					"{C:inactive}(No momento, {C:chips}+#2#{C:inactive} Fichas)",
 				},
@@ -991,8 +991,9 @@ return {
 			["j_unstb_thesis_proposal"] = {
 				["name"] = "Proposta de Tese",
 				["text"] = {
-					"Reativa todas as cartas jogadas",
-					"com uma {C:attention}classe decimal{}",
+					"Reativa {C:attention}#1#{} vezes adicionais",
+					"todas as cartas de",
+					"{C:attention}classe decimal{} jogadas"
 				},
 			},
 			
@@ -1066,8 +1067,8 @@ return {
 			["j_unstb_quintuplets"] = {
 				["name"] = "Quintigêmeos",
 				["text"] = {
-					"Se a mão vencedora for um {C:attention}Flush Five{}",
-					"composta por cartas {C:attention}Aprimoradas{},",
+					"Se a mão jogada contém um",
+					"{C:attention}Five of a Kind{}",
 					"cria uma {C:dark_edition}Marca Negativa{}",
 				},
 			},
@@ -1162,8 +1163,8 @@ return {
 				["name"] = "Curinga Retrô",
 				["text"] = {
 					"{C:attention}Cartas Retrô{} pontuadas têm",
-					"{C:green}#1# de #2#{} chance de reduzir",
-					"sua chance de destruição pela metade",
+					"{C:green}#1# de #2#{} chance de resetar",
+					"sua chance de destruição",
 				},
 			},
 			
@@ -1278,7 +1279,8 @@ return {
 				["name"] = "Escadaria do Curinga",
 				["text"] = {
 					"Ganha {C:mult}+#1#{} Multi quando um Curinga",
-					"com {C:attention}\"Curinga\"{} no nome é comprado",
+					"com {C:attention}\"Curinga\"{} no nome é",
+					"comprado diretamente da loja",
 					"{C:inactive}(No momento, {C:mult}+#2#{C:inactive} Multi){}",
 				},
 			},
@@ -1307,9 +1309,10 @@ return {
 			--Face Card Jokers
 			
 			["j_unstb_jackhammer"] = {
-				["name"] = "Britadeira",
+				["name"] = "Vale-te 5 Vezes",
 				["text"] = {
-					"Se a {C:attention}mão jogada{} tem apenas um {C:attention}Valete{},",
+					"Se a {C:attention}mão jogada{} tem",
+					"apenas um {C:attention}Valete{},",
 					"reative-o {C:attention}#1#{} vezes adicionais",
 					"e em seguida {C:red}destrua-o{}",
 				},
@@ -1395,7 +1398,7 @@ return {
 				["name"] = "Álbum de Coleção",
 				["text"] = {
 					"Curingas com {C:attention}\"Carta\", \"Card\"{}",
-					"ou \"Cartão\" no seu nome dão",
+					"ou {C:attention}\"Cartão\"{} no seu nome dão",
 					"{C:chips}+#1#{} Fichas",
 				},
 			},
@@ -1403,9 +1406,11 @@ return {
 			["j_unstb_throwing_hands"] = {
 				["name"] = "Mãozada",
 				["text"] = {
-					"{X:mult,C:white}X#1#{} Multi se a mão de pôquer for {C:attention}#3#{}",
-					"Caso contrário {X:mult,C:white}X#2#{} Multi",
-					"{s:0.8}A mão muda no fim da rodada",
+					"{X:mult,C:white}X#1#{} Multi",
+					"{C:green}#2# de #3#{} chance de se {E:1,C:red}autodestruir{}",
+					"se a mão de pôquer pontuada",
+					"não for {C:attention}#4#{}",
+					"{s:0.7}A mão muda no fim da rodada",
 				},
 			},
 			
@@ -1464,7 +1469,7 @@ return {
 			},
 			
 			["j_unstb_pity_rate_drop"] = {
-				["name"] = "12º Drop Garantido",
+				["name"] = "Oitavo Drop Garantido",
 				["text"] = {
 					"Quando o {C:attention}Blind{} é selecionado,",
 					"{C:green}#1# de #2#{} chance de criar um {C:attention}Curinga{} {C:red}Raro{}",
@@ -1546,9 +1551,9 @@ return {
 			["j_unstb_j2048"] = {
 				["name"] = "2048",
 				["text"] = {
-					"Se a mão jogada contém um {C:attention}Par{} com",
-					"classes potências de 2 {C:attention}(2, 4, 8){},",
-					"destrói a da esquerda e dá as Fichas para a outra",
+					"Se a mão jogada contém um {C:attention}Par{},",
+					"destrói a carta da esquerda e dá",
+					"suas fichas para a da direita",
 					"{C:inactive}(Arraste para reorganizar){}",
 				},
 			},
