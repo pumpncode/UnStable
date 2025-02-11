@@ -174,6 +174,13 @@ return {
 					"{C:inactive}[#1#, #2#, #3#]{}",
 				},
 			},
+			["decimal_rank_ability_2"] = {
+				["text"] = {
+					"Can act as {C:attention}different rank{}",
+					"when played in {C:purple}Straight{} hand",
+					"{C:inactive}[#1#, #2#]{}",
+				},
+			},
 			
 			-- Other Mechanics
 			

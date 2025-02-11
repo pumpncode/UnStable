@@ -1805,7 +1805,12 @@ SMODS.Enhancement:take_ownership('m_stone', {
 
 --Hook for Card:get_id()
 
-local decimal_rank_map = { ['unstb_0.5'] = 17, unstb_r2 = 2, unstb_e = 3, unstb_Pi = 4}
+local decimal_rank_map = { ['unstb_0.5'] = 'unstb_1', unstb_r2 = '2', unstb_e = '3', unstb_Pi = '4'}
+
+--Expose this part so other mods can register decimal rank used for Engineer
+function unstb_global.register_decimal_rank_map(decimal_rank, integer_rank)
+	decimal_rank_map[decimal_rank] = integer_rank
+end
 
 local ref_getid = Card.get_id
 function Card:get_id()
@@ -1814,7 +1819,7 @@ function Card:get_id()
 	
 	--If 'Engineer' Joker exists, returns rounded up rank instead
 	if engineer_joker and SMODS.Ranks[self.base.value].is_decimal then
-		return decimal_rank_map[self.base.value]
+		return SMODS.Ranks[decimal_rank_map[self.base.value]].id
 	end
 
 	return ref_getid(self)
@@ -1823,7 +1828,7 @@ end
 --Function wrapper to check if a card has decimal rank
 
 local function is_decimal(card)
-	return SMODS.Ranks[card.base.value].is_decimal and not card.config.center.no_rank
+	return (SMODS.Ranks[card.base.value].is_decimal or SMODS.Ranks[card.base.value].decimal_compat) and not card.config.center.no_rank
 end
 
 --Hook for Poker Hand name
@@ -5468,7 +5473,7 @@ create_joker({
 	vars = { {times_max = 5}},
 	
 	custom_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.times_current, card.ability.extra.times_max}}
+		return {vars = {card.ability.extra.times_max, card.ability.extra.times_max - card.ability.extra.times_current}}
     end,
 	
 	add_to_deck = function(self, card, from_debuff)
