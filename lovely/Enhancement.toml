@@ -7,14 +7,19 @@ priority = 0
 [[patches]]
 [patches.pattern]
 target = 'functions/state_events.lua'
-pattern = '''if destroyed then'''
+pattern = '''-- context.remove_playing_cards calculations'''
 position = 'before'
 match_indent = true
 payload = '''
-if scoring_hand[i].config.center.after_play and not scoring_hand[i].debuff and not destroyed then
-    scoring_hand[i].config.center:after_play(scoring_hand[i], {scoring_hand = scoring_hand})
-	destroyed = scoring_hand[i].to_destroy
-end'''
+for i=1, #scoring_hand do
+	if scoring_hand[i].config.center.after_play and not scoring_hand[i].debuff and not unstb_global.table_has_value(cards_destroyed, scoring_hand[i]) then
+		local effect = scoring_hand[i].config.center:after_play(scoring_hand[i], {scoring_hand = scoring_hand})
+		if effect and effect.to_destroy then
+			cards_destroyed[#cards_destroyed+1] = scoring_hand[i]
+		end
+	end
+end
+'''
 
 # Enhancement Discard Overrides
 [[patches]]

@@ -71,3 +71,12 @@ target = 'functions/button_callbacks.lua'
 pattern = '''G.GAME.dollars[ ]*-[ ]*G.GAME.bankrupt_at'''
 position = 'at'
 payload = '''G.GAME.dollars + (G.GAME.virtual_dollars or 0) - G.GAME.bankrupt_at'''
+
+# Adds support for Virtual Money (used for IC Card)
+# (Talisman Variant)
+[[patches]]
+[patches.regex]
+target = 'functions/button_callbacks.lua'
+pattern = '''to_big\(G.GAME.dollars\)[ ]*-[ ]*to_big\(G.GAME.bankrupt_at\)'''
+position = 'at'
+payload = '''to_big(G.GAME.dollars) + to_big(G.GAME.virtual_dollars or 0) - to_big(G.GAME.bankrupt_at)'''

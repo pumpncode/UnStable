@@ -469,7 +469,7 @@ SMODS.Sound({key = 'poison', path = 'poison.ogg'})
 
 --Utility
 
---
+--Check if table value already exists in the List
 local function table_has_value(list, value)
 	for i, v in ipairs(list) do
 		if v==value then
@@ -479,6 +479,9 @@ local function table_has_value(list, value)
 	
 	return false
 end
+
+--Expose this function so I can use this in global scope
+unstb_global.table_has_value = table_has_value
 
 --Auto event scheduler, based on Bunco
 local function event(config)
@@ -1144,7 +1147,9 @@ SMODS.Enhancement {
 				return true end })
 		
 			forced_message("Torn...", card, G.C.BLACK, true)
-			card.to_destroy = true
+			return {
+				to_destroy = true
+			}
 		end
 	end,
  }
@@ -1186,7 +1191,7 @@ SMODS.Enhancement {
     end,
 	
 	after_play = function(self, card, context) 
-		print("Trigger afterplay")
+		--print("Trigger afterplay")
 	
 		local isDestroy = pseudorandom('promo'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_destroy
 		
@@ -1196,7 +1201,9 @@ SMODS.Enhancement {
 				return true end })
 		
 			forced_message("Sold", card, G.C.ORANGE, true)
-			card.to_destroy = true
+			return {
+				to_destroy = true
+			}
 		end
 	end,
  }
@@ -1491,7 +1498,9 @@ SMODS.Enhancement {
 		if card.ability.extra.to_destroy then
 			forced_message("Redeemed!", card, G.C.RED, true)
 				
-			card.to_destroy = true
+			return {
+				to_destroy = true
+			}
 		end
 	end,
 	
@@ -4017,7 +4026,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand then
+		if G.hand and #G.hand.cards > 1 then
 		
 			--Check if the hand contains at least one non-face card
 			for i = 1, #G.hand.cards do
@@ -4090,7 +4099,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand then
+		if G.hand and #G.hand.cards > 1 then
 		
 			--Check if the hand contains at least one non-face card
 			for i = 1, #G.hand.cards do
@@ -4167,7 +4176,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand then
+		if G.hand and #G.hand.cards > 1 then
 			return true
 		end
 		return false
@@ -4265,7 +4274,7 @@ SMODS.Consumable{
 	end,
 
 	can_use = function(self, card)
-		if G.hand then
+		if G.hand and #G.hand.cards > 1 then
 			return true
 		end
 		return false
@@ -5115,11 +5124,12 @@ create_joker({
 				local isActivated = pseudorandom('cinnabar'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds
 				
 				if isActivated then
+					local created_card = unstb_global.SUIT_SEAL[SMODS.Seals[context.other_card.seal].suit_seal].aux_key
 					if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
 						
 						G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
 						event({func = function()
-							local created_card = create_card('Auxiliary', G.consumeables, nil, nil, nil, nil, unstb_global.SUIT_SEAL[SMODS.Seals[context.other_card.seal].suit_seal].aux_key, nil)
+							local created_card = create_card('Auxiliary', G.consumeables, nil, nil, nil, nil, created_card, nil)
 							created_card:add_to_deck()
 							G.consumeables:emplace(created_card)
 							G.GAME.consumeable_buffer = 0

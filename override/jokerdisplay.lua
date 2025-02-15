@@ -1,5 +1,92 @@
 local jd = JokerDisplay.Definitions
 
+--UnStable's Joker
+
+--[[jd["j_unstb_lunar_calendar"] = {
+	text = {
+		{ text = "+" },
+		{ ref_table = "card.joker_display_values", ref_value = "count", retrigger_type = "mult" },
+	},
+	text_config = { colour = G.C.SECONDARY_SET.Planet },
+	reminder_text = {
+		{ text = "(" },
+		{ ref_table = "card.joker_display_values", ref_value = "lunar_suit"},
+		{ text = ")" }
+	},
+	extra = {
+		{
+			{ text = "(" },
+			{ ref_table = "card.joker_display_values", ref_value = "odds" },
+			{ text = ")" },
+		}
+	},
+	extra_config = { colour = G.C.GREEN, scale = 0.3 },
+	calc_function = function(card)
+		local count = 0
+		local text, _, scoring_hand = JokerDisplay.evaluate_hand()
+		if text ~= 'Unknown' then
+			for _, scoring_card in pairs(scoring_hand) do
+				if scoring_card:get_id() and scoring_card:is_suit(card.ability.extra.suit) then
+					count = count +
+						JokerDisplay.calculate_card_triggers(scoring_card, scoring_hand)
+				end
+			end
+		end
+		card.joker_display_values.count = count
+		card.joker_display_values.odds = localize { type = 'variable', key = "jdis_odds", vars = { (G.GAME and G.GAME.probabilities.normal or 1), card.ability.extra.odds_spawn } }
+		card.joker_display_values.lunar_suit = localize(card.ability.extra.suit, 'suits_plural')
+	end,
+	style_function = function(card, text, reminder_text, extra)
+		if reminder_text and reminder_text.children[2] then
+			reminder_text.children[2].config.colour = lighten(G.C.SUITS[card.ability.extra.suit], 0.35)
+		end
+		return false
+	end
+}
+
+jd["j_unstb_dragon_hoard"] = {
+	text = {
+		{ text = "+" },
+		{ ref_table = "card.joker_display_values", ref_value = "mult", retrigger_type = "mult" },
+	},
+	text_config = { colour = G.C.MULT },
+	calc_function = function(card)
+		card.joker_display_values.mult = (G.consumeables and card.ability.extra.mult_rate * math.floor(#G.consumeables.cards/card.ability.extra.held_amount))or 0
+	end
+}
+
+jd["j_unstb_card_dealer"] = {
+	text = {
+		{ text = "+" },
+		{ ref_table = "card.ability.extra", ref_value = "chips", retrigger_type = "mult" }
+	},
+	text_config = { colour = G.C.CHIPS },
+}
+
+jd["j_unstb_match_three"] = {
+	text = {
+		{ text = "+" },
+		{ ref_table = "card.joker_display_values", ref_value = "mult", retrigger_type = "mult" },
+	},
+	text_config = { colour = G.C.MULT },
+	calc_function = function(card)
+		local count = 0
+		local text, _, scoring_hand = JokerDisplay.evaluate_hand()
+		if text ~= 'Unknown' then
+			--TODO: Check for suits in the adjacent card
+			for _, scoring_card in pairs(scoring_hand) do
+				if scoring_card:get_id() and scoring_card:is_suit(card.ability.extra.suit) then
+					count = count +
+						JokerDisplay.calculate_card_triggers(scoring_card, scoring_hand)
+				end
+			end
+		end
+	
+		card.joker_display_values.mult = count
+	end
+}]]
+
+
 --Vanilla Override Jokers
 if unstb_global.config.joker.vanilla then
 
