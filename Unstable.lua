@@ -2365,6 +2365,9 @@ function ustb_get_straight(hand)
 		vals[2] = 'Ace'
 	end
 	
+	--If there is no possible RANKS, breaks the function early
+	if not next(RANKS) then return ret end
+	
 	while 1 do
 		end_iter = false
 		if straight_length >= (5 - (four_fingers and 1 or 0)) then
@@ -3402,7 +3405,7 @@ SMODS.Consumable{
 	in_pool = function(self, args)
 		if not G.GAME then return false end
 		
-        return (G.GAME.aux_blank_count or 0) < (G.GAME.aux_blank_max_count or 2)
+        return G.booster_pack and (G.GAME.aux_blank_count or 0) < (G.GAME.aux_blank_max_count or 2)
     end,
 }
 
@@ -3457,7 +3460,7 @@ SMODS.Consumable{
 	in_pool = function(self, args)
 		if not G.GAME then return false end
 		
-        return (G.GAME.aux_blank_count or 0) >= (G.GAME.aux_blank_max_count or 2)
+        return G.booster_pack and (G.GAME.aux_blank_count or 0) >= (G.GAME.aux_blank_max_count or 2)
     end,
 }
 
