@@ -13,7 +13,7 @@ function unstb_global.register_fibonacci(number_list)
 	end
 end
 
-unstb_global.register_fibonacci({0, 1, 2, 3, 5, 8, 13,	21,	34,	55,	89,	144})
+unstb_global.register_fibonacci({0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144})
 
 --Fibonacci looks for a *nominal* chip of the rank (with special hardcoded case accounted for Ace)
 SMODS.Joker:take_ownership('fibonacci', {
@@ -22,7 +22,7 @@ SMODS.Joker:take_ownership('fibonacci', {
 	loc_vars = function(self, info_queue, card)
 		
 		local key = self.key
-		if getPoolRankFlagEnable('unstb_0') or getPoolRankFlagEnable('unstb_1') or getPoolRankFlagEnable('unstb_21') then
+		if getPoolRankFlagEnable('unstb_0') or getPoolRankFlagEnable('unstb_1') or getPoolRankFlagEnable('unstb_13') or getPoolRankFlagEnable('unstb_21') then
 			key = self.key..'_ex'
 		end
 		
@@ -42,9 +42,10 @@ SMODS.Joker:take_ownership('fibonacci', {
 				
 			else
 				--Failsafe for mod compat
-				return {
-					mult = 0
-				}
+				--[[return {
+					mult = 0,
+					juice_card = false,
+				}]]
 			end
 		end
 		
@@ -55,8 +56,15 @@ SMODS.Joker:take_ownership('fibonacci', {
 
 --A special function written to specifically looking for rank's *nominal* + special case for ??? (Triggers everything)
 
---Table of a true 'face' rank (TODO: Might open it up to allow other mods to register more? Not sure yet)
+--Table of a true 'face' rank
 unstb_global.face_rank = {Jack = true, Queen = true, King = true}
+
+--Function to facilitate registering "true" face rank
+function unstb_global.register_face_rank(rankList)
+	for i = 1, #rankList do
+		unstb_global.face_rank[rankList[i]] = true
+	end
+end
 
 --Check for a modulo and remainder of the card's rank - used for both odd and even check
 function unstb_global.modulo_check(card, mod, remainder)
@@ -82,7 +90,7 @@ SMODS.Joker:take_ownership('odd_todd', {
 	loc_vars = function(self, info_queue, card)
 		
 		local key = self.key
-		if getPoolRankFlagEnable('unstb_1') or getPoolRankFlagEnable('unstb_21') then
+		if getPoolRankFlagEnable('unstb_1') or getPoolRankFlagEnable('unstb_21') or getPoolRankFlagEnable('unstb_11') or getPoolRankFlagEnable('unstb_13') or getPoolRankFlagEnable('unstb_25') or getPoolRankFlagEnable('unstb_161') then
 			key = self.key..'_ex'
 		end
 	
@@ -100,9 +108,10 @@ SMODS.Joker:take_ownership('odd_todd', {
 				
 			else
 				--Failsafe for mod compat
-				return {
-					chips = 0
-				}
+				--[[return {
+					chips = 0,
+					juice_card = false,
+				}]]
 			end
 		end
 		
@@ -115,7 +124,7 @@ SMODS.Joker:take_ownership('even_steven', {
 	loc_vars = function(self, info_queue, card)
 		
 		local key = self.key
-		if getPoolRankFlagEnable('unstb_0') then
+		if getPoolRankFlagEnable('unstb_0') or getPoolRankFlagEnable('unstb_12') then
 			key = self.key..'_ex'
 		end
 	
@@ -133,9 +142,10 @@ SMODS.Joker:take_ownership('even_steven', {
 				
 			else
 				--Failsafe for mod compat
-				return {
-					mult = 0
-				}
+				--[[return {
+					mult = 0,
+					juice_card = false,
+				}]]
 			end
 		end
 		

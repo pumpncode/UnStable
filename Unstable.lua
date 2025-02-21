@@ -3669,7 +3669,8 @@ local tarot_half_rankList = {['unstb_0'] = 'unstb_0',
 							['unstb_12'] = '6',
 							['unstb_13'] = '6',
 							['unstb_21'] = '10',
-							['unstb_25'] = 'unstb_12',}
+							['unstb_25'] = 'unstb_12',
+							['unstb_161'] = 'unstb_???',} --tbh this is Unnecessary cruel but maybe it's for the best
 							
 if check_enable_taglist({'rank_binary', 'rank_decimal'}) then
 

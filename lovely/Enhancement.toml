@@ -15,6 +15,11 @@ for i=1, #scoring_hand do
 	if scoring_hand[i].config.center.after_play and not scoring_hand[i].debuff and not unstb_global.table_has_value(cards_destroyed, scoring_hand[i]) then
 		local effect = scoring_hand[i].config.center:after_play(scoring_hand[i], {scoring_hand = scoring_hand})
 		if effect and effect.to_destroy then
+			if SMODS.shatters(scoring_hand[i]) then
+				scoring_hand[i].shattered = true
+			else 
+				scoring_hand[i].destroyed = true
+			end
 			cards_destroyed[#cards_destroyed+1] = scoring_hand[i]
 		end
 	end
