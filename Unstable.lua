@@ -2744,11 +2744,10 @@ SMODS.Consumable{
                 func = function() 
                     local cards = {}
                     for i=1, card.ability.extra.count do
-                        cards[i] = true
                         local _rank = pseudorandom_element(SMODS.Ranks, pseudoseed('aux_plus_two')) or SMODS.Ranks['2']
                         local _suit = SMODS.Suits[targetCard.base.suit]
 						
-                        create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = G.P_CENTERS.c_base}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
+                        cards[i] = create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = G.P_CENTERS.c_base}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
                     end
                     playing_card_joker_effects(cards)
                     return true end })
@@ -2792,11 +2791,10 @@ SMODS.Consumable{
                 func = function() 
                     local cards = {}
                     for i=1, card.ability.extra.count do
-                        cards[i] = true
                         local _rank = SMODS.Ranks[targetCard.base.value]
                         local _suit = pseudorandom_element(SMODS.Suits, pseudoseed('aux_wild_plus_four')) or SMODS.Suits['Spades']
 						
-                        create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = G.P_CENTERS.c_base}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
+                        cards[i] = create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = G.P_CENTERS.c_base}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
                     end
                     playing_card_joker_effects(cards)
                     return true end })
@@ -3034,12 +3032,11 @@ SMODS.Consumable{
                 trigger = 'after',
                 delay = 0.7,
                 func = function() 
-                    local cards = {true}
 					local _rank = SMODS.Ranks['unstb_21']
 					local _suit = pseudorandom_element(SMODS.Suits, pseudoseed('aux_21')) or SMODS.Suits['Spades']
 					
-					create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = G.P_CENTERS.c_base}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
-                    playing_card_joker_effects(cards)
+					local cards = create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = G.P_CENTERS.c_base}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
+                    playing_card_joker_effects({cards})
                     return true end })
 					
 		--Call joker calculations for post-destroyed stuff
@@ -3823,14 +3820,13 @@ SMODS.Consumable{
                 func = function() 
                     local cards = {}
                     for i=1, card.ability.extra.count do
-                        cards[i] = true
 						local created_rank = pseudorandom_element({'unstb_0.5', 'unstb_r2', 'unstb_e', 'unstb_Pi'}, pseudoseed('trt_knowledge'))
 						setPoolRankFlagEnable(created_rank, true)
 						
                         local _rank = SMODS.Ranks[created_rank]
                         local _suit = SMODS.Suits[targetCard.base.suit]
 						
-                        create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = G.P_CENTERS.c_base}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
+                        cards[i] = create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = G.P_CENTERS.c_base}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
                     end
                     playing_card_joker_effects(cards)
                     return true end })
@@ -4232,7 +4228,6 @@ SMODS.Consumable{
                 func = function() 
                     local cards = {}
                     for i=1, card.ability.extra.create_count do
-                        cards[i] = true
                         local _rank = SMODS.Ranks['unstb_21']
                         local _suit = pseudorandom_element(SMODS.Suits, pseudoseed('altar')) or SMODS.Suits['Spades']
 						
@@ -4244,7 +4239,7 @@ SMODS.Consumable{
                             end
                         end
 						
-                        create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = pseudorandom_element(cen_pool, pseudoseed('altar'))}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
+                        cards[i] = create_playing_card({front = G.P_CARDS[(_suit.card_key)..'_'..(_rank.card_key)], center = pseudorandom_element(cen_pool, pseudoseed('altar'))}, G.hand, nil, i ~= 1, {G.C.SECONDARY_SET.Spectral})
                     end
                     playing_card_joker_effects(cards)
                     return true end })
@@ -5548,6 +5543,10 @@ create_joker({
 							
 							big_juice(context.blueprint_card or card)
 							
+							event({func = function()
+									playing_card_joker_effects({_card})
+							return true end })
+							
 							return true end
 						})
 				delay(1.5)
@@ -5558,7 +5557,7 @@ create_joker({
 					return true end
 					})
 					
-				playing_card_joker_effects({true})
+				
 			end
 		end
 		
@@ -6131,6 +6130,10 @@ create_joker({
 								G.play:emplace(_card)
 								table.insert(G.playing_cards, _card)
 								
+								event({func = function()
+									playing_card_joker_effects({_card})
+								return true end })
+								
 								return true end
 						})
 				
@@ -6146,7 +6149,7 @@ create_joker({
 					return true end
 					})
 					
-				playing_card_joker_effects({true})
+				
 			end
 			
 		end
@@ -6954,6 +6957,10 @@ create_joker({
 									G.play:emplace(_card)
 									table.insert(G.playing_cards, _card)
 									
+									event({func = function()
+										playing_card_joker_effects({_card})
+									return true end })
+									
 									return true end
 							})
 
@@ -6962,8 +6969,6 @@ create_joker({
 						draw_card(G.play,G.deck, 90,'up', nil)  
 						return true end
 						})
-						
-					playing_card_joker_effects({true})
 				end
 			end
 		end
@@ -7802,6 +7807,10 @@ create_joker({
 									G.play:emplace(_card)
 									table.insert(G.playing_cards, _card)
 									
+									event({func = function()
+										playing_card_joker_effects({_card})
+									return true end })
+									
 									return true end
 							})
 
@@ -7810,8 +7819,6 @@ create_joker({
 						draw_card(G.play,G.deck, 90,'up', nil)  
 						return true end
 						})
-						
-					playing_card_joker_effects({true})
 					
 				end
 			end
@@ -7991,6 +7998,10 @@ create_joker({
 						big_juice(context.blueprint_card or card)
 						card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = 'One!', colour = G.C.SECONDARY_SET.Enhanced})
 						
+						event({func = function()
+							playing_card_joker_effects({_card})
+						return true end })
+						
 						return true end
 					})
 
@@ -7999,8 +8010,6 @@ create_joker({
 				draw_card(G.play,G.deck, 90,'up', nil)  
 				return true end
 				})
-				
-			playing_card_joker_effects({true})
 		end
 		
     end
@@ -8559,6 +8568,10 @@ create_joker({
 									G.play:emplace(_card)
 									table.insert(G.playing_cards, _card)
 									
+									event({func = function()
+										playing_card_joker_effects({_card})
+									return true end })
+									
 									return true end
 							})
 
@@ -8567,8 +8580,6 @@ create_joker({
 						draw_card(G.play,G.deck, 90,'up', nil)  
 						return true end
 						})
-						
-					playing_card_joker_effects({true})
 				end
 			end
 		end
@@ -8701,6 +8712,10 @@ create_joker({
 									_card:add_to_deck()
 									G.deck:emplace(_card)
 									table.insert(G.playing_cards, _card)
+									
+									event({func = function()
+										playing_card_joker_effects({_card})
+									return true end })
 									return true end
 							})
 							
@@ -8708,8 +8723,6 @@ create_joker({
 									G.deck.config.card_limit = G.deck.config.card_limit + 1
 									return true end
 							})
-						
-					playing_card_joker_effects({true})
 					
 					forced_message(localize('k_copied_ex'), context.blueprint_card or card, G.C.ORANGE, 0.25)
 				end
