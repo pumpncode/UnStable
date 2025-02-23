@@ -952,6 +952,7 @@ return {
 					"of the scored hand if it is under {C:attention}#1#{}.",
 					"{C:red}Doubles all chips{} if the {C:attention}total rank{} is exactly {C:attention}#1#{}.",
 					"Resets if the total rank is more than {C:attention}#1#{}.",
+					"{s:0.8}Resets at the end of Boss Blind",
 					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
 				},
 			},
@@ -1043,7 +1044,8 @@ return {
 			["j_unstb_social_experiment"] = {
 				["name"] = "Social Experiment",
 				["text"] = {
-					"For each scored {C:attention}numbered card{},",
+					"For each scored {C:attention}non-face card{}",
+					"with {C:chips}extra chips{} less than {C:attention}256{},",
 					"double its Chips, give it to the next card",
 					"and strip its {C:attention}rank{} to {C:attention}0{}",
 				},
@@ -1457,7 +1459,7 @@ return {
 					"Retrigger played cards with",
 					"{C:attention}seals{} {C:attention}#1#{} additional times",
 					"Amount increases by {C:attention}#2#{} for",
-					"every discarded card with a {C:attention}seal{}",
+					"every {C:attention}#3# {C:inactive}[#4#]{} discarded card with a {C:attention}seal{}",
 					"{s:0.8}Resets after each round",
 				},
 			},

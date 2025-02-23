@@ -5309,7 +5309,7 @@ create_joker({
 	
 	gameplay_tag = {'c_aux'},
 	
-	vars = {{odds = 4}},
+	vars = {{odds = 4}, {count = 0}},
 	
     custom_vars = function(self, info_queue, card)
 	
@@ -5320,9 +5320,12 @@ create_joker({
 	
     calculate = function(self, card, context)
 		if context.discard then
-			if not context.other_card.debuff and context.other_card:is_face() and pseudorandom('season_pass'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds then
+			if not context.other_card.debuff and context.other_card:is_face() and card.ability.extra.count < 4 and pseudorandom('season_pass'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds then
 				--Create consumable
 				if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+						--Hidden variable just so that you can't keep loop creating auxiliary cards forever
+						--Will not be visible on the card description by choice
+						card.ability.extra.count = card.ability.extra.count+1
 						
 						G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
 						event({func = function()
@@ -5337,6 +5340,13 @@ create_joker({
 					end
 			end
 		end
+		
+		--Reset the hidden variable at the end of the round
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			if card.ability.extra.count > 0 then
+				card.ability.extra.count = 0
+			end
+		end
     end
 })
 
@@ -5345,7 +5355,7 @@ create_joker({
 --Black Jack
 create_joker({
     name = 'Black Jack', id = 15,
-    rarity = 'Common', cost = 5,
+    rarity = 'Uncommon', cost = 5,
 	
 	gameplay_tag = {'rank_21', 'j_alter'},
 	
@@ -5409,6 +5419,16 @@ create_joker({
 			end
 			
 			
+		end
+		
+		--End of round check, make sure it's checked absolutely once per round
+		if context.end_of_round and G.GAME.blind.boss and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			if card.ability.extra.chips > 0 then
+				card.ability.extra.chips = 0
+				return {
+					  message = 'Reset!'
+				}
+			end
 		end
   end
 })
@@ -5964,7 +5984,7 @@ create_joker({
 			local totalChipCount = 0
 		
 			for i = 1, #context.scoring_hand do
-				if i<#context.scoring_hand and not (context.scoring_hand[i]:is_face() and not (context.scoring_hand[i].config.center.key == 'm_unstb_slop' or context.scoring_hand[i].config.center.no_rank)) then --context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
+				if i<#context.scoring_hand and not (context.scoring_hand[i]:is_face() and not (context.scoring_hand[i].config.center.key == 'm_unstb_slop' or context.scoring_hand[i].config.center.no_rank)) and (context.scoring_hand[i].ability.perma_bonus or 0)<256 then --context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
 					local currentCard = context.scoring_hand[i]
 					
 					local bonusChip = currentCard.ability.perma_bonus or 0
@@ -8280,6 +8300,8 @@ create_joker({
     name = 'The Jolly Joker', id = 59,
     rarity = 'Uncommon', cost = 6,
 	
+	gameplay_tag = {'j_powerful'},
+	
     blueprint = true, eternal = true, perishable = false,
 	
 	vars = { {mult_rate = 8}, {mult = 0}},
@@ -8407,10 +8429,10 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = {{ repetitions = 0 }, { repetition_rate = 1 } },
+	vars = {{ repetitions = 0 }, { repetition_rate = 1 }, {seal_count_current = 0}, {seal_count_trigger = 2} },
 	
 	custom_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.repetitions, card.ability.extra.repetition_rate}}
+		return {vars = {card.ability.extra.repetitions, card.ability.extra.repetition_rate,  card.ability.extra.seal_count_trigger, card.ability.extra.seal_count_trigger-card.ability.extra.seal_count_current}}
     end,
 	
 	--Set sprites and hitbox
@@ -8451,13 +8473,20 @@ create_joker({
 			
 			--Not debuffed, and has seal
 			if not currentCard.debuff and currentCard.seal then
-				card.ability.extra.repetitions = card.ability.extra.repetitions + card.ability.extra.repetition_rate
+			
+				card.ability.extra.seal_count_current = card.ability.extra.seal_count_current + 1
 				
-				--forced_message('+'..card.ability.extra.repetition_rate, card, G.C.ORANGE, true)
-				return {
-					message = '+'..card.ability.extra.repetition_rate,
-					card = card
-				}
+				if card.ability.extra.seal_count_current>=card.ability.extra.seal_count_trigger then
+					card.ability.extra.seal_count_current = 0
+					
+					card.ability.extra.repetitions = card.ability.extra.repetitions + card.ability.extra.repetition_rate
+					
+					--forced_message('+'..card.ability.extra.repetition_rate, card, G.C.ORANGE, true)
+					return {
+						message = '+'..card.ability.extra.repetition_rate,
+						card = card
+					}
+				end
 			end
 			
 		end
