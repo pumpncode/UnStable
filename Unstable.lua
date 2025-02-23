@@ -2192,6 +2192,30 @@ for i=#vanilla_rank_list, 5, -1 do
 	end
 end
 
+--pseudorandom_element Hook to help filling the specific fallback case
+
+local ref_pseudorandom_element = pseudorandom_element
+
+function pseudorandom_element(_t, seed, args)
+	local t, k = ref_pseudorandom_element(_t, seed, args)
+	
+	--If it return empty because it cannot pick anything, call extra fallback case
+	if not k then
+		--Not that much of a "safe" check but I fully expect noone to actually
+		--random rank and suit object together with everything else
+		--If you're doing that I'll cry
+		if type(_t[1])=='table' then
+			if _t[1].set == 'Rank' then
+				return SMODS.Ranks['unstb_???'], 1
+			elseif _t[1].set == 'Suit' then
+				return SMODS.Suit['Spades'], 1
+			end
+		end
+	end
+	
+	return t, k
+end
+
 --Booster Pack for Premium Card
 
 local premium_booster_rate = {0.75, 0.75, 0.5, 0.1}
@@ -9356,65 +9380,65 @@ CardSleeves.Sleeve({
             self.skip_trigger_effect = false
         end
 	end,
-	trigger_effect = function(self, args)
+	calculate = function(self, sleeve, context)
 	
 		--Code based on Abandoned Sleeve from CardSleeve itself
-        if not self.config.prevent_ranks then
+        if not sleeve.config.prevent_ranks then
             return
         end
-        if self.skip_trigger_effect then
+        if sleeve.skip_trigger_effect then
             return
         end
-        if self.allowed_card_centers == nil then
-            self:apply()
+        if sleeve.allowed_card_centers == nil then
+            sleeve:apply()
         end
 
         -- handle Strength, Ouija, Grim, Familiar
-        local card = args.context and args.context.card
+        local card = context.card
         local is_playing_card = card and (card.ability.set == "Default" or card.ability.set == "Enhanced") and card.config.card_key
-        if args.context and args.context.before_use_consumable and card then
+        if context.before_use_consumable and card then
             if card.ability.name == 'Strength' then
-                self.in_strength = true
+                sleeve.in_strength = true
             elseif card.ability.name == "Ouija" then
-                self.in_ouija = true
+                sleeve.in_ouija = true
 			elseif card.ability.name == "Grim" then
-                self.in_grim = true
+                sleeve.in_grim = true
 			elseif card.ability.name == "Familiar" then
-                self.in_familiar = true
+                sleeve.in_familiar = true
             end
 			
-        elseif args.context and args.context.after_use_consumable then
-            self.in_strength = nil
-            self.in_ouija = nil
-			self.ouija_rank = nil
+        elseif context.after_use_consumable then
+            sleeve.in_strength = nil
+            sleeve.in_ouija = nil
+			sleeve.ouija_rank = nil
 			
-			self.in_grim = nil
-			self.in_familiar = nil
-        elseif G.GAME and G.GAME.blind and args.context and (args.context.create_card or args.context.modify_playing_card) and card and is_playing_card then
+			sleeve.in_grim = nil
+			sleeve.in_familiar = nil
+        elseif G.GAME and G.GAME.blind and (context.create_card or context.modify_playing_card) and card and is_playing_card then
             if unstb.lowkey_blacklisted[card.base.value] then
-                local initial = G.GAME.blind == nil or args.context.create_card
+                local initial = G.GAME.blind == nil or context.create_card
 				
-                if self.in_strength then
-                    local base_key = SMODS.Suits[card.base.suit].card_key .. "_" .. self.get_rank_after_5()
+                if sleeve.in_strength then
+                    local base_key = SMODS.Suits[card.base.suit].card_key .. "_" .. sleeve.get_rank_after_5()
                     card:set_base(G.P_CARDS[base_key], initial)
-				elseif self.in_grim then --Grim will always create 1 (because Ace)
+				elseif sleeve.in_grim then --Grim will always create 1 (because Ace)
                     local base_key = SMODS.Suits[card.base.suit].card_key .. "_unstb_1"
                     card:set_base(G.P_CARDS[base_key], initial)
-                elseif self.in_ouija then
-                    if self.ouija_rank == nil then
-                        local random_base = pseudorandom_element(self.allowed_card_centers, pseudoseed("slv"))
+                elseif sleeve.in_ouija then
+                    if sleeve.ouija_rank == nil then
+                        local random_base = pseudorandom_element(sleeve.allowed_card_centers, pseudoseed("slv"))
                         local card_instance = Card(0, 0, 0, 0, random_base, G.P_CENTERS.c_base)
-                        self.ouija_rank = SMODS.Ranks[card_instance.base.value]
+                        sleeve.ouija_rank = SMODS.Ranks[card_instance.base.value]
                         card_instance:remove()
                     end
-                    local base_key = SMODS.Suits[card.base.suit].card_key .. "_" .. self.ouija_rank.card_key
+                    local base_key = SMODS.Suits[card.base.suit].card_key .. "_" .. sleeve.ouija_rank.card_key
                     card:set_base(G.P_CARDS[base_key], initial)
                 else
                     local new_rank = pseudorandom_element(unstb.lowkey_rankList, pseudoseed("slv"))
 					--Use smods change_base so we can still keep the suit
 					SMODS.change_base(card, nil, new_rank)
 					
-					if self.in_familiar and unstb_config.gameplay.seal_suit then --For Familiar, adds face seal to the created card (if the mechanic is enabled)
+					if sleeve.in_familiar and unstb_config.gameplay.seal_suit then --For Familiar, adds face seal to the created card (if the mechanic is enabled)
 						card:set_seal('unstb_face', true, true)
 					end
                 end
