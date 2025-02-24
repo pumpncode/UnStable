@@ -4754,6 +4754,8 @@ create_joker({
 						})
 						
 						forced_message("Planet", context.blueprint_card or card, G.C.SECONDARY_SET.Planet, true)
+						
+						return nil, true
 					end
 				end
 				
@@ -4761,7 +4763,7 @@ create_joker({
 		end
 		
 		--End-of-round Randomize
-		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint and not context.retrigger_joker then
 			card.ability.extra.suit = pseudorandom_element(SMODS.Suits, pseudoseed('lunarcalendar')).key
 			return{
 				message = localize(card.ability.extra.suit, 'suits_singular'),
@@ -4840,12 +4842,14 @@ create_joker({
 		end
 		
 		--End-of-round Resets
-		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
-			card.ability.extra.chips = 0
-			return{
-				message = localize('k_reset'),
-				colour = G.C.RED
-			}
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint and not context.retrigger_joker then
+			if card.ability.extra.chips > 0 then
+				card.ability.extra.chips = 0
+				return{
+					message = localize('k_reset'),
+					colour = G.C.RED
+				}
+			end
 		end
 		
 	end,
@@ -4948,6 +4952,7 @@ create_joker({
 			if polyAmount>0 then
 				delay(2.5)
 			end
+			return nil, true
 		end
 	end,
   
@@ -5162,6 +5167,8 @@ create_joker({
 						forced_message("Auxiliary", context.blueprint_card or card, G.C.UNSTB_AUX, true)
 					end
 				end
+				
+				return nil, true
 			end
 		end
 	end,
@@ -5214,8 +5221,9 @@ create_joker({
 						--forced_message("Free Trial!", context.blueprint_card or card, G.C.UNSTB_AUX, )
 					end
 					return true end })
-					
 				end
+				
+				return nil, true
 			end
 		end
     end
@@ -5250,6 +5258,7 @@ create_joker({
 				end
 			end
 			
+			return nil, true
 		end
 		
     end
@@ -5341,6 +5350,8 @@ create_joker({
 						
 						forced_message("Auxiliary", context.blueprint_card or card, G.C.UNSTB_AUX, 0.5)
 					end
+					
+				return nil, true
 			end
 		end
 		
@@ -5399,14 +5410,11 @@ create_joker({
 				
 				end
 				
-				event({ trigger = 'after', delay = 0.2, func = function()
-                play_sound('multhit1')
-				return true end })
-				
 				return {
 					message = popup_msg,
 					colour = G.C.RED,
-					card = card
+					card = card,
+					sound = 'multhit1'
 				}
 			else
 				if card.ability.extra.chips > 0 then
@@ -5607,12 +5615,14 @@ create_joker({
 					return true end
 					})
 					
+				return nil, true
+					
 				
 			end
 		end
 		
 		--End of round check, make sure it's checked absolutely once per round
-		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint and not context.retrigger_joker then
 			if card.ability.extra.times_current > 0 then
 				card.ability.extra.times_current = 0
 				return {
@@ -5736,6 +5746,8 @@ create_joker({
 					})
 					delay(2.5)
 				end
+				
+				return nil, true
 			end
 		end
 	end,
@@ -5783,7 +5795,7 @@ create_joker({
     end,
 	
     calculate = function(self, card, context)
-		if context.before and context.scoring_hand and not context.blueprint then
+		if context.before and context.scoring_hand and not context.blueprint and not context.retrigger_joker then
 			card.ability.extra.unscored_card = {}
 			for k, v in pairs(context.full_hand) do
 				local unscoring = true
@@ -5800,7 +5812,7 @@ create_joker({
 			end
 		end
 		
-		if context.after and not context.blueprint then
+		if context.after and not context.blueprint and not context.retrigger_joker then
 			for i = 1, #card.ability.extra.unscored_card do
 			
 				local isTurning = pseudorandom('dummy'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds
@@ -5986,7 +5998,7 @@ create_joker({
 	
     calculate = function(self, card, context)
 		
-		if context.after and context.scoring_hand and #context.scoring_hand > 1 and not context.blueprint then
+		if context.after and context.scoring_hand and #context.scoring_hand > 1 and not context.blueprint and not context.retrigger_joker then
 			local totalChipCount = 0
 		
 			for i = 1, #context.scoring_hand do
@@ -6202,6 +6214,7 @@ create_joker({
 				
 			end
 			
+			return nil, true
 		end
 		
     end,
@@ -6289,7 +6302,7 @@ create_joker({
 	
     blueprint = true, eternal = true, perishable = true,
 	
-	vars = {{ count = 5 }, {current_count = 0}},
+	vars = {{ count = 5 }, {current_count = 0}, {tag_count = 0}},
 	
 	custom_vars = function(self, info_queue, card)
         info_queue[#info_queue+1] = G.P_TAGS.tag_double
@@ -6318,17 +6331,18 @@ create_joker({
 	
     calculate = function(self, card, context)
 	
-		if context.individual and context.cardarea == G.play and not context.repetition then
+		if context.individual and context.cardarea == G.play and not context.repetition and not context.blueprint then
 			if context.other_card.edition  then
 				card.ability.extra.current_count = card.ability.extra.current_count + 1
 			end
 		end
 		
-		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over then
 		
 			if card.ability.extra.current_count > 0 then
-			
 				if card.ability.extra.current_count >= card.ability.extra.count then
+					card.ability.extra.tag_count = card.ability.extra.tag_count + 1
+				
 					event({	 trigger = 'after', delay = 0.5, func = function()
 						
 										add_tag(Tag('tag_double'))
@@ -6339,12 +6353,22 @@ create_joker({
 								}
 							)
 					forced_message("Tag!", card, G.C.SECONDARY_SET.Enhanced, true, false)
-				else
-					forced_message("Reset", card, G.C.SECONDARY_SET.Enhanced, true, false)
 				end
 			
 			end
-			card.ability.extra.current_count = 0
+			
+			--This doesn't really work, context.retrigger_joker called after the normal one so it ended up resetting first anyways ;w;
+			--This will remain broken until I figured out something, sry
+			if not context.blueprint and not context.retrigger_joker then
+				if card.ability.extra.tag_count == 0 then
+					forced_message("Reset", card, G.C.SECONDARY_SET.Enhanced, true, false)
+				end
+				
+				card.ability.extra.tag_count = 0
+				card.ability.extra.current_count = 0
+			end
+			
+			return nil, true
 		end
 	end,
 	
@@ -6445,6 +6469,7 @@ create_joker({
 				end
 			end
 		
+			return nil, true
 		end
 		
     end
@@ -6517,6 +6542,8 @@ create_joker({
 				end
 				delay(0.5)
 			end
+			
+			return nil, true
 		end
 		
     end,
@@ -6542,7 +6569,7 @@ create_joker({
 	
 	
     calculate = function(self, card, context)
-		if context.pre_discard and not context.blueprint then
+		if context.pre_discard and not context.blueprint and not context.retrigger_joker then
 			local slop_count = 0
 			for i=1, #context.full_hand do
 				if context.full_hand[i].config.center == G.P_CENTERS.m_unstb_slop then slop_count = slop_count + 1 end
@@ -7021,6 +7048,7 @@ create_joker({
 						return true end
 						})
 				end
+				return nil, true
 			end
 		end
 		
@@ -7065,7 +7093,7 @@ create_joker({
 	end,
 	
     calculate = function(self, card, context)
-		if context.first_hand_drawn then
+		if context.first_hand_drawn and not context.retrigger_joker then
 			event({delay = 0.4, trigger = 'after',
 						func = function()
 							local eligible_list={}
@@ -7117,7 +7145,7 @@ create_joker({
 	end,
 	
     calculate = function(self, card, context)
-		if context.pre_discard and not context.blueprint then
+		if context.pre_discard and not context.blueprint and not context.retrigger_joker then
 			local target_card = pseudorandom_element(G.hand.highlighted, pseudoseed(seed or 'poisonwell'..G.GAME.round_resets.ante))
 			
 			event({trigger = 'after',  func = function()
@@ -7162,7 +7190,7 @@ create_joker({
 	end,
 	
     calculate = function(self, card, context)
-		if context.after and not context.blueprint then
+		if context.after and not context.blueprint and not context.retrigger_joker then
 			if pseudorandom('petridish'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds then
 				local target_card = pseudorandom_element(context.full_hand, pseudoseed(seed or 'petridishtarget'..G.SEED))
 			
@@ -7528,7 +7556,7 @@ create_joker({
 		--Code based on Familiar's Crimsonotype
 		
 		--This bit of code runs before hand played, cannot copyable by other blueprint
-		if context.before and not context.blueprint and not context.repetition and not context.repetition_only then
+		if context.before and not context.blueprint and not context.repetition and not context.repetition_only and not context.retrigger_joker  then
 			card.ability.extra.dir = 0
 			
 			if pseudorandom('plagiarism'..G.SEED) > 0.5 then
@@ -7606,7 +7634,7 @@ create_joker({
         end
 		
 		--Check before hand is played
-		if context.before and context.scoring_hand and not context.blueprint then
+		if context.before and context.scoring_hand and not context.blueprint and not context.retrigger_joker then
 		
 			local isActivated = pseudorandom('throwingcard'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_destroy
 			
@@ -7626,7 +7654,7 @@ create_joker({
 						forced_message("Upgraded!", card, G.C.PURPLE, true)
 					end
 					
-					return true --Destroy the card
+					return { remove = true } --Destroy the card
 				end
 		end
     end
@@ -7683,7 +7711,7 @@ create_joker({
 				--Check if the card called is the same as target card
 				if context.destroying_card == card.ability.extra.target_jack then
 					card.ability.extra.target_jack = nil
-					return true --Destroy the card
+					return { remove = true } --Destroy the card
 				end
 		end
 		
@@ -7759,7 +7787,7 @@ create_joker({
 	
     calculate = function(self, card, context)
 	
-		if context.pre_discard and not context.blueprint then
+		if context.pre_discard and not context.blueprint and not context.retrigger_joker then
             event({trigger = 'after', delay = 0.3, blockable = false,
 				func = function()
 				
@@ -7794,7 +7822,7 @@ create_joker({
         )
 		end
 		
-		if context.after and not context.blueprint then
+		if context.after and not context.blueprint and not context.retrigger_joker then
 			for i = 1, #context.scoring_hand do
 				local currentCard = context.scoring_hand[i]
 				
@@ -7872,6 +7900,8 @@ create_joker({
 						})
 					
 				end
+				
+				return nil, true
 			end
 		end
 		
@@ -7899,13 +7929,13 @@ create_joker({
 		return {vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.odds_destroy}}
     end,
 	
-    blueprint = false, eternal = true, perishable = true,
+    blueprint = true, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
 		--Pre-hand check
 		if context.before and not context.blueprint then
 			for i=1, #context.scoring_hand do
-				if context.scoring_hand[i].base.value == 'King' and context.scoring_hand[i].config.center ~= G.P_CENTERS.c_base and not context.scoring_hand[i].config.center.disenhancement then
+				if not SMODS.has_no_rank(context.scoring_hand[i]) and context.scoring_hand[i].base.value == 'King' and context.scoring_hand[i].config.center ~= G.P_CENTERS.c_base and not context.scoring_hand[i].config.center.disenhancement then
 					if pseudorandom('kingofpop'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_destroy then
 						context.scoring_hand[i].to_destroy = true
 					end
@@ -7913,8 +7943,10 @@ create_joker({
 			end
 		end
 		
-		if context.destroying_card and not context.blueprint then
+		if context.destroying_card then
 			if context.destroying_card.to_destroy then
+				print(inspect(context))
+			
 				event({	 trigger = 'after', delay = 0.5, func = function()
 						
 										add_tag(Tag('tag_double'))
@@ -7926,7 +7958,9 @@ create_joker({
 							)
 				forced_message("Tag!", card, G.C.SECONDARY_SET.Enhanced)
 			
-				return true --Destroy the card
+				if not context.blueprint then
+					return { remove = true } --Destroy the card
+				end
 			end
 		end
     end
@@ -8061,6 +8095,8 @@ create_joker({
 				draw_card(G.play,G.deck, 90,'up', nil)  
 				return true end
 				})
+				
+			return nil, true
 		end
 		
     end
@@ -8089,7 +8125,7 @@ create_joker({
     calculate = function(self, card, context)
 		
 		--Upgrades
-		if context.using_consumeable and not context.blueprint then
+		if context.using_consumeable and not context.blueprint and not context.retrigger_joker then
                 if context.consumeable.ability.set == "Spectral" then
 				   card.ability.extra.xmult = card.ability.extra.xmult + card.ability.extra.xmult_rate
 				   event({
@@ -8198,7 +8234,7 @@ create_joker({
     name = 'Throwing Hands', id = 8,
     rarity = 'Common', cost = 5,
 	
-	vars = {{target_hand = 'High Card'}, {odds_base = 2}, {odds_destroy = 3}, {xmult = 4}},
+	vars = {{target_hand = 'High Card'}, {odds_base = 2}, {odds_destroy = 3}, {xmult = 4}, {is_destroyed = false}},
 	custom_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.xmult, card.ability.extra.odds_base * (G.GAME and G.GAME.probabilities.normal  or 1), card.ability.extra.odds_destroy, localize(card.ability.extra.target_hand, 'poker_hands')}}
     end,
@@ -8214,20 +8250,19 @@ create_joker({
     calculate = function(self, card, context)
 		
 		if context.joker_main and context.scoring_name ~= nil and context.scoring_hand then
-			local is_destroyed = false;
 		
 			if context.scoring_name ~= card.ability.extra.target_hand then
 				if pseudorandom('throwinghands'..G.SEED) < G.GAME.probabilities.normal * card.ability.extra.odds_base / card.ability.extra.odds_destroy then
-					is_destroyed = true
+					card.ability.extra.is_destroyed = true
 				end
 			end
 			
-			if not is_destroyed then
+			if not card.ability.extra.is_destroyed then
 				return {
 					xmult = card.ability.extra.xmult,
 				}
 			else
-				if not context.blueprint then
+				if not context.blueprint and not context.retrigger_joker then
 					event({func = function()
 							
 						play_sound('tarot1')
@@ -8541,7 +8576,7 @@ create_joker({
 		
 		if context.destroying_card and not context.blueprint then
 				if context.destroying_card.config.center == G.P_CENTERS.m_glass then
-					return true --Destroy the card
+					return { remove = true } --Destroy the card
 				end
 		end
 	end
@@ -8586,7 +8621,7 @@ create_joker({
 				card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = 'Create!', colour = G.C.RED})
 			else
 				--Odds increments part are not copyable by Blueprint
-				if not context.blueprint then
+				if not context.blueprint and not context.retrigger_joker then
 					--Increase odds, only if a card has not been created by blueprint prior
 					
 					if not card.ability.extra.blueprint_created then
@@ -8599,6 +8634,7 @@ create_joker({
 					card_eval_status_text(card, 'extra', nil, nil, nil, {message = 'Nope', colour = G.C.RED})
 				end
 			end
+			return nil, true
 		end
 	end
 })
@@ -8643,6 +8679,8 @@ create_joker({
 						return true end
 						})
 				end
+				
+				return nil, true
 			end
 		end
     end
@@ -8661,7 +8699,7 @@ create_joker({
     blueprint = false, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
-		if context.after and not context.blueprint then
+		if context.after and not context.blueprint and not context.retrigger_joker then
 			for i = 1, #context.scoring_hand do
 				local currentCard = context.scoring_hand[i]
 				
@@ -8709,7 +8747,7 @@ create_joker({
 	
     calculate = function(self, card, context)
 		--Upgrades
-		if context.remove_playing_cards and not context.blueprint then
+		if context.remove_playing_cards and not context.blueprint and not context.retrigger_joker then
 			local added_total = 0
 			for i=1, #context.removed do
 				if not context.removed[i].config.center.no_rank then
@@ -8789,6 +8827,7 @@ create_joker({
 					forced_message(localize('k_copied_ex'), context.blueprint_card or card, G.C.ORANGE, 0.25)
 				end
 			end
+			return nil, true
 		end
     end,
 })
@@ -8806,7 +8845,7 @@ create_joker({
     blueprint = false, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
-		if context.using_consumeable and not context.blueprint then
+		if context.using_consumeable and not context.blueprint and not context.retrigger_joker then
 			card.ability.extra.payout = card.ability.extra.payout + 1
 			event({
 			func = function()
@@ -8841,23 +8880,23 @@ create_joker({
 	
     calculate = function(self, card, context)
 		--All upgraded part
-		if context.buying_card and not context.blueprint then
+		if context.buying_card and not context.blueprint and not context.retrigger_joker then
 			card.ability.extra.current_odds = card.ability.extra.current_odds + 1
 			forced_message('Upgrade!', card, G.C.ORANGE, true)
 		end
 		
-		if context.reroll_shop and not context.blueprint then
+		if context.reroll_shop and not context.blueprint and not context.retrigger_joker then
 			card.ability.extra.current_odds = card.ability.extra.current_odds + 1
 			forced_message('Upgrade!', card, G.C.ORANGE, true)
 		end
 		
-		if context.open_booster and not context.blueprint then
+		if context.open_booster and not context.blueprint and not context.retrigger_joker then
 			card.ability.extra.current_odds = card.ability.extra.current_odds + 1
 			forced_message('Upgrade!', card, G.C.ORANGE, true)
 		end
 		
 		--Payout
-		if context.ending_shop and not context.blueprint then
+		if context.ending_shop and not context.blueprint and not context.retrigger_joker then
 			if pseudorandom('raffle'..G.SEED) < G.GAME.probabilities.normal * card.ability.extra.current_odds / card.ability.extra.odds then
 				event({trigger = 'after',  func = function()
 									ease_dollars(card.ability.extra.prize, true)
@@ -8873,7 +8912,7 @@ create_joker({
 		end
 		
 		--Make sure the chance resets again when round ends, cause booster opening from tags currently still trigger it and idk how to prevent that
-		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint and not context.retrigger_joker then
 			card.ability.extra.current_odds = 0
 		end
     end
@@ -8949,7 +8988,7 @@ create_joker({
 			card.ability.extra.start_counting = true
 		end
 		
-		if context.before and context.scoring_hand and not context.blueprint then
+		if context.before and context.scoring_hand and not context.blueprint and not context.retrigger_joker then
 			card.ability.extra.balance = card.ability.extra.balance + card.ability.extra.money_rate
 			
 			--Update the game's global virtual money at the same time
@@ -8958,7 +8997,7 @@ create_joker({
 			forced_message("$"..card.ability.extra.money_rate, card, G.C.GOLD, true)
 		end
 		
-		if context.ending_shop and not context.blueprint then
+		if context.ending_shop and not context.blueprint and not context.retrigger_joker then
 		
 			if card.ability.extra.start_counting then
 				card.ability.extra.round_left = card.ability.extra.round_left - 1
@@ -9019,7 +9058,7 @@ create_joker({
     blueprint = false, eternal = true, perishable = true,
 	
     calculate = function(self, card, context)
-		if context.before and context.scoring_hand and not context.blueprint then
+		if context.before and context.scoring_hand and not context.blueprint and not context.retrigger_joker then
 			local card_list = {}
 			local card_to_destroy = {}
 			
@@ -9067,7 +9106,7 @@ create_joker({
 				--print('check card to destroy')
 				--print(context.destroying_card == card.ability.extra.card_to_destroy[i])
 				if context.destroying_card == card.ability.extra.card_to_destroy[i] then
-					return true
+					return { remove = true }
 				end
 			end
 		end
@@ -9097,7 +9136,7 @@ create_joker({
 	
     calculate = function(self, card, context)
 		
-		if context.after and context.scoring_hand and #context.scoring_hand > 1 and not context.blueprint then
+		if context.after and context.scoring_hand and #context.scoring_hand > 1 and not context.blueprint and not context.retrigger_joker then
 			local sourceCard = {}
 		
 			for i = 1, #context.scoring_hand do
