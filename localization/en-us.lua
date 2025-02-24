@@ -1045,7 +1045,7 @@ return {
 				["name"] = "Social Experiment",
 				["text"] = {
 					"For each scored {C:attention}non-face card{}",
-					"with {C:chips}extra chips{} less than {C:attention}256{},",
+					"with {C:chips}extra chips{} less than {C:attention}128{},",
 					"double its Chips, give it to the next card",
 					"and strip its {C:attention}rank{} to {C:attention}0{}",
 				},
@@ -1459,7 +1459,7 @@ return {
 					"Retrigger played cards with",
 					"{C:attention}seals{} {C:attention}#1#{} additional times",
 					"Amount increases by {C:attention}#2#{} for",
-					"every {C:attention}#3# {C:inactive}[#4#]{} discarded card with a {C:attention}seal{}",
+					"every {C:attention}#3# {C:inactive}[#4#]{} discarded cards with a {C:attention}seal{}",
 					"{s:0.8}Resets after each round",
 				},
 			},

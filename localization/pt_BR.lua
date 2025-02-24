@@ -951,6 +951,7 @@ return {
 					"das classes da mão pontuada se for menor que {C:attention}#1#{}.",
 					"{C:red}Dobra as Fichas acumuladas{} se o {C:attention}valor total{} for exatamente {C:attention}#1#{}.",
 					"Reseta se o valor total for maior que {C:attention}#1#{}.",
+					"{s:0.8}Redefine no fim do Blind de Chefe",
 					"{C:inactive}(No momento, {C:chips}+#2#{C:inactive} Fichas)",
 				},
 			},
@@ -1042,7 +1043,8 @@ return {
 			["j_unstb_social_experiment"] = {
 				["name"] = "Experimento Social",
 				["text"] = {
-					"Para cada {C:attention}carta numerada{} pontuada,",
+					"Para cada carta {C:attention}não-realeza{} pontuada,",
+					"com menos de {C:attention}128{} {C:chips}fichas extra{},",
 					"dobre suas Fichas, dê para a próxima carta",
 					"e converta sua {C:attention}classe{} para {C:attention}0{}",
 				},
@@ -1458,7 +1460,7 @@ return {
 					"Reativa cartas jogadas com",
 					"{C:attention}selos{} {C:attention}#1#{} vezes adicionais",
 					"A quantidade aumenta em {C:attention}#2#{} por",
-					"cada carta descartada com um {C:attention}selo{}",
+					"cada {C:attention}#3# {C:inactive}[#4#]{} cartas descartadas com um {C:attention}selo{}",
 					"{s:0.8}Reseta após cada rodada",
 				},
 			},

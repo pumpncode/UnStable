@@ -5368,7 +5368,7 @@ create_joker({
 	
     calculate = function(self, card, context)
 		--This part handles the chip reward
-		if context.joker_main then
+		if context.joker_main and card.ability.extra.chips>0 then
 		  return {
 			chip_mod = card.ability.extra.chips,
 			message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.chips } }
@@ -5381,13 +5381,14 @@ create_joker({
 			local totalRank = blackJack_evalrank(context.scoring_hand, card.ability.extra.maxRank)
 		
 			if totalRank < card.ability.extra.maxRank then
-				card.ability.extra.chips = card.ability.extra.chips + totalRank
-				
-				return {
-					message = 'Upgraded!',
-					colour = G.C.CHIPS,
-					card = card
-				}
+				if totalRank > 0 then
+					card.ability.extra.chips = card.ability.extra.chips + totalRank
+					return {
+						message = 'Upgraded!',
+						colour = G.C.CHIPS,
+						card = card
+					}
+				end
 			elseif totalRank == card.ability.extra.maxRank then
 				card.ability.extra.chips = (card.ability.extra.chips + totalRank) * 2
 				
@@ -5408,17 +5409,19 @@ create_joker({
 					card = card
 				}
 			else
-				card.ability.extra.chips = 0
-				
-				event({ trigger = 'after', delay = 0.2, func = function()
-                play_sound('tarot1')
-				return true end })
-				
-				return {
-					message = 'Busted...',
-					colour = G.C.BLACK,
-					card = card
-				}
+				if card.ability.extra.chips > 0 then
+					card.ability.extra.chips = 0
+					
+					event({ trigger = 'after', delay = 0.2, func = function()
+					play_sound('tarot1')
+					return true end })
+					
+					return {
+						message = 'Busted...',
+						colour = G.C.BLACK,
+						card = card
+					}
+				end
 			end
 			
 			
@@ -5987,7 +5990,7 @@ create_joker({
 			local totalChipCount = 0
 		
 			for i = 1, #context.scoring_hand do
-				if i<#context.scoring_hand and not (context.scoring_hand[i]:is_face() and not (context.scoring_hand[i].config.center.key == 'm_unstb_slop' or context.scoring_hand[i].config.center.no_rank)) and (context.scoring_hand[i].ability.perma_bonus or 0)<256 then --context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
+				if i<#context.scoring_hand and not (context.scoring_hand[i]:is_face() and not (context.scoring_hand[i].config.center.key == 'm_unstb_slop' or context.scoring_hand[i].config.center.no_rank)) and (context.scoring_hand[i].ability.perma_bonus or 0)<128 then --context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
 					local currentCard = context.scoring_hand[i]
 					
 					local bonusChip = currentCard.ability.perma_bonus or 0
@@ -6272,6 +6275,7 @@ create_joker({
 								return true end
 						}
 					)
+			return nil, true
 		end
 	end
 })
@@ -8477,18 +8481,20 @@ create_joker({
 			--Not debuffed, and has seal
 			if not currentCard.debuff and currentCard.seal then
 			
-				card.ability.extra.seal_count_current = card.ability.extra.seal_count_current + 1
-				
-				if card.ability.extra.seal_count_current>=card.ability.extra.seal_count_trigger then
-					card.ability.extra.seal_count_current = 0
+				if card.ability.extra.seal_count_current < 8 then
+					card.ability.extra.seal_count_current = card.ability.extra.seal_count_current + 1
 					
-					card.ability.extra.repetitions = card.ability.extra.repetitions + card.ability.extra.repetition_rate
-					
-					--forced_message('+'..card.ability.extra.repetition_rate, card, G.C.ORANGE, true)
-					return {
-						message = '+'..card.ability.extra.repetition_rate,
-						card = card
-					}
+					if card.ability.extra.seal_count_current>=card.ability.extra.seal_count_trigger then
+						card.ability.extra.seal_count_current = 0
+						
+						card.ability.extra.repetitions = card.ability.extra.repetitions + card.ability.extra.repetition_rate
+						
+						--forced_message('+'..card.ability.extra.repetition_rate, card, G.C.ORANGE, true)
+						return {
+							message = '+'..card.ability.extra.repetition_rate,
+							card = card
+						}
+					end
 				end
 			end
 			
