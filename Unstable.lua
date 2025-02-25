@@ -608,6 +608,9 @@ local function create_joker(joker)
         atlas = joker.atlas,
         pos = joker.position,
         soul_pos = joker.soul,
+		
+		display_size = joker.resize and { w = joker.resize.w, h = joker.resize.h },
+		pixel_size = joker.resize and { w = joker.resize.w, h = joker.resize.h },
 
         rarity = joker.rarity,
         cost = joker.cost,
@@ -622,7 +625,6 @@ local function create_joker(joker)
 		eternal_compat = (joker.eternal == nil) or joker.eternal,
 		
 		perishable_compat = (joker.perishable == nil) or joker.perishable,
-
         
         process_loc_text = joker.process_loc_text,
 
@@ -5873,24 +5875,7 @@ create_joker({
     blueprint = true, eternal = false, perishable = false,
 	
 	--Set sprites and hitbox
-	
-	set_sprites = function(self, card, front)
-        local w_scale, h_scale = 41/71, 59/95
-        card.children.center.scale.y = card.children.center.scale.y * h_scale
-        card.children.center.scale.x = card.children.center.scale.x * w_scale
-    end,
-	
-	set_ability = function(self, card, initial, delay_sprites)
-        local w_scale, h_scale = 41/71, 59/95
-        card.T.h = card.T.h * h_scale
-        card.T.w = card.T.w * w_scale
-    end,
-	
-	load = function(self, card, initial, delay_sprites)
-        local w_scale, h_scale = 41/71, 59/95
-        card.T.h = card.T.h * h_scale
-        card.T.w = card.T.w * w_scale
-    end,
+	resize = { w = 41, h = 59 },
 	
 	add_to_deck = function(self, card, from_debuff)
 		--Enable rank 0 card in pools
@@ -6310,24 +6295,7 @@ create_joker({
     end,
 	
 	--Set sprites and hitbox
-	
-	set_sprites = function(self, card, front)
-        local w_scale, h_scale = 48/71, 95/95
-        card.children.center.scale.y = card.children.center.scale.y * h_scale
-        card.children.center.scale.x = card.children.center.scale.x * w_scale
-    end,
-	
-	set_ability = function(self, card, initial, delay_sprites)
-        local w_scale, h_scale = 48/71, 95/95
-        card.T.h = card.T.h * h_scale
-        card.T.w = card.T.w * w_scale
-    end,
-	
-	load = function(self, card, initial, delay_sprites)
-        local w_scale, h_scale = 48/71, 95/95
-        card.T.h = card.T.h * h_scale
-        card.T.w = card.T.w * w_scale
-    end,
+	resize = { w = 48, h = 95 },
 	
     calculate = function(self, card, context)
 	
@@ -7235,24 +7203,7 @@ create_joker({
     end,
 	
 	--Set sprites and hitbox
-	
-	set_sprites = function(self, card, front)
-        local w_scale, h_scale = 53/71, 95/95
-        card.children.center.scale.y = card.children.center.scale.y * h_scale
-        card.children.center.scale.x = card.children.center.scale.x * w_scale
-    end,
-	
-	set_ability = function(self, card, initial, delay_sprites)
-        local w_scale, h_scale = 53/71, 95/95
-        card.T.h = card.T.h * h_scale
-        card.T.w = card.T.w * w_scale
-    end,
-	
-	load = function(self, card, initial, delay_sprites)
-        local w_scale, h_scale = 53/71, 95/95
-        card.T.h = card.T.h * h_scale
-        card.T.w = card.T.w * w_scale
-    end,
+	resize = { w = 53, h = 95 },
 	
     calculate = function(self, card, context)
 		--Main context
@@ -8416,24 +8367,7 @@ create_joker({
     end,
 	
 	--Set sprites and hitbox
-	
-	set_sprites = function(self, card, front)
-        local w_scale, h_scale = 64/71, 93/95
-        card.children.center.scale.y = card.children.center.scale.y * h_scale
-        card.children.center.scale.x = card.children.center.scale.x * w_scale
-    end,
-	
-	set_ability = function(self, card, initial, delay_sprites)
-        local w_scale, h_scale = 64/71, 93/95
-        card.T.h = card.T.h * h_scale
-        card.T.w = card.T.w * w_scale
-    end,
-	
-	load = function(self, card, initial, delay_sprites)
-        local w_scale, h_scale = 64/71, 93/95
-        card.T.h = card.T.h * h_scale
-        card.T.w = card.T.w * w_scale
-    end,
+	resize = { w = 64, h = 93 },
 	
 	add_to_deck = function(self, card, from_debuff)
 		--Set the flag to true immediately once this joker has been picked up, it can't spawn again for the rest of the session
@@ -8478,24 +8412,7 @@ create_joker({
     end,
 	
 	--Set sprites and hitbox
-	
-	set_sprites = function(self, card, front)
-        local w_scale, h_scale = 50/71, 80/95
-        card.children.center.scale.y = card.children.center.scale.y * h_scale
-        card.children.center.scale.x = card.children.center.scale.x * w_scale
-    end,
-	
-	set_ability = function(self, card, initial, delay_sprites)
-        local w_scale, h_scale = 50/71, 80/95
-        card.T.h = card.T.h * h_scale
-        card.T.w = card.T.w * w_scale
-    end,
-	
-	load = function(self, card, initial, delay_sprites)
-        local w_scale, h_scale = 50/71, 80/95
-        card.T.h = card.T.h * h_scale
-        card.T.w = card.T.w * w_scale
-    end,
+	resize = { w = 50, h = 80 },
 	
     calculate = function(self, card, context)
 		if context.cardarea == G.play and context.repetition and not context.repetition_only then
