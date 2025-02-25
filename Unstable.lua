@@ -5987,7 +5987,7 @@ create_joker({
 			local totalChipCount = 0
 		
 			for i = 1, #context.scoring_hand do
-				if i<#context.scoring_hand and not (context.scoring_hand[i]:is_face() and not (context.scoring_hand[i].config.center.key == 'm_unstb_slop' or SMODS.has_no_rank(context.scoring_hand[i])) and (context.scoring_hand[i].ability.perma_bonus or 0)<128 then --context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
+				if i<#context.scoring_hand and not (context.scoring_hand[i]:is_face() and not (context.scoring_hand[i].config.center.key == 'm_unstb_slop' or SMODS.has_no_rank(context.scoring_hand[i]))) and (context.scoring_hand[i].ability.perma_bonus or 0)<128 then --context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
 					local currentCard = context.scoring_hand[i]
 					
 					local bonusChip = currentCard.ability.perma_bonus or 0
