@@ -696,7 +696,7 @@ local function blackJack_evalrank(hand, bustAmount)
 	
 	for i = 1, #hand do
 		local currentCard = hand[i]
-		if not (currentCard.config.center == G.P_CENTERS.m_stone or currentCard.config.center.no_rank) and not currentCard.debuff  then
+		if not SMODS.has_no_rank(currentCard) and not currentCard.debuff  then
 			
 			if currentCard.base.value ~= 'Ace' then
 				rank = rank + (SMODS.Ranks[currentCard.base.value].nominal or 0) --Supports modded ranks as well, just in case
@@ -1839,7 +1839,7 @@ end
 --Function wrapper to check if a card has decimal rank
 
 local function is_decimal(card)
-	return (SMODS.Ranks[card.base.value].is_decimal or SMODS.Ranks[card.base.value].decimal_compat) and not card.config.center.no_rank
+	return not SMODS.has_no_rank(card) and (SMODS.Ranks[card.base.value].is_decimal or SMODS.Ranks[card.base.value].decimal_compat)
 end
 
 --Hook for Poker Hand name
@@ -2799,7 +2799,7 @@ SMODS.Consumable{
 
 	can_use = function(self, card)
 		local selected_hands = get_selected_cards(card, G.hand.highlighted)
-		if G.hand and (#selected_hands == 1) and not selected_hands[1].config.center.no_rank then
+		if G.hand and (#selected_hands == 1) and not SMODS.has_no_rank(selected_hands[1]) then
 			return true
 		end
 		return false
@@ -5987,7 +5987,7 @@ create_joker({
 			local totalChipCount = 0
 		
 			for i = 1, #context.scoring_hand do
-				if i<#context.scoring_hand and not (context.scoring_hand[i]:is_face() and not (context.scoring_hand[i].config.center.key == 'm_unstb_slop' or context.scoring_hand[i].config.center.no_rank)) and (context.scoring_hand[i].ability.perma_bonus or 0)<128 then --context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
+				if i<#context.scoring_hand and not (context.scoring_hand[i]:is_face() and not (context.scoring_hand[i].config.center.key == 'm_unstb_slop' or SMODS.has_no_rank(context.scoring_hand[i])) and (context.scoring_hand[i].ability.perma_bonus or 0)<128 then --context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then --Check if it is not a Stone card	
 					local currentCard = context.scoring_hand[i]
 					
 					local bonusChip = currentCard.ability.perma_bonus or 0
@@ -6988,7 +6988,7 @@ create_joker({
     calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
 			local currentCard = context.other_card
-			if currentCard.base.value == card.ability.extra.target_rank and not currentCard.config.center.no_rank then
+			if currentCard.base.value == card.ability.extra.target_rank and not SMODS.has_no_rank(currentCard) then
 				
 				local isActivated = pseudorandom('jokerisland'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds_ticket
 				
@@ -8572,7 +8572,7 @@ create_joker({
 		if context.individual and context.cardarea == G.play then
 			local currentCard = context.other_card
 			
-			if not currentCard.config.center.no_rank and currentCard.base.value == '7' then
+			if not SMODS.has_no_rank(currentCard) and currentCard.base.value == '7' then
 				local isActivated = pseudorandom('salmonrun'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds
 				
 				if isActivated then
@@ -8667,7 +8667,7 @@ create_joker({
 		if context.remove_playing_cards and not context.blueprint and not context.retrigger_joker then
 			local added_total = 0
 			for i=1, #context.removed do
-				if not context.removed[i].config.center.no_rank then
+				if not SMODS.has_no_rank(context.removed[i]) then
 					added_total = added_total + context.removed[i].base.nominal
 				end
 			end
