@@ -5195,7 +5195,7 @@ create_joker({
 	
 	gameplay_tag = {'c_aux'},
 	
-	vars = {{odds = 4}},
+	vars = {{odds = 4},  {count = 0}},
 	custom_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = {key = 'e_negative_consumable', set = 'Edition', config = {extra = 1}}
 		
@@ -5208,7 +5208,11 @@ create_joker({
 		
 		if context.using_consumeable then
 			if context.consumeable.ability.set == "Auxiliary" then
-				if pseudorandom('freetrial'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds then
+				if pseudorandom('freetrial'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds and card.ability.extra.count < 6 then
+					--Hidden variable just so that you can't keep loop creating auxiliary cards forever
+					--Will not be visible on the card description by choice
+					card.ability.extra.count = card.ability.extra.count+1
+					
 					event({trigger = 'after', delay = 0.4, func = function()
 					if G.consumeables.config.card_limit >= #G.consumeables.cards then
 						play_sound('timpani')
@@ -5226,6 +5230,13 @@ create_joker({
 				end
 				
 				return nil, true
+			end
+		end
+		
+		--Reset the hidden variable at the end of the round
+		if context.end_of_round and not context.other_card and not context.repetition and not context.game_over and not context.blueprint then
+			if card.ability.extra.count > 0 then
+				card.ability.extra.count = 0
 			end
 		end
     end
@@ -5334,7 +5345,7 @@ create_joker({
 	
     calculate = function(self, card, context)
 		if context.discard then
-			if not context.other_card.debuff and context.other_card:is_face() and card.ability.extra.count < 4 and pseudorandom('season_pass'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds then
+			if not context.other_card.debuff and context.other_card:is_face() and card.ability.extra.count < 6 and pseudorandom('season_pass'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds then
 				--Create consumable
 				if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
 						--Hidden variable just so that you can't keep loop creating auxiliary cards forever
