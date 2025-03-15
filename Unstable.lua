@@ -1839,7 +1839,7 @@ end
 --Function wrapper to check if a card has decimal rank
 
 local function is_decimal(card)
-	return not SMODS.has_no_rank(card) and (SMODS.Ranks[card.base.value].is_decimal or SMODS.Ranks[card.base.value].decimal_compat)
+	return not SMODS.has_no_rank(card) and SMODS.Ranks[card.base.value] and (SMODS.Ranks[card.base.value].is_decimal or SMODS.Ranks[card.base.value].decimal_compat)
 end
 
 --Hook for Poker Hand name
@@ -2040,9 +2040,17 @@ SMODS.Rank {
     card_key = '?',
     pos = { x = 1 },
     nominal = 0,
-    next = { 'unstb_???' },
-	unstb_prev= { 'unstb_???' },
+    next = {},
+	unstb_prev= {},
     shorthand = '?',
+	
+	strength_effect = {
+            ignore = true
+        },
+		
+	decrease_effect = {
+		ignore = true
+	},
 	
 	in_pool = unstb_rankCheck,
 }
