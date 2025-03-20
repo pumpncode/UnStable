@@ -4663,7 +4663,7 @@ SMODS.Consumable{
 	
 		if #G.jokers.cards >= 1 then
 			for i=1, #G.jokers.cards do
-				if G.jokers.cards[i].edition then
+				if G.jokers.cards[i].edition and not unstb_global.siphon_blacklist[G.jokers.cards[i].edition.key] then
 					return true
 				end
 			end
@@ -8209,7 +8209,7 @@ create_joker({
 		return {vars = {card.ability.extra.xmult, card.ability.extra.odds_base * (G.GAME and G.GAME.probabilities.normal  or 1), card.ability.extra.odds_destroy, localize(card.ability.extra.target_hand, 'poker_hands')}}
     end,
 	
-    blueprint = true, eternal = true, perishable = true,
+    blueprint = true, eternal = false, perishable = true,
 	
 	set_ability = function(self,card, initial, delay_sprites)
 	
