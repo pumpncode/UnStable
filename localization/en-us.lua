@@ -1086,7 +1086,7 @@ return {
 			--Edition Line
 			
 			["j_unstb_graphic_card"] = {
-				["name"] = "Graphic Card",
+				["name"] = "Graphics Card",
 				["text"] = {
 					"Create a {C:attention}Double Tag{}",
 					"at the end of the round",
