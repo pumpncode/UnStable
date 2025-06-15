@@ -9506,11 +9506,11 @@ function unstb_process_english_loc()
 		local jokers = temp_loc.descriptions.Joker or {}
 		for k,v in pairs(jokers) do
 			if not unstb_global.name_joker[k] and not unstb_global.name_card[k] then
-				if v.name and string.match(string.lower(v.name), "joker") then
+				if v.name and type(v.name) == 'string' and string.match(string.lower(v.name), "joker") then
 					unstb_global.name_joker[k] = v.name
 				end
 				
-				if v.name and string.match(string.lower(v.name), "card") then
+				if v.name and type(v.name) == 'string' and string.match(string.lower(v.name), "card") then
 					unstb_global.name_card[k] = v.name
 				end
 			end
@@ -9520,7 +9520,7 @@ function unstb_process_english_loc()
 		local suit = (temp_loc.misc and temp_loc.misc.suits_singular) or {}
 		
 		for k,v in pairs(suit) do
-			if not unstb_global.name_suit[k] and v then
+			if not unstb_global.name_suit[k] and v and type(v) == 'string' then
 				local suit_name = string.lower(v)
 				
 				local vowel = suit_name:gsub("[^aeiou]","")
